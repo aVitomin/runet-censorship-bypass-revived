@@ -204,7 +204,7 @@ dd {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: var(--ui-space-1-5);
 }
 
@@ -238,6 +238,7 @@ dd {
 }
 
 .check input {
+  flex: 0 0 18px;
   width: 18px;
   height: 18px;
   margin: 2px 0 0;
@@ -321,23 +322,24 @@ dd {
 }
 
 .form-actions {
-  position: sticky;
-  bottom: var(--ui-space-1);
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--ui-space-1);
-  align-items: center;
   padding: var(--ui-space-1-5);
   border: 1px solid var(--ui-color-border);
   border-radius: var(--ui-radius-large);
   background: var(--ui-color-surface);
-  box-shadow: var(--ui-shadow-floating);
-  backdrop-filter: blur(8px);
 }
 
-.form-actions .status {
-  flex: 1 1 260px;
+.form-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-1);
+}
+
+.form-action-buttons button {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .read-only {
@@ -385,8 +387,16 @@ dd {
 }
 
 @media (max-width: 520px) {
-  .form-actions,
   .source-card {
     display: grid;
+  }
+
+  .form-action-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-action-buttons button:last-child {
+    grid-column: 1 / -1;
   }
 }

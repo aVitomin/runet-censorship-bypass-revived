@@ -144,6 +144,9 @@
   function getSafeError(error, context) {
 
     const code = error && error.code || '';
+    if (code === 'ANTIFILTER_PROXY_REQUIRED' || code === 'DOMAIN_PROVIDER_PROXY_REQUIRED') {
+      return t('antifilterProxyRequired');
+    }
     if (context === 'provider-update') {
       return t(providerUpdateErrorKey(code));
     }
@@ -1090,6 +1093,7 @@
 
   function getProviderDescription(provider) {
 
+    if (provider.key === 'antifilter') return t('antifilterSourceHelp');
     if (provider.key === 'Антизапрет') {
       return t('providerAntizapretDescription');
     }
@@ -1310,20 +1314,24 @@
   function renderSetupProxyStep(parent) {
 
     const count = getProxyCandidateCount();
+    const antifilter = state.snapshot.state.currentPacProviderKey === 'antifilter';
+    const mods = state.snapshot.state.pacMods;
+    const ready = count > 0 && count <= 32 && mods.useProxyRulesForAntifilter &&
+      mods.usePacScriptProxies;
     const status = count ?
       formatCount(
           count,
           'optionsSetupOneProxyConnection',
           'optionsSetupManyProxyConnections',
       ) :
-      t('optionsSetupNoProxyConnections');
+      t(antifilter ? 'optionsDisabled' : 'optionsSetupNoProxyConnections');
     const body = createSetupStep(
         parent,
         2,
-        t('optionsSetupProxyTitle'),
-        t('optionsSetupProxyHelp'),
+        t(antifilter ? 'optionsNavProxyMethods' : 'optionsSetupProxyTitle'),
+        t(antifilter ? 'antifilterProxyRequired' : 'optionsSetupProxyHelp'),
         status,
-        'optional',
+        antifilter ? ready ? 'complete' : 'current' : 'optional',
     );
     const action = createButton(
         body,
@@ -1505,7 +1513,6 @@
     const header = append(content, 'div', 'source-choice-header');
     const copy = append(header, 'div');
     appendText(copy, 'div', getProviderLabel(provider), 'item-title');
-    appendText(copy, 'p', getProviderDescription(provider), 'item-meta');
     const status = appendText(
         header,
         'span',
@@ -1519,6 +1526,7 @@
     statusId += 1;
     status.id = `options-source-status-${statusId}`;
     status.dataset.sourceChoiceStatus = provider.key;
+    appendText(content, 'p', getProviderDescription(provider), 'item-meta');
     if (input.disabled) {
       input.setAttribute('aria-describedby', status.id);
     }
@@ -2718,6 +2726,9 @@
     );
     input.onchange = () => updateEnabledStatus(status, input.checked);
 
+    appendCheckbox(block, 'useProxyRulesForAntifilter', t('antifilterProxyConsent'),
+        pacMods.useProxyRulesForAntifilter === true, t('antifilterProxyHelp'));
+
   }
 
   function renderProxyPolicy(parent, pacMods) {
@@ -3503,6 +3514,7 @@
       localTor,
       torBrowser,
       usePacScriptProxies: getChecked(form, 'usePacScriptProxies'),
+      useProxyRulesForAntifilter: getChecked(form, 'useProxyRulesForAntifilter'),
       ownProxiesOnlyForOwnSites: getChecked(
           form,
           'ownProxiesOnlyForOwnSites',

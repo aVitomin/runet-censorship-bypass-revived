@@ -20,7 +20,10 @@ function makePackage() {
     if (noticeSources[relativePath]) {
       source = noticeSources[relativePath];
     } else if (relativePath.startsWith('background/common/') ||
-        ['pages/shared/ui-theme.js', 'pages/shared/ui-theme.css'].includes(relativePath)) {
+        ['pages/shared/ui-theme.js', 'pages/shared/ui-theme.css',
+          'pages/shared/site-resources.js', 'pages/shared/site-resources-ui.js',
+          'pages/shared/site-resources.css',
+          'pages/shared/routing-data-status.js', 'pages/shared/routing-data-status.css'].includes(relativePath)) {
       source = Path.resolve(
           sourceRoot,
           '..',

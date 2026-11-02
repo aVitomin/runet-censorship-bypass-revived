@@ -233,3 +233,31 @@ HTTPS versions 3/4 add the exact channel and source receipt. OFF recovery resolv
 the cross-store selection; active recovery uses durable ON as the commit decision.
 Ambiguity blocks recovery rather than selecting latest Saved. See
 [active installation and recovery](FIREFOX_ARCHITECTURE.md) for the transaction.
+
+## Separate compact domain schema
+
+The common verifier also understands envelope schema 2 for `antifilter` only:
+`REVERSED_DOMAIN_BLOCKS_V1`, exact hosts, at most 2,000,000 rules and 16 MiB.
+Its lookup feeds the existing dataset runtime and routing/request guard. Legacy
+schema 1, the packaged Anticensority baseline and its trust/update channel remain
+unchanged. Development builds offer Antifilter with a separate download step
+and explicit permission to use configured proxy connections; it is not included
+in published 1.0.1. See [domain source integration](DOMAIN_SOURCE_PREFLIGHT.md#runtime-adapter-development-integration)
+for source selection, routing and refresh behavior.
+
+The runtime store can stage Antifilter's first HTTPS candidate without creating
+a packaged baseline. It requires the complete fixed-source receipt (including
+policy, exclusion counts and source hash), bound to the schema-2 envelope.
+Anticensority still requires its verified packaged baseline. Provider/source
+identities cannot be interchanged.
+
+First exact promotion explicitly supplies `currentDatasetIdentity: null` and
+is allowed only when Antifilter has no active, previous-good or packaged identity.
+The exact staged hash, sequence and HTTPS receipt must match. Later promotions
+require the proven current identity and retain its bytes for recovery. This
+updates dataset pointers only, never browser proxy settings or Saved/Effective
+configuration. Source switching uses revision-bound Save and explicit Apply.
+The first-download RPC initializes only an empty provider namespace; subsequent
+refreshes use the recovery journal, full source receipt and ownership checks.
+Per-source check history is separate. A pending switch to another source defers
+installation and cannot replace Effective settings or credentials.

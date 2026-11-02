@@ -24,6 +24,10 @@
   let productionDatasetStore = null;
   let datasetPromotionController = null;
   let providerUpdateController = null;
+  let popupRoutingRefresh = null;
+  const availableSources = new Set();
+  const promotionControllers = new Map();
+  const updateControllers = new Map();
   // Historical display metadata only: never a trust/availability/routing cache.
   // Settings, activation and recovery still verify artifacts on every read.
   const verifiedSourceDates = new Map();
@@ -167,14 +171,16 @@
     storageArea: browser.storage.local,
     sha256,
     activationSnapshot: () => activationController.snapshot(),
-    async currentProviderDatasetIdentity() {
+    async currentProviderDatasetIdentity(providerKey = productionProviderApi.PROVIDER_KEY) {
 
       const loaded = await createProductionDatasetStore().loadVerifications(
-          productionProviderApi.PROVIDER_KEY, {firstUsableOnly: true},
+          providerKey, {firstUsableOnly: true},
       );
       const selected = [loaded.active, loaded.previousLkg, loaded.packagedBaseline]
           .find((value) => value && value.ok);
-      return selected ? selected.dataset.identity : productionProviderApi.datasetIdentity();
+      if (selected) return selected.dataset.identity;
+      return providerKey === productionProviderApi.PROVIDER_KEY ?
+        productionProviderApi.datasetIdentity() : null;
 
     },
     async datasetIdentityAvailable(identity) {
@@ -190,9 +196,13 @@
             verification.dataset.identity.artifactSha256 ===
               identity.artifactSha256);
       if (matching) rememberSourceDate(matching);
-      providerBootstrapState = Object.assign({}, providerBootstrapState, {
-        datasetAvailable: Boolean(matching),
-      });
+      if (matching) availableSources.add(identity.providerKey);
+      else availableSources.delete(identity.providerKey);
+      if (identity.providerKey === productionProviderApi.PROVIDER_KEY) {
+        providerBootstrapState = Object.assign({}, providerBootstrapState, {
+          datasetAvailable: Boolean(matching),
+        });
+      }
       return Boolean(matching);
 
     },
@@ -227,14 +237,39 @@
         version: identity && identity.datasetVersion};
     },
   });
-  datasetPromotionController = datasetPromotionApi.createController({
-    storageArea: browser.storage.local,
-    datasetStore: createProductionDatasetStore(),
-    sha256,
-    activationSnapshot: () => activationController.snapshot(),
-    providerKey: productionProviderApi.PROVIDER_KEY,
-    replacePrepared: (prepared) => activationController.replacePrepared(prepared),
-  });
+  for (const providerKey of ['anticensority', 'antifilter']) {
+    promotionControllers.set(providerKey, datasetPromotionApi.createController({
+      storageArea: browser.storage.local,
+      datasetStore: createProductionDatasetStore(),
+      sha256,
+      activationSnapshot: () => activationController.snapshot(),
+      providerKey,
+      replacePrepared: (prepared) => activationController.replacePrepared(prepared),
+    }));
+  }
+  async function selectedSource() {
+    try {
+      const identity = await readRoutingIdentity();
+      return identity && identity.providerKey === 'antifilter' ? 'antifilter' : 'anticensority';
+    } catch (_error) {
+      // Maintenance may stage fixed-source data while configuration is broken.
+      // Apply and promotion independently require a proven exact configuration.
+      return 'anticensority';
+    }
+  }
+  datasetPromotionController = {
+    async initialize() {
+      const stored = await browser.storage.local.get(
+          productConfigApi.DATASET_PROMOTION_STORAGE_KEY);
+      const journal = stored[productConfigApi.DATASET_PROMOTION_STORAGE_KEY];
+      const source = journal ? journal.providerKey : 'anticensority';
+      if (!promotionControllers.has(source)) return {ok: false, code: 'DATASET_PROMOTION_RECOVERY_REQUIRED'};
+      return promotionControllers.get(source).initialize();
+    },
+    async install() {
+      return promotionControllers.get(await selectedSource()).install();
+    },
+  };
   async function readRoutingIdentity() {
 
     const activation = activationController.snapshot();
@@ -259,14 +294,15 @@
   }
   function routingSourceAvailable(providerKey) {
 
-    return providerKey === 'manual' || providerKey === productionProviderApi.PROVIDER_KEY &&
+    return providerKey === 'manual' || availableSources.has(providerKey) ||
+      providerKey === productionProviderApi.PROVIDER_KEY &&
       providerBootstrapState.datasetAvailable === true;
 
   }
   async function readCurrentDatasetIdentity() {
 
     const identity = await readRoutingIdentity();
-    return identity && identity.providerKey === productionProviderApi.PROVIDER_KEY ?
+    return identity && ['anticensority', 'antifilter'].includes(identity.providerKey) ?
       identity : null;
 
   }
@@ -286,20 +322,50 @@
     return {identity, sourceUpdatedAt: verifiedSourceDates.get(key) || null};
 
   }
-  providerUpdateController = providerUpdateControlApi.createController({
-    storageArea: browser.storage.local,
-    datasetStore: createProductionDatasetStore(),
-    alarmsApi: browser.alarms,
-    fetchImpl: root.fetch.bind(root),
-    cryptoSubtle: root.crypto.subtle,
-    AbortController: root.AbortController,
-    sha256,
-    providerKey: productionProviderApi.PROVIDER_KEY,
-    trustConfiguration: productionProviderApi.UPDATE_TRUST_CONFIGURATION,
-    sourceUpdateEnabled: productionProviderApi.SOURCE_UPDATE_ENABLED,
-    readCurrentDatasetIdentity,
-    readCurrentDatasetInfo,
-  });
+  for (const providerKey of ['anticensority', 'antifilter']) {
+    updateControllers.set(providerKey, providerUpdateControlApi.createController({
+      storageArea: browser.storage.local,
+      datasetStore: createProductionDatasetStore(),
+      alarmsApi: browser.alarms,
+      fetchImpl: root.fetch.bind(root),
+      cryptoSubtle: root.crypto.subtle,
+      AbortController: root.AbortController,
+      sha256,
+      providerKey,
+      trustConfiguration: providerKey === 'anticensority' ? productionProviderApi.UPDATE_TRUST_CONFIGURATION :
+      {enabled: false, manifestUrl: null, providerKey, trustedPublicKeys: {}},
+      createSourceUpdater: providerKey === 'antifilter' ? root.rucbFirefoxAntifilterUpdater.createUpdater : undefined,
+      sourceUpdateEnabled: productionProviderApi.SOURCE_UPDATE_ENABLED,
+      readCurrentDatasetIdentity,
+      readCurrentDatasetInfo,
+    }));
+  }
+  providerUpdateController = {
+    async updateConfigured() {
+      return updateControllers.get(await selectedSource()).updateConfigured();
+    },
+    async initialize() {
+      for (const controller of updateControllers.values()) await controller.initialize();
+    },
+  };
+  for (const method of ['check', 'publicStatus', 'markInstalled']) {
+    providerUpdateController[method] = async (...args) =>
+      updateControllers.get(await selectedSource())[method](...args);
+  }
+
+  async function prepareAntifilter() {
+    const controller = updateControllers.get('antifilter');
+    const checked = await controller.check();
+    if (!checked.ok) return errorResponse(safeProviderUpdateErrorCode(checked));
+    const store = createProductionDatasetStore();
+    // Only bootstrap a previously empty provider namespace. This changes no
+    // Saved revision, Effective generation or browser proxy settings. Subsequent
+    // data replacements use the normal crash-safe promotion controller.
+    const prepared = await root.rucbFirefoxAntifilterUpdater.publishFirstCandidate(store);
+    if (!prepared.ok) return errorResponse(prepared.code);
+    invalidateOptionsStatus();
+    return {ok: true, result: {status: 'PREPARED'}};
+  }
   const bootId = root.crypto && typeof root.crypto.randomUUID === 'function' ?
     root.crypto.randomUUID() :
     `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
@@ -457,6 +523,7 @@
     const manifest = browser.runtime.getManifest();
     const activation = activationController.snapshot();
     let manual = saved && saved.settings.source === 'manual';
+    let sourceKey = saved ? saved.settings.source : productionProviderApi.PROVIDER_KEY;
     if (!saved) {
       const stored = await browser.storage.local.get(productConfigApi.CONFIG_STORAGE_KEY);
       try {
@@ -464,6 +531,7 @@
             stored[productConfigApi.CONFIG_STORAGE_KEY], sha256,
         );
         manual = verified.config.providerKey === 'manual';
+        sourceKey = verified.config.providerKey;
       } catch (_error) {
         // Unproven config never makes a source available.
       }
@@ -481,9 +549,9 @@
       routingImplemented: true,
       activationSupported: true,
       providerDatasetImplemented: true,
-      providerDatasetAvailable: manual || providerBootstrapState.datasetAvailable === true,
+      providerDatasetAvailable: manual || routingSourceAvailable(sourceKey),
       providerUpdateImplemented: true,
-      providerUpdateConfigured: providerUpdateController.updateConfigured(),
+      providerUpdateConfigured: await providerUpdateController.updateConfigured(),
     };
 
   }
@@ -571,18 +639,53 @@
     try {
       const snapshot = await verifiedConfigurationSnapshot();
       const routingSettings = snapshot.effective || snapshot.saved;
-      const [capabilities, site, operational, configuration] = await Promise.all([
+      const [capabilities, site, operational, configuration, routingData] = await Promise.all([
         capabilitiesStatus(snapshot.saved),
         siteController.get(message.tabUrl, routingSettings),
         operationalController.publicStatus(routingSettings),
         configurationStatus(snapshot),
+        popupRoutingDataStatus(snapshot),
       ]);
       // Site controls and diagnostics describe Effective. Only the pending
       // summary exposes Saved; no settings, credentials or raw URL are returned.
-      return {ok: true, result: {capabilities, site, operational, configuration}};
+      return {ok: true, result: {capabilities, site, operational, configuration, routingData}};
     } catch (_error) {
       return errorResponse('SETTINGS_STATE_UNAVAILABLE');
     }
+
+  }
+
+  async function popupRoutingDataStatus(snapshot = null) {
+
+    snapshot = snapshot || await verifiedConfigurationSnapshot();
+    const source = (snapshot.effective || snapshot.saved).settings.source;
+    const controller = updateControllers.get(source);
+    const update = controller ? await controller.publicStatus() : null;
+    return {
+      source,
+      sourceUpdatedAt: update ? update.sourceUpdatedAt : null,
+      lastCheckedAt: update ? update.lastSuccessfulCheckAt : null,
+      canCheck: Boolean(controller && await controller.updateConfigured()),
+      updating: Boolean(popupRoutingRefresh || update && update.status === 'CHECKING'),
+      active: Boolean(activationController.snapshot().active),
+    };
+
+  }
+
+  async function refreshPopupRoutingData() {
+
+    const before = await popupRoutingDataStatus();
+    if (!before.canCheck) return {ok: true, result: {status: 'UNAVAILABLE'}};
+    const checked = await checkForProviderUpdate();
+    if (!checked || checked.ok !== true) return {ok: true, result: {status: 'FAILED'}};
+    const status = checked.result.status;
+    const after = await popupRoutingDataStatus();
+    // Promotion is already serialized with Save/Apply/Clear by the existing
+    // update path. A successful fetch alone is not an installed active update.
+    const outcome = status === 'INSTALLED' ? after.active ? 'APPLIED' : 'PREPARED' :
+      status === 'UNCHANGED' && !checked.result.update.updateAvailable ? 'UNCHANGED' :
+        'DEFERRED';
+    return {ok: true, result: {status: outcome}};
 
   }
 
@@ -728,7 +831,7 @@
 
   async function installStagedProviderDataset() {
 
-    if (!providerUpdateController.updateConfigured()) {
+    if (!await providerUpdateController.updateConfigured()) {
       return errorResponse(providerUpdateControlApi.ERRORS.TRUST_NOT_CONFIGURED);
     }
     configurationApplying = true;
@@ -788,7 +891,7 @@
     // A blocked runtime or external owner may retain a candidate for later.
     let resultStatus = checked.status;
     if ((checked.status === 'STAGED' || update.updateAvailable) &&
-        providerUpdateController.updateConfigured()) {
+        await providerUpdateController.updateConfigured()) {
       const current = activationController.snapshot();
       const canInstall = current && (
         current.active === true && current.runtimeState === 'READY' && current.durableIntent === 'ON' ||
@@ -1007,6 +1110,10 @@
       }
       return enqueueRpcControlOperation(installStagedProviderDataset);
     }
+    if (type === 'firefox.antifilter.prepare') {
+      if (!exactRpcRequest(message, type)) return errorResponse('INVALID_RPC_REQUEST');
+      return enqueueRpcControlOperation(prepareAntifilter);
+    }
     if (type === 'firefox.provider.update.get') {
       if (!exactRpcRequest(message, type)) {
         return errorResponse('INVALID_RPC_REQUEST');
@@ -1025,6 +1132,16 @@
         return errorResponse('INVALID_RPC_REQUEST');
       }
       return enqueueRpcControlOperation(checkForProviderUpdate);
+    }
+    if (type === 'firefox.routingData.refresh') {
+      if (!exactRpcRequest(message, type)) return errorResponse('INVALID_RPC_REQUEST');
+      if (!popupRoutingRefresh) {
+        popupRoutingRefresh = enqueueRpcControlOperation(refreshPopupRoutingData)
+            .finally(() => {
+              popupRoutingRefresh = null;
+            });
+      }
+      return popupRoutingRefresh;
     }
     return errorResponse('UNKNOWN_RPC');
 
@@ -1074,8 +1191,8 @@
     browser.alarms.onAlarm.addListener((alarm) => {
 
       if (!alarm || alarm.name !== providerUpdateControlApi.ALARM_NAME) return;
-      initialization.then(() => enqueueRpcControlOperation(() =>
-        providerUpdateController.updateConfigured() ? checkForProviderUpdate() : undefined,
+      initialization.then(() => enqueueRpcControlOperation(async () =>
+        await providerUpdateController.updateConfigured() ? checkForProviderUpdate() : undefined,
       )).catch(() => undefined);
 
     });

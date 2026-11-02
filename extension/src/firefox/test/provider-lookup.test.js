@@ -2,6 +2,7 @@
 
 const Assert = require('node:assert');
 const Lookup = require('../background/provider-lookup');
+const {compactArtifact} = require('../../tooling/test-support/domain-dataset');
 const {
   Dataset,
   artifact,
@@ -37,6 +38,25 @@ function fixedWidthHost(width) {
 }
 
 describe('Firefox HOST_BUCKETS_V1 lookup', function() {
+
+  it('keeps schema 2 exact-host matching separate from legacy suffix matching', async function() {
+    const verified = await Dataset.verifyProviderDataset(compactArtifact());
+    Assert.strictEqual(verified.ok, true, verified.code);
+    const lookup = Lookup.buildLookup(verified);
+    for (const host of ['blocked.example', 'BLOCKED.EXAMPLE.',
+      'under_score.example', 'xn--e1afmkfd.xn--p1ai']) {
+      Assert.strictEqual(lookup.lookup(host).kind, 'PROVIDER_PROXY');
+    }
+    for (const host of ['child.blocked.example', 'notblocked.example',
+      'ordinary.example', 'blocked.example..']) {
+      Assert.strictEqual(lookup.lookup(host).kind, 'MISS');
+    }
+    Assert.strictEqual(lookup.lookup(null).kind, 'FAILURE');
+    Assert.strictEqual(lookup.lookup('bad/host').kind, 'FAILURE');
+    Assert.throws(() => Lookup.buildLookup(Object.assign({}, verified, {dataset:
+      Object.assign({}, verified.dataset, {envelope: {schemaVersion: 1}})})),
+    /INVALID_VERIFIED_DATASET/);
+  });
 
   it('matches a base domain', async function() {
 

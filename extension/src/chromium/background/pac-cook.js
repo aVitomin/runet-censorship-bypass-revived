@@ -1,6 +1,6 @@
 'use strict';
 
-/* global mv3Hash, mv3PacMods */
+/* global mv3Hash, mv3PacMods, rucbAntifilterSource, mv3DomainProviderPac */
 
 (function(exports) {
 
@@ -66,6 +66,9 @@
       exceptions: normalized.exceptions.map(withoutNote),
       rules: normalized.rules.map(withoutNote),
     });
+    if (!pacEffectiveMods.useProxyRulesForAntifilter) {
+      delete pacEffectiveMods.useProxyRulesForAntifilter;
+    }
     return stableStringify({
       pacCookSemanticsVersion: PAC_COOK_SEMANTICS_VERSION,
       pacMods: pacEffectiveMods,
@@ -83,6 +86,9 @@
       })),
     });
     // Include wrapper semantics so safety fixes invalidate older cooked PACs.
+    if (!pacEffectiveMods.useProxyRulesForAntifilter) {
+      delete pacEffectiveMods.useProxyRulesForAntifilter;
+    }
     return mv3Hash.sha256Hex(stableStringify({
       pacCookSemanticsVersion: PAC_COOK_SEMANTICS_VERSION,
       pacMods: pacEffectiveMods,
@@ -350,12 +356,28 @@ ${COOK_END}`;
       );
     }
 
+    const normalizedMods = normalizePacMods(pacMods);
+    if (providerKey === 'antifilter') {
+      try {
+        const candidates = mv3PacMods.getProxyRuleCandidates(normalizedMods);
+        if (!normalizedMods.useProxyRulesForAntifilter || !normalizedMods.usePacScriptProxies ||
+            !candidates.length) {
+          throw Object.assign(new Error('ANTIFILTER_PROXY_REQUIRED'),
+              {code: 'ANTIFILTER_PROXY_REQUIRED'});
+        }
+        const verified = await rucbAntifilterSource.deserializeCandidate(rawPacData);
+        rawPacData = mv3DomainProviderPac.createProviderPac(verified.verification, candidates);
+      } catch (failure) {
+        const code = failure && /^(ANTIFILTER|DOMAIN_PROVIDER|INVALID_DOMAIN_PROVIDER)_[A-Z_]+$/.test(failure.code) ?
+          failure.code : 'ANTIFILTER_PREPARATION_FAILED';
+        return createFailure(providerKey, sourceRawPacSha256, createError(code, code));
+      }
+    }
     const rawError = validatePacText(rawPacData, false);
     if (rawError) {
       return createFailure(providerKey, sourceRawPacSha256, rawError);
     }
 
-    const normalizedMods = normalizePacMods(pacMods);
     const warnings = getWarnings(normalizedMods);
     const explicitProxyError = getExplicitProxyConfigurationError(normalizedMods);
     if (explicitProxyError) {

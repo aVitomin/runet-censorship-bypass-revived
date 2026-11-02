@@ -17,6 +17,7 @@ const BACKGROUND_FILES = Object.freeze([
   'hash.js',
   'pac-download.js',
   'pac-cook.js',
+  'domain-provider-pac.js',
   'proxy-auth.js',
   'proxy-settings.js',
 ]);
@@ -32,6 +33,7 @@ const BACKGROUND_EXPORTS = Object.freeze([
   'mv3Hash',
   'mv3PacDownload',
   'mv3PacCook',
+  'mv3DomainProviderPac',
   'mv3ProxyAuth',
   'mv3ProxySettings',
 ]);
@@ -41,6 +43,8 @@ function loadBackgroundModules() {
   BACKGROUND_EXPORTS.forEach((name) => delete global[name]);
   global.self = global;
   global.tldts = require('tldts');
+  global.rucbDomainBlockCodec = require('../../shared/domain-block-codec');
+  global.rucbAntifilterSource = require('../../shared/antifilter-source');
   if (!global.crypto) {
     global.crypto = Crypto.webcrypto;
   }

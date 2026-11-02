@@ -147,7 +147,7 @@ describe('Firefox immutable provider dataset store', function() {
     },
     {
       name: 'unsupported schema',
-      create: () => artifact({envelopeOverrides: {schemaVersion: 2}}),
+      create: () => artifact({envelopeOverrides: {schemaVersion: 99}}),
       code: 'UNSUPPORTED_SCHEMA_VERSION',
     },
     {

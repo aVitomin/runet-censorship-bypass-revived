@@ -10,6 +10,40 @@ const Options = require('../pages/options');
 
 const sourceRoot = Path.resolve(__dirname, '..');
 
+function routingData(overrides = {}) {
+  return Object.assign({source: 'anticensority', sourceUpdatedAt: null, lastCheckedAt: null,
+    canCheck: true, updating: false, active: false}, overrides);
+}
+
+describe('Firefox popup routing-data updates', function() {
+  it('coalesces clicks and preserves configuration while showing deferred or failed results', async function() {
+    const calls = [];
+    let finish;
+    const waiting = new Promise((resolve) => {
+      finish = resolve;
+    });
+    const bundle = {capabilities: capabilities(), site: siteState(),
+      operational: operationalResult(), configuration: {savedRevision: 2, effectiveId: 'generation-1',
+        active: true, pending: true, applying: false, blocked: false, reason: null,
+        pendingCategories: ['routingSettings']}, routingData: routingData()};
+    const controller = Popup.createController({getActiveTabUrl: async () => '',
+      rpc: {async call(message) {
+        calls.push(message.type);
+        return message.type === 'firefox.popup.get' ? bundle : waiting;
+      }}});
+    Assert.equal(await controller.refresh(), true);
+    const checking = controller.refreshRoutingData();
+    Assert.equal(controller.snapshot().operation, 'DATA_UPDATE');
+    Assert.equal(await controller.refreshRoutingData(), false);
+    finish({status: 'DEFERRED', secret: 'synthetic-private'});
+    Assert.equal(await checking, true);
+    Assert.equal(controller.snapshot().routingUpdateResult, 'DEFERRED');
+    Assert.deepEqual(controller.snapshot().configuration, bundle.configuration);
+    Assert.deepEqual(calls, ['firefox.popup.get', 'firefox.routingData.refresh', 'firefox.popup.get']);
+    Assert.ok(!JSON.stringify(controller.snapshot()).includes('synthetic-private'));
+  });
+});
+
 function capabilities(overrides = {}) {
 
   return Object.assign({
@@ -126,7 +160,7 @@ function configurationRpc(rpc) {
         adapter.call({type: 'firefox.site.get', tabUrl: message.tabUrl}),
         adapter.call({type: 'firefox.operational.get'}),
       ]);
-      return {capabilities, site, operational,
+      return {capabilities, site, operational, routingData: routingData(),
         configuration: await adapter.call({type: 'firefox.configuration.get'})};
     }
 
@@ -718,7 +752,8 @@ describe('Firefox production UI controllers', function() {
         if (message.type === 'firefox.popup.get') {
           const result = await test.rpc.call({type: 'firefox.options.get'});
           return {capabilities: result.capabilities, site: siteState(),
-            operational: result.operational, configuration: result.configuration};
+            operational: result.operational, configuration: result.configuration,
+            routingData: routingData()};
         }
         if (message.type === 'firefox.site.get') return siteState();
         if (message.type === 'firefox.site.apply') {
@@ -929,7 +964,8 @@ describe('Firefox production UI controllers', function() {
     const calls = [];
     let lookups = 0;
     const result = {capabilities: capabilities(), site: siteState(),
-      operational: operationalResult(), configuration: unifiedUi().configuration()};
+      operational: operationalResult(), configuration: unifiedUi().configuration(),
+      routingData: routingData()};
     const controller = Popup.createController({
       getActiveTabUrl: async () => {
         lookups += 1; return 'https://sub.example.com/private?synthetic=1';
@@ -948,7 +984,8 @@ describe('Firefox production UI controllers', function() {
 
   it('rejects malformed popup bundles without partially replacing a previous snapshot', async function() {
     const complete = {capabilities: capabilities(), site: siteState(),
-      operational: operationalResult(), configuration: unifiedUi().configuration()};
+      operational: operationalResult(), configuration: unifiedUi().configuration(),
+      routingData: routingData()};
     const missing = Object.assign({}, complete);
     delete missing.configuration;
     for (const invalid of [null, missing, Object.assign({settings: {}}, complete),
@@ -976,6 +1013,7 @@ describe('Firefox production UI controllers', function() {
       rpc: {async call(message) {
         Assert.deepStrictEqual(message, {type: 'firefox.popup.get', tabUrl: ''});
         return {capabilities: capabilities(), operational: operationalResult(),
+          routingData: routingData(),
           configuration: unifiedUi().configuration(),
           site: siteState({target: {controllable: false, host: '', reasonCode: 'UNSUPPORTED_PAGE'},
             route: null, patterns: null})};

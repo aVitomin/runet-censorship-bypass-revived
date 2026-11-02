@@ -1,21 +1,23 @@
 # Chrome Web Store listing — 1.0
 
-Public version `1.0.0` and its installation button were verified on 2026-10-28:
+Public version `1.0.1` was verified on 2026-10-30:
 [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph). The
 [reviewer notes](CHROME_REVIEWER_NOTES_1_0.md) retain the PAC disclosure and
 review requirements for future changes.
 The shorter descriptions below are repository drafts for a future listing
 edit; they have not replaced the submitted store copy or package metadata.
 
-## Prepared name for the next release
+## Published name
 
 - **English:** Runet Censorship Bypass — Revived.
 - **Russian:** Обход блокировок Рунета — Revived.
-- Chrome reads the localized name from the package manifest. Apply this name
-  with the next validated version of the existing store item; it is not live yet.
-- Keep the existing extension ID and store URL. Homepage, support and privacy
-  links already point to this fork; their canonical destinations are in the
+- Chrome reads the localized name from the package manifest. Both Revived names
+  are part of version 1.0.1; keep them when updating the existing store item.
+- Keep the existing extension ID and store URL. Canonical homepage, support and
+  privacy destinations are in the
   [link audit](LINK_AUDIT_1_0.md#revived-preparation--2026-10-28).
+  Repository URLs have changed; saving the corresponding dashboard fields
+  has not yet been verified. Earlier repository addresses redirect.
 
 ## Short description
 
@@ -154,6 +156,6 @@ the 440x280 promotional PNG and the verified packaged icon. Native popup images
 are genuine documentation workflow captures, not padded 1280x800 store shots.
 Follow the [current listing guidance](https://developer.chrome.com/docs/webstore/cws-dashboard-listing/)
 and [image requirements](https://developer.chrome.com/docs/webstore/images).
-The existing public store link is recorded above. Its current name is still
-the 1.0.0 name. Recapture any screenshots displaying the name from the final
-Revived build before submitting the update; do not relabel old captures as new.
+The existing public store link is recorded above. Version 1.0.1 uses the Revived
+name. Recapture changed screens from the final build before the next submission;
+do not relabel earlier captures as screenshots of a newer version.

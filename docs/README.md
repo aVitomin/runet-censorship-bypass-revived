@@ -19,6 +19,7 @@
 - [Участие в проекте](../CONTRIBUTING.md) и [подготовка среды](development/DEVELOPMENT.md)
 - [Архитектура Chromium и общих компонентов](development/ARCHITECTURE.md), [Firefox](development/FIREFOX_ARCHITECTURE.md)
 - [Тестирование](development/TESTING.md)
+- [Локальная проверка новых доменных баз](development/DOMAIN_SOURCE_PREFLIGHT.md)
 - [Изменения и статус выпуска 1.0.1](development/releases/1.0.1.md)
 - [Совместимость браузеров: расчётные минимумы и реальные проверки](development/BROWSER_COMPATIBILITY.md)
 - [Процесс выпуска](development/RELEASE_PROCESS.md) и [технические сведения о 1.0.0](development/releases/1.0.0.md)

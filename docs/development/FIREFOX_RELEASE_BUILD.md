@@ -2,7 +2,8 @@
 
 Firefox follows the repository release train. Both targets use the complete
 version from `extension/src/templates-data.js`; the Chromium manifest template
-uses `storeVersion` without an added prefix. The source and latest published Firefox release are `1.0.1`.
+uses `storeVersion` without an added prefix. The prepared source version is
+`1.0.2`; the latest published Firefox release remains `1.0.1`.
 Mozilla publication and the signed artifact were verified on 2026-10-29;
 local build output remains unsigned until processed by Mozilla.
 See the [channel status](../release/STORE_PUBLICATION_CHECKLIST.md#current-channel-status).
@@ -32,10 +33,10 @@ package allowlist/integrity verifier after each build, and compares both
 release sets byte for byte. It refuses a dirty tracked tree and refuses to
 overwrite an existing release output. It then writes:
 
-- `extension/dist/firefox-release/runet-censorship-bypass-firefox-1.0.1.xpi` — unsigned
+- `extension/dist/firefox-release/runet-censorship-bypass-firefox-1.0.2.xpi` — unsigned
   release candidate with `manifest.json` at archive root;
 - the matching `.xpi.sha256` file;
-- `runet-censorship-bypass-firefox-1.0.1-source.zip` — all tracked source
+- `runet-censorship-bypass-firefox-1.0.2-source.zip` — all tracked source
   files needed for review and reproduction, under one versioned root;
 - the matching source-archive `.sha256` file.
 
@@ -64,7 +65,7 @@ reference invocation is not evidence of completed validation:
 
 ```powershell
 npx --yes --ignore-scripts addons-linter@10.10.0 `
-  "$Project\dist\firefox-release\runet-censorship-bypass-firefox-1.0.1.xpi"
+  "$Project\dist\firefox-release\runet-censorship-bypass-firefox-1.0.2.xpi"
 ```
 
 This command is an explicit release audit tool invocation; it is not a project

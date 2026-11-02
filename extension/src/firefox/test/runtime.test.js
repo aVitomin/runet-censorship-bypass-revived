@@ -491,6 +491,8 @@ function startEventPage(options = {}) {
   Vm.runInContext(routingContractSource, context, {
     filename: 'routing-contract.js',
   });
+  Vm.runInContext(Fs.readFileSync(Path.resolve(sourceRoot, '..', 'shared',
+      'domain-block-codec.js'), 'utf8'), context, {filename: 'domain-block-codec.js'});
   Vm.runInContext(providerDatasetSource, context, {
     filename: 'provider-dataset.js',
   });
@@ -508,7 +510,7 @@ function startEventPage(options = {}) {
   Vm.runInContext(providerUpdaterSource, context, {
     filename: 'provider-updater.js',
   });
-  for (const file of ['anticensority-source.js', 'provider-source-updater.js']) {
+  for (const file of ['anticensority-source.js', 'provider-source-updater.js', 'antifilter-updater.js']) {
     Vm.runInContext(Fs.readFileSync(Path.join(sourceRoot, 'background', file), 'utf8'), context,
         {filename: file});
   }
@@ -757,7 +759,7 @@ describe('Firefox production control package', function() {
       const response = await page.send(request);
       Assert.strictEqual(response.ok, true);
       Assert.deepStrictEqual(Object.keys(response.result).sort(),
-          ['capabilities', 'configuration', 'operational', 'site']);
+          ['capabilities', 'configuration', 'operational', 'routingData', 'site']);
       Assert.strictEqual(response.result.configuration.savedRevision,
           response.result.site.revision);
       Assert.strictEqual(response.result.configuration.active, false);
@@ -1275,7 +1277,12 @@ describe('Firefox production control package', function() {
       scripts: [
         'background/vendor/tldts/dist/index.umd.min.js',
         'background/common/routing-contract.js',
+        'background/common/domain-block-codec.js',
         'background/common/provider-dataset.js',
+        'background/common/domain-source-policy.js',
+        'background/common/domain-stream-import.js',
+        'background/common/antifilter-source.js',
+        'background/common/domain-candidate-store.js',
         'background/common/provider-dataset-state.js',
         'background/off-state.js',
         'background/proxy-control.js',
@@ -1283,6 +1290,7 @@ describe('Firefox production control package', function() {
         'background/provider-updater.js',
         'background/anticensority-source.js',
         'background/provider-source-updater.js',
+        'background/antifilter-updater.js',
         'background/provider-update-control.js',
         'background/provider-lookup.js',
         'background/dataset-runtime.js',
@@ -1458,7 +1466,7 @@ describe('Firefox production control package', function() {
           'completed-listener-registered',
           'error-listener-registered',
           'listener-registered',
-          'product-config-storage-get',
+          'storage-get',
         ]);
         Assert.deepStrictEqual(
             JSON.parse(JSON.stringify(
@@ -1615,11 +1623,11 @@ describe('Firefox production control package', function() {
         );
         Assert.strictEqual(eventPage.proxySettingsCalls.set, 0);
         Assert.strictEqual(eventPage.proxySettingsCalls.clear, 0);
-        // Recovery still checks product config; the FAILED toolbar needs no site read.
+        // Recovery and source-aware maintenance inspect config; no site is read.
         Assert.strictEqual(
             eventPage.events.filter((event) =>
               event === 'product-config-storage-get').length,
-            3,
+            4,
         );
 
       });
@@ -2166,7 +2174,7 @@ describe('Firefox production control package', function() {
     Assert.strictEqual((await reboot.send({type: 'firefox.options.get'})).result.configuration.active, true);
   });
 
-  it('refreshes active HTTPS data without applying pending Saved settings', async function() {
+  it('popup routing update refreshes active HTTPS data without applying pending Saved settings', async function() {
 
     let installs = 0;
     const page = await unifiedFixture(true, {
@@ -2185,7 +2193,7 @@ describe('Firefox production control package', function() {
     const before = (await page.send({type: 'firefox.configuration.get'})).result;
     Assert.strictEqual(before.pending, true);
     const writes = Object.assign({}, page.proxySettingsCalls);
-    Assert.strictEqual((await page.send({type: 'firefox.provider.update.check'})).result.status, 'INSTALLED');
+    Assert.strictEqual((await page.send({type: 'firefox.routingData.refresh'})).result.status, 'APPLIED');
     const after = (await page.send({type: 'firefox.configuration.get'})).result;
     Assert.strictEqual(installs, 1);
     Assert.strictEqual(after.active, true);
@@ -2195,6 +2203,40 @@ describe('Firefox production control package', function() {
     Assert.strictEqual(page.proxySettingsCalls.set, writes.set);
     Assert.strictEqual(page.proxySettingsCalls.clear, writes.clear);
 
+  });
+
+  it('popup routing update coalesces OFF checks and skips manual sources without writes', async function() {
+    let checks = 0;
+    let finish;
+    const waiting = new Promise((resolve) => {
+      finish = resolve;
+    });
+    const page = await unifiedFixture(true, {
+      providerSourceUpdateConfigured: true,
+      providerUpdateCheck: async () => {
+        checks += 1; return waiting;
+      },
+      promotionInstall: async () => ({ok: true, status: 'INSTALLED'}),
+    });
+    const writes = Object.assign({}, page.proxySettingsCalls);
+    const first = page.send({type: 'firefox.routingData.refresh'});
+    const second = page.send({type: 'firefox.routingData.refresh'});
+    for (let n = 0; n < 30 && !checks; n += 1) {
+      await new Promise((resolve) => setImmediate(resolve));
+    }
+    Assert.equal(checks, 1);
+    finish({ok: true, status: 'STAGED'});
+    Assert.equal((await first).result.status, 'PREPARED');
+    Assert.equal((await second).result.status, 'PREPARED');
+    Assert.equal((await page.send({type: 'firefox.configuration.get'})).result.active, false);
+    Assert.equal(page.proxySettingsCalls.set, writes.set);
+    Assert.equal(page.proxySettingsCalls.clear, writes.clear);
+    const saved = (await page.send({type: 'firefox.settings.get'})).result;
+    saved.settings.source = 'manual';
+    Assert.equal((await page.send({type: 'firefox.settings.replace', expectedRevision: saved.revision,
+      settings: saved.settings})).ok, true);
+    Assert.equal((await page.send({type: 'firefox.routingData.refresh'})).result.status, 'UNAVAILABLE');
+    Assert.equal(checks, 1);
   });
 
   it('retains a checked candidate without installation under external control', async function() {
@@ -2347,6 +2389,10 @@ describe('Firefox production control package', function() {
 
   it('queues the alarm check and installation together before a later Clear', async function() {
 
+    let signalStarted;
+    const started = new Promise((resolve) => {
+      signalStarted = resolve;
+    });
     let releaseInstall;
     const wait = new Promise((resolve) => {
       releaseInstall = resolve;
@@ -2360,13 +2406,14 @@ describe('Firefox production control package', function() {
       },
       promotionInstall: async () => {
         order.push('install-start');
+        signalStarted();
         await wait;
         order.push('install-end');
         return {ok: true, status: 'INSTALLED'};
       },
     });
     page.alarmListeners.alarm({name: 'firefox.provider.update.check'});
-    await new Promise((resolve) => setImmediate(resolve));
+    await started;
     Assert.deepStrictEqual(order, ['check', 'install-start']);
     const clearing = page.send({type: 'firefox.activation.clear'}).then(() => order.push('clear'));
     await new Promise((resolve) => setImmediate(resolve));

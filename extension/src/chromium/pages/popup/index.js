@@ -16,6 +16,7 @@
     ],
   });
   let activeTabUrl = '';
+  let resourceTab = null;
   let latestState = null;
   let draft = null;
   let busyOperation = '';
@@ -26,6 +27,7 @@
   let refreshAfterInit = false;
   let openingSettings = false;
   let surfaceConfigured = false;
+  let routingUpdateResult = null;
 
   document.addEventListener('DOMContentLoaded', init);
 
@@ -161,6 +163,7 @@
     }
     try {
       const tab = await getActiveTab();
+      resourceTab = tab;
       activeTabUrl = tab && tab.url || '';
       const previousDraft = ifPreserveUi && latestState && isSiteDraftDirty(latestState) ?
         draft : null;
@@ -273,6 +276,18 @@
       renderSiteCard(root, state);
       renderDailyDetails(root, state, presentation);
     }
+    const routingCard = append(root, 'section', 'ui-card card');
+    window.rucbRoutingDataStatus.render(routingCard, {
+      status: state.routingData ? window.rucbRoutingDataStatus.validate(state.routingData) : null,
+      pending: isOperationBusy(state), result: routingUpdateResult,
+      translate: t, onCheck: refreshRoutingData,
+    });
+    const resourcesButton = appendButton(routingCard, t('resourcesTitle'), 'ui-button');
+    resourcesButton.disabled = !resourceTab || resourceTab.incognito !== false ||
+      !Number.isSafeInteger(resourceTab.id) || !/^https?:\/\//u.test(activeTabUrl);
+    resourcesButton.onclick = () => {
+      chrome.tabs.create({url: chrome.runtime.getURL(`pages/resources/index.html#${resourceTab.id}`)});
+    };
     renderLiveAnnouncement(root, state, presentation, lastOperation);
     focusRequestedControl();
 
@@ -1144,6 +1159,29 @@
       }
     } finally {
       busyOperation = '';
+      renderPopup(latestState);
+    }
+
+  }
+
+  async function refreshRoutingData() {
+
+    if (isOperationBusy(latestState) || !latestState.routingData ||
+        !latestState.routingData.canCheck) return;
+    busyOperation = 'updatePac';
+    routingUpdateResult = null;
+    renderPopup(latestState);
+    try {
+      const result = await rpc.callBackground('refreshRoutingData');
+      routingUpdateResult = result && window.rucbRoutingDataStatus.RESULTS.includes(result.status) ?
+        result.status : 'FAILED';
+    } catch (_error) {
+      routingUpdateResult = 'FAILED';
+    } finally {
+      // Preserve a local site-rule draft while reading the updated metadata.
+      await loadPopup(true);
+      busyOperation = '';
+      requestedFocus = 'routing-data-check';
       renderPopup(latestState);
     }
 

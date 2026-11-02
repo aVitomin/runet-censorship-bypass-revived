@@ -47,6 +47,50 @@ async function effective(h) {
 }
 
 describe('Chromium Saved and Effective generations', function() {
+  it('popup routing update uses Effective source and credentials without applying pending Saved', async function() {
+    const h = await active();
+    const before = await effective(h);
+    await save(h);
+    await h.callRpc('setCurrentPacProvider', {providerKey: 'Антицензорити'});
+    const revision = h.getState().savedRevision;
+    h.setDownloadResult(h.createDownloadResult(CHANGED_RAW_PAC));
+    const downloads = h.counts.pacDownloads;
+    const results = await Promise.all([h.callRpc('refreshRoutingData'), h.callRpc('refreshRoutingData')]);
+    Assert.equal(results[0].status, 'APPLIED');
+    Assert.equal(results[1].status, 'APPLIED');
+    Assert.equal(h.counts.pacDownloads, downloads + 1);
+    const after = await effective(h);
+    Assert.equal(after.config.currentPacProviderKey, before.config.currentPacProviderKey);
+    Assert.equal(h.getState().savedRevision, revision);
+    Assert.equal(h.getState().currentPacProviderKey, 'Антицензорити');
+    start(h, 'popup-update');
+    Assert.equal((await challenge(h, 'popup-update')).authCredentials.password, 'synthetic-A');
+    Assert.equal(h.counts.proxySettingsClears, 0);
+    const popup = await h.callRpc('getPopupState', {tabUrl: ''});
+    Assert.equal(popup.routingData.source, 'antizapret');
+    Assert.equal(popup.configuration.pending, true);
+    Assert.doesNotMatch(JSON.stringify(popup.routingData), /synthetic|password|url|proxy\.example/);
+  });
+
+  it('popup routing update stays OFF and reports failed downloads without discarding Effective', async function() {
+    const h = await active();
+    const before = await effective(h);
+    h.setDownloadResult({ok: false, status: 'error', error: {code: 'PAC_DOWNLOAD_FAILED',
+      message: 'synthetic-private-query'}});
+    Assert.equal((await h.callRpc('refreshRoutingData')).status, 'FAILED');
+    Assert.equal((await effective(h)).id, before.id);
+    await h.callRpc('clearProxy');
+    h.setDownloadResult(h.createDownloadResult(CHANGED_RAW_PAC));
+    const sets = h.counts.proxySettingsWrites;
+    Assert.equal((await h.callRpc('refreshRoutingData')).status, 'PREPARED');
+    Assert.equal(h.counts.proxySettingsWrites, sets);
+    Assert.equal((await h.callRpc('getConfigurationStatus')).active, false);
+    await h.callRpc('setCurrentPacProvider', {providerKey: 'onlyOwnSites'});
+    const downloads = h.counts.pacDownloads;
+    Assert.equal((await h.callRpc('refreshRoutingData')).status, 'UNAVAILABLE');
+    Assert.equal(h.counts.pacDownloads, downloads);
+  });
+
   it('projects clean and pending categories independently of storage object-key order', async function() {
 
     const h = await active();

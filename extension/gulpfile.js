@@ -72,7 +72,9 @@ const chromiumRuntimeSrc = [
 ];
 const chromiumCommonSrc = './src/chromium-compat/pages/lib/**/*';
 const sharedIconSrc = './src/assets/icons/**/*';
-const sharedUiSrc = ['./src/shared/ui-theme.js', './src/shared/ui-theme.css'];
+const sharedUiSrc = ['./src/shared/ui-theme.js', './src/shared/ui-theme.css',
+  './src/shared/site-resources.js', './src/shared/site-resources-ui.js', './src/shared/site-resources.css',
+  './src/shared/routing-data-status.js', './src/shared/routing-data-status.css'];
 const firefoxRuntimeSrc = [
   './src/firefox/manifest.json',
   './src/firefox/background/off-state.js',
@@ -81,6 +83,7 @@ const firefoxRuntimeSrc = [
   './src/firefox/background/provider-updater.js',
   './src/firefox/background/anticensority-source.js',
   './src/firefox/background/provider-source-updater.js',
+  './src/firefox/background/antifilter-updater.js',
   './src/firefox/background/provider-update-control.js',
   './src/firefox/background/dataset-promotion.js',
   './src/firefox/background/provider-lookup.js',
@@ -100,6 +103,8 @@ const firefoxRuntimeSrc = [
   './src/firefox/pages/popup/index.html',
   './src/firefox/pages/popup/index.js',
   './src/firefox/pages/popup/popup.css',
+  './src/firefox/pages/resources/index.html',
+  './src/firefox/pages/resources/index.js',
   './src/firefox/pages/options/index.html',
   './src/firefox/pages/options/index.js',
   './src/firefox/pages/options/options.css',
@@ -109,6 +114,11 @@ const firefoxRuntimeSrc = [
   './src/firefox/provider/anticensority-hosts-v1.envelope.json',
 ];
 const firefoxCommonSrc = [
+  './src/shared/domain-block-codec.js',
+  './src/shared/domain-source-policy.js',
+  './src/shared/domain-stream-import.js',
+  './src/shared/antifilter-source.js',
+  './src/shared/domain-candidate-store.js',
   './src/shared/configuration-transfer.js',
   './src/shared/configuration-transfer-ui.js',
   './src/shared/routing-contract.js',
@@ -176,6 +186,12 @@ const copyChromiumIcons = function(cb) {
 const copyChromiumTransfer = function(cb) {
 
   gulp.src([
+    './src/shared/domain-block-codec.js',
+    './src/shared/domain-source-policy.js',
+    './src/shared/domain-stream-import.js',
+    './src/shared/antifilter-source.js',
+    './src/shared/domain-candidate-store.js',
+    './src/shared/provider-dataset.js',
     './src/shared/configuration-transfer.js',
     './src/shared/configuration-transfer-ui.js',
   ], {base: './src/shared', encoding: false})

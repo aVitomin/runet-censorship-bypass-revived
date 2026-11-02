@@ -112,7 +112,7 @@
     if (!object(value)) fail();
     if (value.kind === 'builtin') {
       keys(value, ['kind', 'id']);
-      return {kind: 'builtin', id: choice(value.id, ['anticensority', 'antizapret', 'manual'])};
+      return {kind: 'builtin', id: choice(value.id, ['anticensority', 'antizapret', 'manual', 'antifilter'])};
     }
     if (value.kind === 'custom') {
       keys(value, ['kind', 'urls']);
@@ -142,8 +142,9 @@
     if (new Set(proxies.map((entry) => entry.name)).size !== proxies.length ||
         ['localTor', 'torBrowser'].some((kind) => proxies.filter((entry) => entry.kind === kind).length > 1)) fail();
     keys(value.routing, ['providerProxies', 'ownProxiesOnlyForOwnSites', 'replaceDirectWithProxy',
-      'noDirect', 'proxyAuthentication']);
+      'noDirect', 'proxyAuthentication'], ['useProxyRulesForAntifilter']);
     const routing = Object.fromEntries(Object.keys(value.routing).map((key) => [key, bool(value.routing[key])]));
+    if (!routing.useProxyRulesForAntifilter) delete routing.useProxyRulesForAntifilter;
     let ui;
     if (value.ui !== undefined) {
       keys(value.ui, ['language']);

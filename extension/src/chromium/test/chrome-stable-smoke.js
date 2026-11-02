@@ -2781,6 +2781,10 @@ async function runSmoke() {
         'The unpacked extension ID changed across the profile restart.',
     );
     const restartedOptionsPage = await openExtensionPage(session);
+    // Native proxy control can survive restart while durable startup recovery
+    // is still promoting its generation. This read waits for that recovery;
+    // keep the exact generation, transaction and installed-PAC assertions below.
+    await callRpc(restartedOptionsPage, 'getPopupState', {tabUrl: ''});
     assertProxyControl(await waitForProxyControl(restartedOptionsPage));
     Assert.deepStrictEqual(
         await readEffectiveGenerationProof(restartedOptionsPage),

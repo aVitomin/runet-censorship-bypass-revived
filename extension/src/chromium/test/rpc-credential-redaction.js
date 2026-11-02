@@ -21,7 +21,7 @@ const REVIEWED_RPC_METHODS = Object.freeze([
   'getProxyAuthStatus', 'setProxyAuthEnabled', 'clearProxyAuthEvents',
   'testProxyAuthConfig', 'getPeriodicUpdateStatus',
   'setPeriodicUpdateEnabled', 'setPeriodicUpdateInterval',
-  'runPeriodicUpdateNow', 'clearPeriodicUpdateEvents',
+  'runPeriodicUpdateNow', 'refreshRoutingData', 'clearPeriodicUpdateEvents',
 ]);
 
 function createCredentialPacMods(secret, overrides = {}) {
@@ -180,6 +180,7 @@ Mocha.describe('Chromium RPC credential redaction', function() {
         const proxyStatus = await harness.callRpc('getProxyStatus');
         const proxyHealth = await harness.callRpc('getProxyHealth');
         const periodicUpdate = await harness.callRpc('getPeriodicUpdateStatus');
+        const routingUpdate = await harness.callRpc('refreshRoutingData');
         const responses = [
           settings,
           popup,
@@ -198,6 +199,7 @@ Mocha.describe('Chromium RPC credential redaction', function() {
           proxyStatus,
           proxyHealth,
           periodicUpdate,
+          routingUpdate,
         ];
         responses.forEach((response) =>
           expectNoCredentialExposure(response, [secret]),

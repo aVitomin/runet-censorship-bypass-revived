@@ -9,7 +9,9 @@
   const datasetState = typeof module === 'object' && module.exports ?
     require('../../shared/provider-dataset-state') :
     root.mv3ProviderDatasetState;
-  const api = factory(dataset, datasetState);
+  const antifilter = typeof module === 'object' && module.exports ?
+    require('../../shared/antifilter-source') : root.rucbAntifilterSource;
+  const api = factory(dataset, datasetState, antifilter);
   if (typeof module === 'object' && module.exports) {
     module.exports = api;
     return;
@@ -17,7 +19,7 @@
   root.rucbFirefoxDatasetStore = api;
 
 })(typeof globalThis === 'object' ? globalThis : this,
-    function(Dataset, DatasetState) {
+    function(Dataset, DatasetState, Antifilter) {
 
       const DATABASE_NAME = 'rucb-firefox-provider-datasets-v1';
       const DATABASE_VERSION = 1;
@@ -79,9 +81,17 @@
 
       }
 
-      function canonicalHttpsSource(value) {
+      function canonicalHttpsSource(value, providerKey) {
+
+        if (value && value.sourceId === 'antifilter-domains') {
+          if (providerKey !== 'antifilter' || !Antifilter) {
+            throw storeError('INVALID_HTTPS_SOURCE');
+          }
+          return Antifilter.validateReceipt(value);
+        }
 
         if (!exactKeys(value, ['sourceId', 'sourceSha256', 'updatedAt']) ||
+            (providerKey !== undefined && providerKey !== 'anticensority') ||
             value.sourceId !== 'anticensority-pac' ||
             !isSha256(value.sourceSha256) || !isTimestamp(value.updatedAt)) {
           throw storeError('INVALID_HTTPS_SOURCE');
@@ -93,8 +103,21 @@
 
       function sameSource(left, right) {
 
-        return Boolean(left && right && left.sourceId === right.sourceId &&
-          left.sourceSha256 === right.sourceSha256 && left.updatedAt === right.updatedAt);
+        if (!left || !right || left.sourceId !== right.sourceId ||
+            left.sourceSha256 !== right.sourceSha256 || left.updatedAt !== right.updatedAt) {
+          return false;
+        }
+        if (left.sourceId !== 'antifilter-domains') return true;
+        try {
+          const expected = canonicalHttpsSource(left, 'antifilter');
+          const actual = canonicalHttpsSource(right, 'antifilter');
+          return Object.keys(expected).every((key) => key === 'rejections' ?
+            Object.keys(expected.rejections).every((code) =>
+              expected.rejections[code] === actual.rejections[code]) :
+            expected[key] === actual[key]);
+        } catch (_error) {
+          return false;
+        }
 
       }
 
@@ -238,7 +261,7 @@
                   value.httpsState.sequence === null) throw storeError('INVALID_HTTPS_STATE');
               normalized.httpsState = {sequence: value.httpsState.sequence,
                 artifactSha256: value.httpsState.artifactSha256,
-                source: canonicalHttpsSource(value.httpsState.source)};
+                source: canonicalHttpsSource(value.httpsState.source, providerKey)};
             }
             if (value.httpsFloor !== null) {
               if (!exactKeys(value.httpsFloor, ['updatedAt', 'artifactSha256']) ||
@@ -314,7 +337,7 @@
           envelope: verification.dataset.envelope,
           artifactBytes: copyBytes(artifactBytes),
         }, verification.trust === Dataset.TRUST.REMOTE_HTTPS_VALIDATED ?
-          {source: canonicalHttpsSource(verification.source)} : {});
+          {source: canonicalHttpsSource(verification.source, identity.providerKey)} : {});
 
       }
 
@@ -354,8 +377,14 @@
         envelope.sourceRevisions.forEach(Object.freeze);
         Object.freeze(envelope.sourceRevisions);
         Object.freeze(envelope);
-        payload.buckets.forEach(Object.freeze);
-        Object.freeze(payload.buckets);
+        if (payload.format === Dataset.PAYLOAD_FORMAT) {
+          payload.buckets.forEach(Object.freeze);
+          Object.freeze(payload.buckets);
+        } else {
+          // Compact payload has already been validated and deeply frozen by
+          // the common verifier; retain the same immutable cache guarantee.
+          Object.freeze(payload.blocks);
+        }
         Object.freeze(payload);
         return verification;
 
@@ -515,14 +544,17 @@
             return verification;
           }
           try {
-            const source = canonicalHttpsSource(input.source);
             const envelope = verification.dataset.envelope;
+            const source = canonicalHttpsSource(input.source, envelope.providerKey);
             const revisions = envelope.sourceRevisions;
-            if (verification.dataset.identity.providerKey !== 'anticensority' ||
+            if (!['anticensority', 'antifilter'].includes(envelope.providerKey) ||
                 envelope.generatedAt !== source.updatedAt ||
                 revisions.length !== 1 || revisions[0].sourceId !== source.sourceId ||
                 revisions[0].revision !== `sha256=${source.sourceSha256}`) {
               return rejection('HTTPS_SOURCE_IDENTITY_MISMATCH');
+            }
+            if (envelope.providerKey === 'antifilter') {
+              Antifilter.validateBinding(envelope, source);
             }
             return Object.freeze(Object.assign({}, verification, {source}));
           } catch (_error) {
@@ -805,8 +837,31 @@
           }
           const stored = await loadVerifications(providerKey);
           const baseline = stored.packagedBaseline;
-          if (!baseline || !baseline.ok || baseline.trust !== Dataset.TRUST.PACKAGED_TRUSTED) {
+          const firstDownloadSource = providerKey === 'antifilter';
+          if (firstDownloadSource ? baseline !== null :
+            !baseline || !baseline.ok || baseline.trust !== Dataset.TRUST.PACKAGED_TRUSTED) {
             return rejection('HTTPS_BASELINE_REQUIRED');
+          }
+          if (firstDownloadSource) {
+            // Antifilter has no bundled baseline. Its complete transport receipt
+            // binds the first candidate; later candidates also obey the persisted
+            // runtime floor, independently of the downloader's staging database.
+            const previous = await loadStaged(providerKey);
+            if (!previous.ok) return previous;
+            if (stored.active && !stored.active.ok) {
+              return rejection('HTTPS_CURRENT_DATASET_UNAVAILABLE');
+            }
+            try {
+              for (const known of [stored.active, stored.previousLkg, previous.verification]) {
+                if (known && known.ok && known.trust === Dataset.TRUST.REMOTE_HTTPS_VALIDATED) {
+                  Antifilter.checkContinuity(
+                      {envelope: candidate.dataset.envelope, receipt: source},
+                      {envelope: known.dataset.envelope, receipt: known.source});
+                }
+              }
+            } catch (error) {
+              return rejection(error.code || 'HTTPS_SOURCE_IDENTITY_MISMATCH');
+            }
           }
           const selected = DatasetState.planDatasetActivation({
             protectionIntended: true,
@@ -827,7 +882,7 @@
               stagedChannel: oldChannel, httpsState: null, httpsFloor: null});
           }
           const artifactSha256 = candidate.dataset.identity.artifactSha256;
-          const baselineFloor = {updatedAt: baseline.dataset.envelope.generatedAt,
+          const baselineFloor = baseline && {updatedAt: baseline.dataset.envelope.generatedAt,
             artifactSha256: baseline.dataset.identity.artifactSha256};
           const floors = [baselineFloor, pointers.httpsFloor].filter(Boolean);
           if (floors.some((floor) => Date.parse(source.updatedAt) < Date.parse(floor.updatedAt))) {
@@ -959,12 +1014,15 @@
           const providerKey = input.providerKey;
           const currentIdentity = input.currentDatasetIdentity;
           const channel = input.channel === undefined ? 'SIGNED' : input.channel;
+          const firstDownload = providerKey === 'antifilter' && channel === 'HTTPS' &&
+            currentIdentity === null;
+          const currentValid = currentIdentity && typeof currentIdentity === 'object' &&
+            currentIdentity.providerKey === providerKey &&
+            typeof currentIdentity.datasetVersion === 'string' &&
+            isSha256(currentIdentity.artifactSha256);
           if (!isProviderKey(providerKey) ||
               !isSha256(input.stagedArtifactSha256) ||
-              !currentIdentity || typeof currentIdentity !== 'object' ||
-              currentIdentity.providerKey !== providerKey ||
-              typeof currentIdentity.datasetVersion !== 'string' ||
-              !isSha256(currentIdentity.artifactSha256) ||
+              (!firstDownload && !currentValid) ||
               !Number.isSafeInteger(input.stagedSequence) ||
               input.stagedSequence < 1 || !trustForChannel(channel)) {
             return rejection('INVALID_PROMOTION_INPUT');
@@ -980,15 +1038,19 @@
                 input.stagedArtifactSha256 ||
               !matchesCandidateState(staged.pointers, channel, input.stagedSequence,
                   input.stagedArtifactSha256, input.source) ||
-              input.stagedArtifactSha256 === currentIdentity.artifactSha256) {
+              (!firstDownload && input.stagedArtifactSha256 === currentIdentity.artifactSha256)) {
             return rejection('PROMOTION_STATE_MISMATCH');
           }
           const stored = await loadVerifications(providerKey);
-          const selectable = [
+          const known = [
             stored.active,
             stored.previousLkg,
             stored.packagedBaseline,
-          ].some((verification) => verification && verification.ok === true &&
+          ];
+          const selectable = firstDownload ? known.every((value) => value === null) &&
+            ['activeArtifactSha256', 'previousLkgArtifactSha256', 'packagedBaselineArtifactSha256']
+                .every((key) => stored.pointers[key] === null) :
+            known.some((verification) => verification && verification.ok === true &&
             verification.dataset.identity.artifactSha256 ===
               currentIdentity.artifactSha256 &&
             verification.dataset.identity.datasetVersion ===
@@ -1000,7 +1062,7 @@
           }
           const pointers = Object.assign({}, staged.pointers, {
             activeArtifactSha256: input.stagedArtifactSha256,
-            previousLkgArtifactSha256: currentIdentity.artifactSha256,
+            previousLkgArtifactSha256: firstDownload ? null : currentIdentity.artifactSha256,
             stagedArtifactSha256: null,
             stagedSequence: null,
           });
@@ -1058,7 +1120,8 @@
               snapshot = {
                 envelope: structuredClone(input && input.envelope),
                 artifactBytes: copyBytes(bytes),
-                source: canonicalHttpsSource(input && input.source),
+                source: canonicalHttpsSource(input && input.source,
+                    input && input.envelope && input.envelope.providerKey),
               };
             } catch (error) {
               return Promise.resolve(rejection(error.code || 'INVALID_HTTPS_SOURCE'));

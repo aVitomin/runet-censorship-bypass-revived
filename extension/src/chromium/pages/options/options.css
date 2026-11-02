@@ -191,7 +191,6 @@ ul:last-child {
 
 .options-main {
   min-width: 0;
-  padding-bottom: 96px;
 }
 
 .page-section {
@@ -203,7 +202,7 @@ ul:last-child {
   padding: 0 var(--ui-space-0-5);
 }
 
-.section-header h2[tabindex="-1"]:focus {
+.section-header h2[tabindex="-1"]:focus-visible {
   border-radius: var(--ui-radius-small);
   outline: 2px solid var(--ui-color-focus);
   outline-offset: 4px;
@@ -578,6 +577,11 @@ ul:last-child {
   min-width: 0;
 }
 
+.source-choice-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .item-row,
 .editor-panel,
 .method-card {
@@ -820,10 +824,8 @@ details.disclosure[open] > summary {
 }
 
 .global-action-bar {
-  position: sticky;
-  z-index: 5;
-  bottom: var(--ui-space-2);
   display: flex;
+  flex-wrap: wrap;
   gap: var(--ui-space-2);
   align-items: center;
   justify-content: space-between;
@@ -832,11 +834,12 @@ details.disclosure[open] > summary {
   border: 1px solid var(--ui-color-border);
   border-radius: var(--ui-radius-large);
   background: var(--ui-color-surface);
-  box-shadow: var(--ui-shadow-floating);
 }
 
 .global-action-copy {
   min-width: 0;
+  flex: 1 1 240px;
+  overflow-wrap: anywhere;
 }
 
 .global-action-copy strong,
@@ -851,8 +854,16 @@ details.disclosure[open] > summary {
 
 .global-action-buttons {
   display: flex;
-  flex: 0 0 auto;
+  flex-wrap: wrap;
+  max-width: 100%;
   gap: var(--ui-space-1);
+}
+
+.global-action-buttons .ui-button {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .loading-shell {
@@ -890,10 +901,6 @@ details.disclosure[open] > summary {
   .mobile-nav {
     display: grid;
     gap: var(--ui-space-0-5);
-  }
-
-  .options-main {
-    padding-bottom: 112px;
   }
 
 }
@@ -934,7 +941,6 @@ details.disclosure[open] > summary {
   }
 
   .global-action-bar {
-    bottom: var(--ui-space-1);
     display: grid;
     gap: var(--ui-space-1);
   }
@@ -994,7 +1000,7 @@ details.disclosure[open] > summary {
     background: Canvas;
   }
 
-  .section-header h2[tabindex="-1"]:focus {
+  .section-header h2[tabindex="-1"]:focus-visible {
     outline-color: Highlight;
     box-shadow: none;
   }

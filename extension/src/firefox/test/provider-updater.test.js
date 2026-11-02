@@ -382,7 +382,7 @@ describe('Firefox authenticated provider update pipeline', function() {
 
     const candidate = updateArtifact('bad-schema', 'schema.example');
     const signed = await bundle({candidate, manifestOverrides: {
-      envelope: Object.assign({}, candidate.envelope, {schemaVersion: 2}),
+      envelope: Object.assign({}, candidate.envelope, {schemaVersion: 99}),
     }});
     const context = await setup({signed});
     const before = pointersSnapshot(context.backend);

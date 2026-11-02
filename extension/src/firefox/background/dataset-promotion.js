@@ -115,11 +115,11 @@
         }
         if (https) {
           try {
-            if (value.channel !== 'HTTPS' || value.providerKey !== 'anticensority') {
+            if (value.channel !== 'HTTPS' || !['anticensority', 'antifilter'].includes(value.providerKey)) {
               throw promotionError(ERRORS.RECOVERY_REQUIRED);
             }
             value = Object.assign({}, value, {
-              source: DatasetStore.canonicalHttpsSource(value.source),
+              source: DatasetStore.canonicalHttpsSource(value.source, value.providerKey),
             });
           } catch (_error) {
             throw promotionError(ERRORS.RECOVERY_REQUIRED);
@@ -160,10 +160,10 @@
         const channel = journal.channel || 'SIGNED';
         return Boolean(verification && verification.ok &&
           verification.trust === DatasetStore.trustForChannel(channel) &&
-          (channel !== 'HTTPS' || verification.source &&
-            verification.source.sourceId === journal.source.sourceId &&
-            verification.source.sourceSha256 === journal.source.sourceSha256 &&
-            verification.source.updatedAt === journal.source.updatedAt));
+          (channel !== 'HTTPS' || DatasetStore.matchesCandidateState({httpsState: {
+            sequence: journal.sequence, artifactSha256: journal.stagedArtifactSha256,
+            source: journal.source}}, channel, journal.sequence,
+          journal.stagedArtifactSha256, verification.source)));
 
       }
 
@@ -401,7 +401,10 @@
           // refresh. Keep the verified candidate cached until an explicit Apply
           // selects this provider with no pending source change.
           if (oldConfig.providerKey === 'manual' || effectiveRecords &&
-              effectiveRecords[ProductConfig.CONFIG_STORAGE_KEY].providerKey === 'manual') {
+              effectiveRecords[ProductConfig.CONFIG_STORAGE_KEY].providerKey === 'manual' ||
+              active && ['anticensority', 'antifilter'].includes(oldConfig.providerKey) &&
+              effectiveRecords && oldConfig.providerKey !== providerKey &&
+              effectiveRecords[ProductConfig.CONFIG_STORAGE_KEY].providerKey === providerKey) {
             return Object.freeze({ok: true, status: 'DEFERRED'});
           }
           if (active && (!effectiveRecords || !sameIdentity(

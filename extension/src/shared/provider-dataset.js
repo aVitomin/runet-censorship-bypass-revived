@@ -1,17 +1,23 @@
 'use strict';
 
+/* global require */
+
 (function publishProviderDataset(root, factory) {
 
-  const providerDataset = factory();
+  const codec = typeof module === 'object' && module.exports ?
+    require('./domain-block-codec') : root.rucbDomainBlockCodec;
+  const providerDataset = factory(codec);
   if (typeof module === 'object' && module.exports) {
     module.exports = providerDataset;
     return;
   }
   root.mv3ProviderDataset = providerDataset;
 
-})(typeof globalThis === 'object' ? globalThis : this, function() {
+})(typeof globalThis === 'object' ? globalThis : this, function(Codec) {
 
   const SCHEMA_VERSION = 1;
+  const COMPACT_SCHEMA_VERSION = 2;
+  const COMPACT_PROVIDER_KEY = 'antifilter';
   const ROUTE_TABLE_VERSION = 1;
   const PAYLOAD_FORMAT = 'HOST_BUCKETS_V1';
   const MAX_ARTIFACT_BYTES = 16 * 1024 * 1024;
@@ -178,7 +184,7 @@
   function validateEnvelope(value) {
 
     requireExactObject(value, ENVELOPE_FIELDS);
-    if (value.schemaVersion !== SCHEMA_VERSION) {
+    if (![SCHEMA_VERSION, COMPACT_SCHEMA_VERSION].includes(value.schemaVersion)) {
       throw verificationError('UNSUPPORTED_SCHEMA_VERSION');
     }
     if (value.routeTableVersion !== ROUTE_TABLE_VERSION) {
@@ -188,6 +194,10 @@
         value.providerKey,
         'INVALID_PROVIDER_KEY',
     );
+    const compact = value.schemaVersion === COMPACT_SCHEMA_VERSION;
+    if (compact !== (providerKey === COMPACT_PROVIDER_KEY)) {
+      throw verificationError('PROVIDER_SCHEMA_MISMATCH');
+    }
     const datasetVersion = requireVersion(value.datasetVersion);
     const generatedAt = requireTimestamp(value.generatedAt);
     const sourceRevisions = validateSourceRevisions(value.sourceRevisions);
@@ -195,7 +205,7 @@
         value.ruleCount,
         'INVALID_RULE_COUNT',
     );
-    if (ruleCount > MAX_RULES) {
+    if (ruleCount > (compact ? Codec.MAX_RULES : MAX_RULES)) {
       throw verificationError('TOO_MANY_RULES');
     }
     const artifactByteCount = requirePositiveInteger(
@@ -210,7 +220,7 @@
       throw verificationError('INVALID_ARTIFACT_SHA256');
     }
     return {
-      schemaVersion: SCHEMA_VERSION,
+      schemaVersion: value.schemaVersion,
       providerKey,
       datasetVersion,
       generatedAt,
@@ -353,6 +363,23 @@
 
   }
 
+  function validateCompactPayload(value, envelope) {
+
+    // Schema 2 is a separate exact-host source. Never interpret it as legacy
+    // suffix buckets or relax the old schema's rule/grammar limits.
+    if (!value || value.policy !== 'EXACT_HOST') {
+      throw verificationError('INVALID_COMPACT_MATCH_POLICY');
+    }
+    Codec.validate(value);
+    if (value.ruleCount !== envelope.ruleCount) {
+      throw verificationError('RULE_COUNT_MISMATCH');
+    }
+    return Object.freeze(Object.assign({}, value, {
+      blocks: Object.freeze(value.blocks.slice()),
+    }));
+
+  }
+
   function copyExactBytes(value) {
 
     if (!(value instanceof Uint8Array)) {
@@ -422,10 +449,10 @@
           normalizedEnvelope.artifactSha256) {
         throw verificationError('ARTIFACT_SHA256_MISMATCH');
       }
-      const payload = validatePayload(
-          decodePayload(exactBytes),
-          normalizedEnvelope.ruleCount,
-      );
+      const decoded = decodePayload(exactBytes);
+      const payload = normalizedEnvelope.schemaVersion === COMPACT_SCHEMA_VERSION ?
+        validateCompactPayload(decoded, normalizedEnvelope) :
+        validatePayload(decoded, normalizedEnvelope.ruleCount);
       const activationEligible = [TRUST.PACKAGED_TRUSTED,
         TRUST.REMOTE_AUTHENTICATED, TRUST.REMOTE_HTTPS_VALIDATED,
       ].includes(normalizedTrust);
@@ -459,6 +486,8 @@
       MAX_SOURCE_REVISIONS,
     }),
     PAYLOAD_FORMAT,
+    COMPACT_SCHEMA_VERSION,
+    COMPACT_PROVIDER_KEY,
     ROUTE_REFS,
     ROUTE_TABLE_VERSION,
     SCHEMA_VERSION,
