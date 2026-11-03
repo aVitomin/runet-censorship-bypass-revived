@@ -1,7 +1,8 @@
 # Установка, обновление и удаление
 
-**Версия 1.0.1 доступна в обоих магазинах.** Для ручной установки также
-доступны Chromium ZIP и подписанный Mozilla Firefox XPI.
+**Chromium ZIP 1.0.2 доступен для ручной установки.** В обоих магазинах
+остаётся **1.0.1**; подписанный Firefox XPI — **1.0.1**.
+Обновления 1.0.2 в магазины пока не поданы.
 
 ## Установить из магазина
 
@@ -22,7 +23,7 @@
 
 ## Требования
 
-В манифестах **1.0.1** установлены расчётные минимумы:
+В манифестах **1.0.1–1.0.2** установлены расчётные минимумы:
 **Chromium 108+** и **Firefox 140+**, включая ESR на подходящей базе.
 Ожидается работа в совместимых настольных браузерах с Manifest V3 и API прокси.
 Версия движка Chromium важнее собственного номера Brave, Opera или другого
@@ -30,12 +31,13 @@
 Каждая версия и каждый форк отдельно не проверялись;
 [основания и фактические проверки](../development/BROWSER_COMPATIBILITY.md) указаны отдельно.
 
-Проверенные браузеры и границы QA: [технические сведения о выпуске 1.0.1](../development/releases/1.0.1.md).
+Проверенные браузеры и границы QA: [технические сведения о 1.0.2](../development/releases/1.0.2.md)
+и [1.0.1](../development/releases/1.0.1.md).
 
 ## Ручная установка Chromium: ZIP
 
-1. Скачайте [готовый ZIP 1.0.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.1/runet-censorship-bypass-mv3-1.0.1-4b9a9b3.zip)
-   и [его контрольную сумму](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.1/runet-censorship-bypass-mv3-1.0.1-4b9a9b3.zip.sha256.txt).
+1. Скачайте [готовый ZIP 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-mv3-1.0.2-f7ae775.zip)
+   и [его контрольную сумму](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-mv3-1.0.2-f7ae775.zip.sha256.txt).
 2. Проверьте SHA-256 и полностью распакуйте ZIP в постоянную папку.
 3. Откройте `chrome://extensions`, `brave://extensions` или `edge://extensions`.
 4. Включите **Режим разработчика → Загрузить распакованное расширение**.
@@ -47,13 +49,13 @@
 SHA-256 ZIP:
 
 ```text
-8bd77fab8e414d2bc092801153fcf731b43bf1581f3588a5ec6cffab9daffdd8
+9c04b868cb1d739b38af0f595bc0c487f2183cd63b4ab6256d682279129e257c
 ```
 
 Пример проверки в Windows:
 
 ```powershell
-Get-FileHash .\runet-censorship-bypass-mv3-1.0.1-4b9a9b3.zip -Algorithm SHA256
+Get-FileHash .\runet-censorship-bypass-mv3-1.0.2-f7ae775.zip -Algorithm SHA256
 ```
 
 Если сумма отличается, не устанавливайте файл.
@@ -87,7 +89,8 @@ SHA-256 XPI:
 Для режима **Прокси** нужно подходящее настроенное подключение.
 Расширение не предоставляет VPN или прокси-сервер и не запускает локальные службы.
 
-[Настройка и повседневное использование](USER_GUIDE_1_0.md).
+[Руководство 1.0.2 для нового Chromium ZIP](USER_GUIDE_1_0_2.md) ·
+[Руководство 1.0.1 для магазинных установок](USER_GUIDE_1_0.md).
 
 ## Обновить расширение
 
@@ -130,13 +133,14 @@ Chromium-версии на магазинную могут создать отд
 
 ## English summary
 
-Install **Chrome 1.0.0** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.0.1** from
+Install **Chrome 1.0.1** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.0.1** from
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/). Firefox requires **140+** and private-window
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
 
-**Chromium 1.0.1** is available as a manual ZIP and its store update is under
-review. **Firefox 1.0.1** is also available as a Mozilla-signed XPI. Version **1.0.1** targets desktop **Chromium 108+** and **Firefox 140+**,
+**Chromium 1.0.2** is available as a manual ZIP. Its store update has not been
+submitted yet. **Firefox 1.0.1** is also available as a Mozilla-signed XPI;
+Firefox 1.0.2 awaits submission and signing. Versions **1.0.1–1.0.2** target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR releases on a compatible base. These are API-based compatibility
 estimates, not test results for every version or fork. Required MV3 and proxy
 extension APIs must be available; mobile browsers and WebView are outside this scope.
@@ -148,4 +152,5 @@ Switching it to a store installation may require settings transfer; exported
 settings omit credentials and custom-source URLs. Disable the old installation
 before applying the new one.
 
-Save records settings; Apply activates them. See the [1.0 guide](USER_GUIDE_1_0.md#english-summary).
+Save records settings; Apply activates them. See the [1.0.2 guide](USER_GUIDE_1_0_2.md#english-summary), or the
+[1.0.1 guide](USER_GUIDE_1_0.md#english-summary) for current store installations.

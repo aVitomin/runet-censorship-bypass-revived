@@ -1,13 +1,13 @@
 # Совместимость браузеров
 
-## Расчётные минимумы для 1.0.1
+## Расчётные минимумы для 1.0.1–1.0.2
 
 Ожидается работа в **настольных браузерах на Chromium 108+ и Firefox 140+**,
 включая Firefox ESR на этой или более новой базе, при наличии необходимых
 API расширений. Это вывод по коду и документации платформ, а не результат
 проверки каждой версии, ОС или форка.
 
-| Семейство | Минимум в манифесте 1.0.1 | Главное ограничение |
+| Семейство | Минимум в манифестах 1.0.1–1.0.2 | Главное ограничение |
 | --- | --- | --- |
 | Chromium | `minimum_chrome_version: "108"` | Авторизация прокси через `webRequestAuthProvider` в Manifest V3 |
 | Firefox | `strict_min_version: "140.0"` | Встроенное согласие на обработку/передачу данных `data_collection_permissions` |
@@ -69,9 +69,14 @@ Chromium 108 и Firefox 140 отдельно не запускались. Для
 ESR на Debian/Linux есть [воспроизводимый сценарий](qa/FIREFOX_ESR_153.md);
 он не является доказательством уже выполненной проверки.
 
+Для 1.0.2 выполнены локальные сценарии обновления в Chrome 156.0.8078.79
+и Firefox 159.0; на Windows Firefox 153.5.1 ESR — ограниченный сценарий
+с активными и отложенными настройками. Подписанное постоянное обновление
+Firefox 1.0.2 ещё не проверено. [Подробности](releases/1.0.2.md).
+
 ## Доступные пакеты
 
-Chromium **1.0.1** доступен в Chrome Web Store и как ZIP с минимумом
+Chromium **1.0.2** доступен как ZIP; в Chrome Web Store — **1.0.1**, с минимумом
 **Chromium 108+**. Firefox **1.0.1** доступен в Mozilla Add-ons и как подписанный
 XPI с минимумом **140.0**. Публичные версии магазинов проверены 30 октября 2026.
 Старые пакеты не изменяются задним числом. Матрица выполненных проверок 1.0.0
@@ -79,7 +84,7 @@ XPI с минимумом **140.0**. Публичные версии магаз�
 
 ## English
 
-Version 1.0.1 is expected to work in desktop **Chromium 108+** and
+Versions 1.0.1–1.0.2 are expected to work in desktop **Chromium 108+** and
 **Firefox 140+**, including ESR on a compatible base, provided the required
 extension APIs are available. These are source/API-based minimums; every
 version, platform and derivative has not been tested. Mobile browsers and
