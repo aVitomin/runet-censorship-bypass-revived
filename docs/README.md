@@ -5,6 +5,7 @@
 - [Скачать и установить](user/INSTALLATION.md)
 - [Руководство 1.0](user/USER_GUIDE_1_0.md): маршруты, подключения, сохранение и применение, перенос настроек
 - [Помощь и сообщения об ошибках](../SUPPORT.md)
+- [Поддержать проект](../DONATE.md)
 - [Приватность 1.0](release/PRIVACY_1_0.md)
 - [Снимки интерфейса](assets/releases/1.0/README.md)
 
@@ -19,6 +20,8 @@
 - [Участие в проекте](../CONTRIBUTING.md) и [подготовка среды](development/DEVELOPMENT.md)
 - [Архитектура Chromium и общих компонентов](development/ARCHITECTURE.md), [Firefox](development/FIREFOX_ARCHITECTURE.md)
 - [Тестирование](development/TESTING.md)
+- [Локальная проверка новых доменных баз](development/DOMAIN_SOURCE_PREFLIGHT.md)
+- [Готовящееся обновление 1.0.2](development/release-drafts/1.0.2.md)
 - [Изменения и статус выпуска 1.0.1](development/releases/1.0.1.md)
 - [Совместимость браузеров: расчётные минимумы и реальные проверки](development/BROWSER_COMPATIBILITY.md)
 - [Процесс выпуска](development/RELEASE_PROCESS.md) и [технические сведения о 1.0.0](development/releases/1.0.0.md)

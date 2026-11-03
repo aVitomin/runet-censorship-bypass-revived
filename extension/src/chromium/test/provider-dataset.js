@@ -177,7 +177,7 @@ const REJECTION_CASES = Object.freeze([
   {
     name: 'unknown schema version',
     create() {
-      return createArtifact({envelopeOverrides: {schemaVersion: 2}});
+      return createArtifact({envelopeOverrides: {schemaVersion: 99}});
     },
     code: 'UNSUPPORTED_SCHEMA_VERSION',
   },
@@ -618,6 +618,7 @@ Mocha.describe('declarative provider dataset', function() {
         const sources = [
           'provider-dataset.js',
           'provider-dataset-state.js',
+          'domain-block-codec.js',
         ].map((filename) => Fs.readFileSync(
             Path.join(commonDirectory, filename),
             'utf8',
@@ -627,7 +628,9 @@ Mocha.describe('declarative provider dataset', function() {
         Chai.expect(sources).not.to.match(
             /\b(?:indexedDB|localStorage|sessionStorage)\b/,
         );
-        Chai.expect(sources).not.to.match(/\brequire\s*\(/);
+        // CommonJS may import only the package-owned pure codec.
+        Chai.expect(sources.replace(/require\('\.\/domain-block-codec'\)/, ''))
+            .not.to.match(/\brequire\s*\(/);
         Chai.expect(sources).not.to.match(
             /\b(?:eval|Function)\s*\(/,
         );

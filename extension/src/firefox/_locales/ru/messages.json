@@ -1,334 +1,994 @@
 {
-  "providerLifecycleControlHelp": {"message": "Проверьте состояние защиты выше. Само по себе обновление данных маршрутизации не означает, что маршрутизация активна."},
-  "providerLifecycleHelp": {"message": "Проверить обновления → Проверить данные → Подготовить → Применить обновление."},
-  "providerLifecycleName": {"message": "Данные маршрутизации"},
-  "providerLifecycleLastResult": {"message": "Результат последней проверки / обновления"},
-  "providerLifecycleUnknown": {"message": "Неизвестно"},
-  "providerLifecycleUnknownHelp": {"message": "Результата проверки обновлений пока нет."},
-  "providerLifecycleChecking": {"message": "Проверяем…"},
-  "providerLifecycleApplying": {"message": "Подготавливаем и применяем…"},
-  "providerLifecycleVerified": {"message": "Проверено"},
-  "providerLifecycleVerifiedHelp": {"message": "Данные маршрутизации прошли предусмотренные проверки целостности. Это не проверка прокси-подключений."},
-  "providerLifecyclePrepared": {"message": "Готово к применению"},
-  "providerLifecyclePreparedHelp": {"message": "Данные прошли проверку, обновление готово к применению. Сохранённые настройки не применены."},
-  "providerLifecycleApplied": {"message": "Применено"},
-  "providerLifecycleAppliedHelp": {"message": "Текущие данные маршрутизации используются. Доступность подключений зависит от настроенных прокси-служб."},
-  "providerLifecycleAppliedOff": {"message": "Данные обновлены"},
-  "providerLifecycleAppliedOffHelp": {"message": "Данные маршрутизации обновлены. Защита остаётся выключенной."},
-  "providerLifecycleFailed": {"message": "Не удалось обновить"},
-  "providerLifecyclePreparationFailed": {"message": "Не удалось подготовить или применить обновление. Проверьте состояние защиты."},
-  "providerLifecycleBusyHelp": {"message": "Обновление выполняется. При подготовке действует прежняя маршрутизация; сохранённые изменения остаются неприменёнными."},
-  "providerLifecycleCheck": {"message": "Проверить обновления"},
-  "transferCredentialsMissingLabel": {"message":"Нужны учётные данные"},
-  "transferUnsupported_authentication": {"message":"В Firefox нет общего переключателя авторизации прокси. Проверьте импортированные профили перед применением; недостающие учётные данные нужно ввести заново."},
-  "transferTitle": {"message":"Импорт / Экспорт"},
-  "transferHelp": {"message":"Ручной перенос сохранённых настроек, а не синхронизация. Файл содержит правила сайтов и адреса прокси, но не логины и пароли. Несохранённые правки не экспортируются. Импорт сохраняет настройки, но не применяет их и не включает защиту."},
-  "transferExport": {"message":"Экспорт настроек"},
-  "transferImport": {"message":"Импорт настроек: выберите JSON-файл"},
-  "transferSupport": {"message":"Экспорт для поддержки"},
-  "transferSupportHelp": {"message":"Файл для поддержки содержит только сведения о среде и состоянии, без правил сайтов и адресов прокси. Его нельзя импортировать как настройки."},
-  "transferPreview": {"message":"Перед импортом"},
-  "transferCounts": {"message":"Правил: $1 (добавлено/удалено записей: $2). Профилей прокси: $3. Требуют ввода учётных данных: $4."},
-  "transferReplaceWarning": {"message":"Сохранённые настройки маршрутизации будут заменены. Перед применением введите недостающие учётные данные. Проверьте предупреждения о неподдерживаемых полях: они не переносятся."},
-  "transferConfirm": {"message":"Сохранить импортированные настройки"},
-  "transferCancel": {"message":"Отменить импорт"},
-  "transferImported": {"message":"Настройки импортированы. Они сохранены, но не применены."},
-  "transferExported": {"message":"Файл экспорта подготовлен. Не публикуйте файл настроек."},
-  "transferInvalid": {"message":"Файл не соответствует формату настроек. Импорт не выполнен."},
-  "transferSocks4aUnsupported": {"message":"Файл содержит подключения SOCKS4A, которые Chromium не поддерживает. Импорт не выполнен. Используйте Firefox или настройте SOCKS5, если ваш прокси-сервер его поддерживает."},
-  "transferVersion": {"message":"Эта версия формата экспорта не поддерживается."},
-  "transferLimit": {"message":"Превышен предел размера или сложности импорта (файл не более 1 МиБ)."},
-  "transferDraft": {"message":"Перед импортом проверьте и сохраните или отмените свои правки. Они не потеряны."},
-  "transferNoConfiguration": {"message":"Это файл для поддержки, а не файл настроек."},
-  "transferConflict": {"message":"Настройки изменились в другом окне. Выберите файл снова и проверьте обновлённый предварительный просмотр."},
-  "transferCredentialsRequired": {"message":"Учётные данные не перенесены: введите их перед применением либо явно выберите работу без авторизации."},
-  "transferUnsupported_source": {"message":"Выбор источника не переносится в этот браузер. Проверьте источник правил перед применением. Адреса своих источников исключены из экспорта: они могут содержать токены доступа."},
-  "transferUnsupported_language": {"message":"В этом браузере настройка языка интерфейса не переносится."},
-  "transferUnsupported_disabledRules": {"message":"Этот браузер не хранит отключённые правила; они будут пропущены."},
-  "transferUnsupported_proxyOptions": {"message":"Индивидуальные параметры DNS и ожидания прокси здесь не поддерживаются; используются настройки браузера."},
-  "transferUnsupported_torScope": {"message":"Этот браузер не использует отключённый режим Tor только для .onion или замены Direct. Проверьте режим Tor после импорта."},
-  "transferUnsupported_torExclusive": {"message":"Этот браузер поддерживает один режим Tor одновременно. Оба режима будут отключены, пока вы не выберете один."},
-  "transferUnsupported_warpScope": {"message":"Переключатели области WARP здесь относятся ко всему списку. Несогласованные переключатели будут отключены; проверьте их перед применением."},
-  "rulesEditorHelp": {"message": "Измените строку, добавьте или удалите правило. «Сохранить» сохраняет правки, «Применить» включает их. «Авто» убирает только эту запись: другие подходящие правила и автоматический источник продолжают действовать."},
-  "rulesAllowlistHelp": {"message": "В этом же списке отдельно отмечены записи списка режима «Авто». Если он не пуст, остальные сайты идут напрямую, кроме сайтов с явным правилом. Запись в списке не принуждает к режиму «Авто»."},
-  "rulesAdd": {"message": "Добавить правило сайта"},
-  "rulesDelete": {"message": "Удалить правило"},
-  "rulesEmpty": {"message": "Правил сайтов пока нет. Используется режим «Авто»."},
-  "rulesHost": {"message": "Сайт или домен"},
-  "rulesScope": {"message": "Область правила"},
-  "rulesRoute": {"message": "Маршрут / тип правила"},
-  "rulesScopeHost": {"message": "Только этот хост"},
-  "rulesScopeDomain": {"message": "Домен и поддомены"},
-  "rulesScopePattern": {"message": "Существующий шаблон (прежний синтаксис)"},
-  "rulesAuto": {"message": "Авто — убрать эту запись"},
-  "rulesWhitelist": {"message": "Список режима «Авто»"},
-  "rulesHostError": {"message": "Введите хост без звёздочки; для поддоменов выберите «Домен и поддомены»."},
-  "unifiedSaveSection": {"message": "Сохранить настройки"},
-  "unifiedPopupConflict": {"message": "Настройки изменены в другом окне. Проверьте текущее состояние и подтвердите применение заново."},
-  "unifiedControlLost": {"message": "Прокси контролируется браузером или другим расширением. Проверьте управление прокси перед повторным применением."},
-  "unifiedUnproven": {"message": "Не удалось подтвердить действующие настройки. Проверьте состояние и снова нажмите «Применить»."},
-  "unifiedActions": {"message": "Действия с настройками"},
-  "unifiedApply": {"message": "Применить"},
-  "unifiedApplyOn": {"message": "Применить и включить"},
-  "unifiedApplyAll": {"message": "Применить все сохранённые изменения"},
-  "unifiedDiscard": {"message": "Отменить несохранённые правки"},
-  "unifiedReview": {"message": "Проверить в настройках"},
-  "unifiedActive": {"message": "Защита включена"},
-  "unifiedPending": {"message": "Защита включена — изменения не применены"},
-  "unifiedApplying": {"message": "Применяем…"},
-  "unifiedInactive": {"message": "Защита выключена"},
-  "unifiedBlocked": {"message": "Требуется действие"},
-  "unifiedUnsaved": {"message": "Несохранённые изменения"},
-  "unifiedConflict": {"message": "Настройки изменены в другом окне. Ваши правки сохранены в этом окне. Отмените несохранённые правки, чтобы загрузить и проверить новые настройки."},
-  "unifiedSaveFirst": {"message": "Перед применением сохраните или отмените правки."},
-  "unifiedSavedActive": {"message": "Сохранено. Пока действуют прежние настройки."},
-  "unifiedPreparing": {"message": "Пока новые настройки подготавливаются, действуют прежние."},
-  "unifiedApplyFailed": {"message": "Изменения не применены. Прежние настройки продолжают действовать."},
-  "unifiedSiteSaved": {"message": "Правило сайта сохранено, но не применено. Прежние настройки продолжают действовать."},
-  "unifiedPopupPending": {"message": "Другие сохранённые настройки ещё не применены. Вместе с правилом сайта будут применены и они."},
-  "unifiedTransition": {"message": "Сейчас: $1. Выбрано: $2."},
-  "unifiedCategory_siteRules": {"message": "Изменены правила сайтов"},
-  "unifiedCategory_proxyConnections": {"message": "Изменены подключения к прокси"},
-  "unifiedCategory_routingSettings": {"message": "Изменены настройки маршрутизации"},
-  "extensionName": {"message": "Обход блокировок Рунета — Revived"},
-  "extensionDescription": {"message": "Независимый форк Anticensority. Управление маршрутами сайтов: автоматически, через прокси или напрямую."},
-  "popupTitle": {"message": "Состояние защиты"},
-  "popupSubtitle": {"message": "Управление маршрутизацией Firefox"},
-  "popupLoading": {"message": "Читаем текущее состояние…"},
-  "popupLoadFailed": {"message": "Не удалось прочитать состояние расширения."},
-  "popupStateOff": {"message": "Защита выключена"},
-  "popupStateInitializing": {"message": "Защита запускается"},
-  "popupStateActive": {"message": "Защита активна"},
-  "popupStateRecovered": {"message": "Защита восстановлена"},
-  "popupStateBlocked": {"message": "Защита заблокирована"},
-  "popupStateExternal": {"message": "Приоритет у другого контроллера"},
-  "popupHelpOff": {"message": "Включите защиту, когда будете готовы."},
-  "popupHelpInitializing": {"message": "До завершения восстановления защищённые запросы блокируются."},
-  "popupHelpActive": {"message": "Firefox использует проверенную локальную конфигурацию маршрутизации."},
-  "popupHelpRecovered": {"message": "Сеанс маршрутизации восстановлен после перезапуска фоновой страницы."},
-  "popupHelpBlocked": {"message": "Маршрутизация недоступна, а защищённые запросы блокируются. Защиту можно безопасно выключить."},
-  "popupHelpPrivateBlocked": {"message": "Доступ к приватным окнам отозван. Маршрутизация заблокирована, защиту можно безопасно выключить."},
-  "popupHelpPrivateRequired": {"message": "Перед включением разрешите расширению работу в приватных окнах."},
-  "popupHelpExternal": {"message": "Управление прокси Firefox изменено извне. Расширение остановило маршрутизацию и не будет перезаписывать чужую настройку."},
-  "popupHelpDatasetMissing": {"message": "Проверенные данные маршрутизации недоступны."},
-  "popupErrorPrivateAccess": {"message": "Нужен доступ к приватным окнам."},
-  "popupErrorPrivateAccessCheck": {"message": "Firefox не сообщил состояние доступа к приватным окнам. Защита не была включена."},
-  "popupErrorDataset": {"message": "Проверенные данные маршрутизации недоступны или повреждены."},
-  "popupErrorSettings": {"message": "Проверьте сохранённые настройки маршрутизации и учётные данные прокси."},
-  "popupErrorProxyCandidate": {"message": "Перед режимом Proxy настройте хотя бы одно прокси-соединение."},
-  "popupErrorRevision": {"message": "Настройки изменились в другом месте. Состояние текущего сайта перезагружено; проверьте его и повторите."},
-  "popupErrorGeneric": {"message": "Не удалось завершить операцию. Проверьте состояние защиты выше."},
-  "popupOperationPending": {"message": "Операция выполняется"},
-  "popupDetails": {"message": "Готовность"},
-  "popupDataset": {"message": "Данные маршрутизации"},
-  "popupPrivateAccess": {"message": "Доступ к приватным окнам"},
-  "permissionPrivateAccessTitle": {"message": "Нужен доступ к приватным окнам"},
-  "permissionPrivateAccessExplanation": {"message": "Сейчас расширение управляет общими настройками прокси Firefox, которые действуют и в приватных окнах. Доступ нужен, чтобы расширение не показывало защиту включённой, пока приватные окна остаются вне его управления."},
-  "permissionPrivateAccessUnknown": {"message": "Firefox не сообщил текущее состояние разрешения. Включение останется недоступным, пока расширение не сможет его проверить."},
-  "permissionPrivateAccessSteps": {"message": "Откройте меню Firefox → Дополнения и темы → Расширения. Выберите «Обход блокировок Рунета — Revived», затем в разделе «Работа в приватных окнах» выберите «Разрешить». После этого вернитесь сюда."},
-  "permissionCheckAgain": {"message": "Проверить снова"},
-  "permissionRestrictedSitesInfo": {"message": "Разрешение Firefox «Работа на сайтах с ограничениями» настраивается отдельно и для включения защиты не требуется. Расширение не умеет проверять его состояние; изменяйте его вручную, только если Firefox ограничивает обычный сайт. Страницы about: нельзя маршрутизировать."},
-  "valueAvailable": {"message": "Доступен"},
-  "valueUnavailable": {"message": "Недоступен"},
-  "valueGranted": {"message": "Разрешён"},
-  "valueDenied": {"message": "Запрещён"},
-  "valueUnknown": {"message": "Неизвестно"},
-  "actionEnable": {"message": "Включить"},
-  "actionDisable": {"message": "Выключить"},
-  "actionSettings": {"message": "Настройки"},
-  "actionRetry": {"message": "Повторить"},
-  "popupApplyChanges": {"message": "Применить"},
-  "popupTurnOff": {"message": "Выключить"},
-  "popupPillOFF": {"message": "Выкл."},
-  "popupPillACTIVE": {"message": "Активно"},
-  "popupPillRECOVERED": {"message": "Восстановлено"},
-  "popupPillINITIALIZING": {"message": "Запуск"},
-  "popupPillBLOCKED": {"message": "Блокировка"},
-  "popupPillEXTERNAL": {"message": "Внешнее"},
-  "popupCurrentSiteRouting": {"message": "Текущий сайт"},
-  "popupCurrentTabUnavailable": {"message": "Эта страница недоступна"},
-  "popupPageCannotBeControlledHelp": {"message": "Firefox не разрешает правила маршрутизации для этой страницы браузера или расширения."},
-  "popupSiteModeGroup": {"message": "Режим маршрутизации для $1"},
-  "popupModeAUTO": {"message": "Авто"},
-  "popupModePROXY": {"message": "Через прокси"},
-  "popupModeDIRECT": {"message": "Напрямую"},
-  "popupAutoModeDescription": {"message": "Использовать для сайта встроенные правила маршрутизации Anticensority."},
-  "popupProxyModeDescription": {"message": "Всегда использовать для сайта настроенные прокси-подключения."},
-  "popupDirectModeDescription": {"message": "Открывать сайт напрямую, вне режима «Авто»."},
-  "popupProxyRouteNeedsMethod": {"message": "Для режима «Через прокси» нужно хотя бы одно включённое прокси-подключение."},
-  "popupConfigureProxyMethods": {"message": "Настроить прокси-соединения"},
-  "popupScope": {"message": "Область правила"},
-  "popupHostOnly": {"message": "Точный хост"},
-  "popupDomainAndSubdomains": {"message": "Домен и поддомены"},
-  "popupRulePreview": {"message": "Правило: $1"},
-  "popupNotApplied": {"message": "Не применено"},
-  "popupAutomaticRouting": {"message": "Источник правил"},
-  "popupAutomaticSource": {"message": "«Автоматически» использует выбранный в настройках источник. В ручном режиме действуют только ваши правила и подключения."},
-  "actionSave": {"message": "Сохранить настройки"},
-  "actionReload": {"message": "Перезагрузить"},
-  "actionAddProxy": {"message": "Добавить свой прокси"},
-  "actionAddWarp": {"message": "Добавить кандидата WARP"},
-  "actionMoveUp": {"message": "Выше"},
-  "actionMoveDown": {"message": "Ниже"},
-  "actionRemove": {"message": "Удалить"},
-  "optionsTitle": {"message": "Настройки маршрутизации Firefox"},
-  "optionsSubtitle": {"message": "Настройте маршрутизацию и прокси-подключения для Firefox."},
-  "optionsNavigationLabel": {"message": "Разделы настроек"},
-  "optionsNavOverview": {"message": "Обзор"},
-  "optionsNavAutomaticRouting": {"message": "Источник правил"},
-  "optionsNavSiteRules": {"message": "Правила сайтов"},
-  "optionsNavProxyConnections": {"message": "Прокси-соединения"},
-  "optionsNavMaintenance": {"message": "Обслуживание"},
-  "optionsNavAdvanced": {"message": "Расширенные"},
-  "optionsNavAbout": {"message": "О расширении"},
-  "optionsSectionEyebrow": {"message": "Firefox"},
-  "optionsProtectionState": {"message": "Защита"},
-  "optionsAutomaticSourceHelp": {"message": "Выберите данные Anticensority для автоматической маршрутизации или используйте только свои правила и подключения. Сохранение смены источника не применяет её."},
-  "optionsSourceLabel": {"message": "Источник маршрутизации"},
-  "optionsManualSource": {"message": "Только мои правила и подключения"},
-  "optionsManualSourceHelp": {"message": "Ручной режим работает без базы Anticensority. Действуют ваши правила сайтов, маршруты onion и настройки подключений; остальные сайты используют Direct при стандартных настройках маршрутизации. Обновления базы остаются подготовленными до выбора и применения Anticensority."},
-  "optionsAnticensoritySource": {"message": "Встроенные данные маршрутизации Anticensority"},
-  "optionsMaintenanceHelp": {"message": "Проверьте данные маршрутизации, затем подготовьте обновление. Проверенные данные можно применить при включённой защите; сохранённые настройки при этом не применяются."},
-  "optionsLocalDatasetTitle": {"message": "Текущие данные маршрутизации"},
-  "providerUpdateTitle": {"message": "Обновление данных маршрутизации"},
-  "providerUpdateHelp": {"message": "«Обновить данные» проверяет источник и применяет проверенные изменения, когда защита готова или выключена. Обновление при включённой защите не прерывает её и не применяет сохранённые настройки. Автоматическая проверка выполняется каждые 12 часов; при блокировке обновление остаётся подготовленным."},
-  "providerUpdateChannel": {"message": "Проверка данных"},
-  "providerUpdateChannel_HTTPS": {"message": "HTTPS и строгая проверка данных; без подписи автора"},
-  "providerUpdateChannel_SIGNED": {"message": "Подпись автора и строгая проверка данных"},
-  "providerUpdateChannel_NONE": {"message": "Не настроено"},
-  "providerUpdateSourceDate": {"message": "Дата данных источника"},
-  "providerUpdateCurrentVersion": {"message": "Текущая версия"},
-  "providerUpdateAvailableVersion": {"message": "Доступная версия"},
-  "providerUpdateLastCheck": {"message": "Последняя проверка"},
-  "providerUpdateErrorCategory": {"message": "Последняя ошибка"},
-  "providerUpdateCheck": {"message": "Обновить данные"},
-  "providerUpdateInstall": {"message": "Применить обновление"},
-  "providerUpdateActionRequired": {"message": "Перед установкой устраните указанную выше проблему с защитой."},
-  "providerUpdateActiveHelp": {"message": "При обновлении действующие пользовательские настройки сохраняются, а сохранённые изменения остаются ожидающими применения. Применение не выключает защиту и не включает её, если она выключена. Дата данных источника отличается от даты проверки. Проверка данных не доказывает доступность прокси."},
-  "providerUpdateChecked": {"message": "Проверка данных маршрутизации завершена."},
-  "providerUpdateInstalled": {"message": "Обновление данных маршрутизации применено."},
-  "providerUpdateStatusIdle": {"message": "Готово"},
-  "providerUpdateStatusChecking": {"message": "Проверяем…"},
-  "providerUpdateStatusCurrent": {"message": "Обновлено"},
-  "providerUpdateStatusAvailable": {"message": "Доступно обновление"},
-  "providerUpdateStatusUpdated": {"message": "Установлено"},
-  "providerUpdateStatusFailed": {"message": "Ошибка проверки"},
-  "providerUpdateStatusUnavailable": {"message": "Не настроено"},
-  "providerUpdateError_AUTHENTICATION_FAILED": {"message": "Не удалось проверить подлинность или целостность данных маршрутизации"},
-  "providerUpdateError_DATASET_REJECTED": {"message": "Источник вернул некорректные данные маршрутизации"},
-  "providerUpdateError_NETWORK_FAILED": {"message": "Сетевая проверка не удалась"},
-  "providerUpdateError_ROLLBACK_REJECTED": {"message": "Старое обновление отклонено"},
-  "providerUpdateError_SEQUENCE_CONFLICT": {"message": "Обновление противоречит ранее проверенным данным"},
-  "providerUpdateError_STORAGE_FAILED": {"message": "Не удалось подготовить или сохранить обновление"},
-  "providerUpdateError_TRUST_NOT_CONFIGURED": {"message": "Удалённые обновления в этой сборке не настроены."},
-  "providerUpdateError_UPDATE_INTERRUPTED": {"message": "Предыдущая проверка была прервана"},
-  "providerUpdateError_UPDATE_REJECTED": {"message": "Обновление безопасно отклонено"},
-  "optionsAdvancedHelp": {"message": "Настройте замену Direct и маршруты через локальный Tor, Tor Browser или WARP."},
-  "optionsAboutHelp": {"message": "Обход блокировок Рунета — Revived для Firefox использует встроенные проверенные данные маршрутизации и не содержит удалённого исполняемого кода."},
-  "optionsVersion": {"message": "Версия $1"},
-  "optionsLoading": {"message": "Загружаем сохранённые настройки…"},
-  "optionsLoadFailed": {"message": "Не удалось загрузить сохранённые настройки."},
-  "optionsReadOnlyHelp": {"message": "Настройки доступны только для чтения, пока защита Firefox запускается или заблокирована. Сначала устраните указанную причину."},
-  "optionsReadOnlyShort": {"message": "Только чтение во время запуска или блокировки."},
-  "optionsReady": {"message": "«Сохранить настройки» сохраняет правки. «Применить» делает сохранённые изменения действующими; несохранённые правки не применяются."},
-  "optionsSaved": {"message": "Настройки сохранены. Текущая маршрутизация не изменится, пока вы не нажмёте «Применить»."},
-  "optionsApplySaved": {"message": "Применить"},
-  "optionsApplied": {"message": "Сохранённые настройки теперь действуют."},
-  "optionsRevisionConflict": {"message": "Настройки изменились в другой вкладке. Загружены последние сохранённые настройки; проверьте правки перед повторным сохранением."},
-  "optionsErrorReadOnly": {"message": "Операция недоступна в текущем состоянии защиты. Проверьте указанное выше состояние и повторите попытку."},
-  "optionsErrorValidation": {"message": "Проверьте значения маршрутизации и прокси. Фоновая проверка отклонила конфигурацию."},
-  "optionsErrorGeneric": {"message": "Операция с настройками безопасно завершилась ошибкой."},
-  "optionsRulesTitle": {"message": "Правила сайтов"},
-  "optionsRulesHelp": {"message": "Обычное имя совпадает только с этим хостом. Область «Домен и поддомены» включает и сам указанный домен. Правила хранятся в этом профиле браузера и не синхронизируются с другим браузером."},
-  "optionsRulesPlaceholder": {"message": "example.com\n*.example.org"},
-  "optionsDirectRules": {"message": "Правила Direct"},
-  "optionsProxyRules": {"message": "Правила Proxy"},
-  "optionsWhitelistRules": {"message": "Правила белого списка"},
-  "optionsRoutingFlags": {"message": "Параметры маршрутизации"},
-  "flagUseProviderProxies": {"message": "Использовать прокси провайдера"},
-  "flagOwnProxiesOnlyForOwnSites": {"message": "Использовать настроенные прокси только для явных правил Proxy"},
-  "flagReplaceDirectWithProxy": {"message": "Заменять Direct провайдера настроенными прокси"},
-  "flagNoDirect": {"message": "Убирать резервный Direct провайдера"},
-  "optionsOwnProxies": {"message": "Свои прокси"},
-  "optionsOwnProxiesHelp": {"message": "Кандидаты пробуются в показанном порядке перед локальным Tor, Tor Browser и WARP. Аутентификация HTTP/HTTPS поддерживается; аутентификация SOCKS зависит от поддержки браузера и расширения."},
-  "optionsOwnProxyUntitled": {"message": "Свой прокси"},
-  "optionsLocalTor": {"message": "Локальный Tor"},
-  "optionsTorBrowser": {"message": "Tor Browser"},
-  "optionsWarp": {"message": "WARP"},
-  "optionsWarpUntitled": {"message": "Кандидат WARP"},
-  "optionsPasswordKept": {"message": "Сохранённый пароль остаётся прежним, но никогда не загружается на эту страницу."},
-  "optionsPasswordEmpty": {"message": "Для этого прокси нет сохранённого пароля."},
-  "optionsNone": {"message": "Нет"},
-  "fieldId": {"message": "Идентификатор"},
-  "fieldType": {"message": "Тип прокси"},
-  "fieldHost": {"message": "Хост"},
-  "fieldPort": {"message": "Порт"},
-  "fieldFailoverTimeout": {"message": "Тайм-аут переключения (секунды, необязательно)"},
-  "fieldProxyDns": {"message": "Разрешать имена сайтов через SOCKS-прокси (SOCKS4A / SOCKS5)"},
-  "fieldEnabled": {"message": "Включён для явных правил Proxy"},
-  "fieldUseForProxyRules": {"message": "Использовать для явных правил Proxy"},
-  "fieldUseForOnion": {"message": "Использовать для .onion"},
-  "fieldUseAsDirectReplacement": {"message": "Использовать для замены Direct провайдера"},
-  "fieldCredentials": {"message": "Учётные данные"},
-  "fieldUsername": {"message": "Имя пользователя"},
-  "fieldNewPassword": {"message": "Новый пароль"},
-  "credentialKEEP": {"message": "Сохранить пароль"},
-  "credentialSET": {"message": "Заменить пароль"},
-  "credentialNONE": {"message": "Без пароля / удалить"},
-  "actionTitleExternal": {"message": "Настройками прокси управляет другой контроллер. Откройте расширение для безопасного восстановления."},
-  "actionTitleApplying": {"message": "Включение защиты Firefox…"},
-  "actionTitleClearing": {"message": "Выключение защиты Firefox…"},
-  "actionTitleChecking": {"message": "Проверяем настроенное подключение…"},
-  "actionTitleLoading": {"message": "Проверка состояния защиты Firefox…"},
-  "actionTitleOff": {"message": "Защита выключена. Firefox использует исходные настройки прокси."},
-  "actionTitleError": {"message": "Защита Firefox требует внимания. Откройте расширение для подробностей."},
-  "actionTitleHealthWarning": {"message": "Последняя проверка соединения завершилась ошибкой. Откройте расширение и повторите её."},
-  "actionTitleActiveAuto": {"message": "Защита включена — текущий сайт: Авто"},
-  "actionTitleActiveProxy": {"message": "Защита включена — текущий сайт: Прокси"},
-  "actionTitleActiveDirect": {"message": "Защита включена — текущий сайт: Напрямую"},
-  "actionTitleActiveUnavailable": {"message": "Защита включена — маршрутизация текущей страницы недоступна"},
-  "healthConnectionTitle": {"message": "Проверка соединения"},
-  "healthConnectionHelp": {"message": "Проверяет последний сайт с явным режимом Прокси через активную сессию Firefox. Маршрутизация и настройки не изменяются."},
-  "healthStatusOk": {"message": "Соединение установлено"},
-  "healthStatusError": {"message": "Ошибка соединения"},
-  "healthStatusInconclusive": {"message": "Нет однозначного результата"},
-  "healthStatusUnknown": {"message": "Не проверялось"},
-  "healthCheckAction": {"message": "Проверить соединение"},
-  "healthCheckAgain": {"message": "Проверить снова"},
-  "healthLastChecked": {"message": "Последняя проверка"},
-  "healthCheckedCandidate": {"message": "Первый настроенный способ"},
-  "healthCode_HEALTH_CHECK_FAILED": {"message": "Соединение не удалось, маршрутизация не изменена. Проверьте прокси и адрес назначения и повторите попытку."},
-  "healthCode_HEALTH_CHECK_INTERRUPTED": {"message": "Предыдущая проверка была прервана при остановке фоновой страницы."},
-  "healthCode_HEALTH_CHECK_SUPERSEDED": {"message": "Состояние защиты изменилось во время проверки."},
-  "healthCode_HEALTH_CHECK_TIMEOUT": {"message": "Время проверки соединения истекло."},
-  "healthCode_HEALTH_NOT_ACTIVE": {"message": "Перед проверкой включите защиту."},
-  "healthCode_HEALTH_PROXY_CANDIDATE_UNAVAILABLE": {"message": "Для проверки нет включённого прокси-кандидата."},
-  "healthCode_HEALTH_PROXY_RULE_REQUIRED": {"message": "Выберите явный режим Прокси для сайта и сначала запустите проверку из его popup."},
-  "healthCode_HEALTH_TARGET_REQUIRED": {"message": "Сначала запустите проверку из popup сайта с явным режимом Прокси."},
-  "diagnosticsTitle": {"message": "Безопасная диагностика"},
-  "diagnosticsRedactionHelp": {"message": "Отчёт не содержит адресов посещённых страниц, адресов и учётных данных прокси, ссылок аутентификации, идентификаторов данных маршрутизации и внутреннего состояния защиты."},
-  "diagnosticsExtensionVersion": {"message": "Версия расширения"},
-  "diagnosticsBrowserVersion": {"message": "Версия браузера"},
-  "diagnosticsRuntimeState": {"message": "Состояние защиты"},
-  "diagnosticsRecoveryState": {"message": "Состояние восстановления"},
-  "diagnosticsControlState": {"message": "Управление прокси"},
-  "diagnosticsDatasetVersion": {"message": "Версия данных маршрутизации"},
-  "diagnosticsProxyCounts": {"message": "Включённые/настроенные способы прокси"},
-  "diagnosticsProxyTypes": {"message": "Настроенные типы прокси"},
-  "diagnosticsControlOwned": {"message": "Управляется этим расширением"},
-  "diagnosticsControlAvailable": {"message": "Доступно"},
-  "diagnosticsControlExternal": {"message": "Управляется другим расширением"},
-  "diagnosticsControlPolicy": {"message": "Управляется политикой браузера"},
-  "diagnosticsDownload": {"message": "Скачать безопасную диагностику"},
-  "notificationsAttentionTitle": {"message": "Уведомления о защите"},
-  "notificationsAttentionEnabled": {"message": "Firefox уведомит только о потере управления защитой, заблокированном восстановлении или неудачной запрошенной проверке соединения."},
-  "notificationsAttentionUnavailable": {"message": "Уведомления браузера недоступны."},
-  "notificationProtectionTitle": {"message": "Защита требует внимания"},
-  "notificationHealthTitle": {"message": "Ошибка проверки соединения"},
-  "notificationControlLoss": {"message": "Другой контроллер изменил настройки прокси Firefox. Защита безопасно остановлена и не возобновлена."},
-  "notificationPrivateAccessBlocked": {"message": "Доступ в приватных окнах отозван. Защита заблокирована, её можно безопасно выключить."},
-  "notificationRecoveryBlocked": {"message": "Firefox не смог восстановить защищённую сессию. Откройте расширение, чтобы проверить состояние или выключить его."},
-  "notificationHealthFailure": {"message": "Запрошенная проверка прокси завершилась ошибкой. Откройте раздел Обслуживание для безопасного результата."},
+  "providerLifecycleControlHelp": {
+    "message": "Проверьте состояние защиты выше. Само по себе обновление данных маршрутизации не означает, что маршрутизация активна."
+  },
+  "providerLifecycleHelp": {
+    "message": "Проверить обновления → Проверить данные → Подготовить → Применить обновление."
+  },
+  "providerLifecycleName": {
+    "message": "Данные маршрутизации"
+  },
+  "providerLifecycleLastResult": {
+    "message": "Результат последней проверки / обновления"
+  },
+  "providerLifecycleUnknown": {
+    "message": "Неизвестно"
+  },
+  "providerLifecycleUnknownHelp": {
+    "message": "Результата проверки обновлений пока нет."
+  },
+  "providerLifecycleChecking": {
+    "message": "Проверяем…"
+  },
+  "providerLifecycleApplying": {
+    "message": "Подготавливаем и применяем…"
+  },
+  "providerLifecycleVerified": {
+    "message": "Проверено"
+  },
+  "providerLifecycleVerifiedHelp": {
+    "message": "Данные маршрутизации прошли предусмотренные проверки целостности. Это не проверка прокси-подключений."
+  },
+  "providerLifecyclePrepared": {
+    "message": "Готово к применению"
+  },
+  "providerLifecyclePreparedHelp": {
+    "message": "Данные прошли проверку, обновление готово к применению. Сохранённые настройки не применены."
+  },
+  "providerLifecycleApplied": {
+    "message": "Применено"
+  },
+  "providerLifecycleAppliedHelp": {
+    "message": "Текущие данные маршрутизации используются. Доступность подключений зависит от настроенных прокси-служб."
+  },
+  "providerLifecycleAppliedOff": {
+    "message": "Данные обновлены"
+  },
+  "providerLifecycleAppliedOffHelp": {
+    "message": "Данные маршрутизации обновлены. Защита остаётся выключенной."
+  },
+  "providerLifecycleFailed": {
+    "message": "Не удалось обновить"
+  },
+  "providerLifecyclePreparationFailed": {
+    "message": "Не удалось подготовить или применить обновление. Проверьте состояние защиты."
+  },
+  "providerLifecycleBusyHelp": {
+    "message": "Обновление выполняется. При подготовке действует прежняя маршрутизация; сохранённые изменения остаются неприменёнными."
+  },
+  "providerLifecycleCheck": {
+    "message": "Проверить обновления"
+  },
+  "transferCredentialsMissingLabel": {
+    "message": "Нужны учётные данные"
+  },
+  "transferUnsupported_authentication": {
+    "message": "В Firefox нет общего переключателя авторизации прокси. Проверьте импортированные профили перед применением; недостающие учётные данные нужно ввести заново."
+  },
+  "transferTitle": {
+    "message": "Импорт / Экспорт"
+  },
+  "transferHelp": {
+    "message": "Ручной перенос сохранённых настроек, а не синхронизация. Файл содержит правила сайтов и адреса прокси, но не логины и пароли. Несохранённые правки не экспортируются. Импорт сохраняет настройки, но не применяет их и не включает защиту."
+  },
+  "transferExport": {
+    "message": "Экспорт настроек"
+  },
+  "transferImport": {
+    "message": "Импорт настроек: выберите JSON-файл"
+  },
+  "transferSupport": {
+    "message": "Экспорт для поддержки"
+  },
+  "transferSupportHelp": {
+    "message": "Файл для поддержки содержит только сведения о среде и состоянии, без правил сайтов и адресов прокси. Его нельзя импортировать как настройки."
+  },
+  "transferPreview": {
+    "message": "Перед импортом"
+  },
+  "transferCounts": {
+    "message": "Правил: $1 (добавлено/удалено записей: $2). Профилей прокси: $3. Требуют ввода учётных данных: $4."
+  },
+  "transferReplaceWarning": {
+    "message": "Сохранённые настройки маршрутизации будут заменены. Перед применением введите недостающие учётные данные. Проверьте предупреждения о неподдерживаемых полях: они не переносятся."
+  },
+  "transferConfirm": {
+    "message": "Сохранить импортированные настройки"
+  },
+  "transferCancel": {
+    "message": "Отменить импорт"
+  },
+  "transferImported": {
+    "message": "Настройки импортированы. Они сохранены, но не применены."
+  },
+  "transferExported": {
+    "message": "Файл экспорта подготовлен. Не публикуйте файл настроек."
+  },
+  "transferInvalid": {
+    "message": "Файл не соответствует формату настроек. Импорт не выполнен."
+  },
+  "transferSocks4aUnsupported": {
+    "message": "Файл содержит подключения SOCKS4A, которые Chromium не поддерживает. Импорт не выполнен. Используйте Firefox или настройте SOCKS5, если ваш прокси-сервер его поддерживает."
+  },
+  "transferVersion": {
+    "message": "Эта версия формата экспорта не поддерживается."
+  },
+  "transferLimit": {
+    "message": "Превышен предел размера или сложности импорта (файл не более 1 МиБ)."
+  },
+  "transferDraft": {
+    "message": "Перед импортом проверьте и сохраните или отмените свои правки. Они не потеряны."
+  },
+  "transferNoConfiguration": {
+    "message": "Это файл для поддержки, а не файл настроек."
+  },
+  "transferConflict": {
+    "message": "Настройки изменились в другом окне. Выберите файл снова и проверьте обновлённый предварительный просмотр."
+  },
+  "transferCredentialsRequired": {
+    "message": "Учётные данные не перенесены: введите их перед применением либо явно выберите работу без авторизации."
+  },
+  "transferUnsupported_source": {
+    "message": "Выбор источника не переносится в этот браузер. Проверьте источник правил перед применением. Адреса своих источников исключены из экспорта: они могут содержать токены доступа."
+  },
+  "transferUnsupported_language": {
+    "message": "В этом браузере настройка языка интерфейса не переносится."
+  },
+  "transferUnsupported_disabledRules": {
+    "message": "Этот браузер не хранит отключённые правила; они будут пропущены."
+  },
+  "transferUnsupported_proxyOptions": {
+    "message": "Индивидуальные параметры DNS и ожидания прокси здесь не поддерживаются; используются настройки браузера."
+  },
+  "transferUnsupported_torScope": {
+    "message": "Этот браузер не использует отключённый режим Tor только для .onion или замены Direct. Проверьте режим Tor после импорта."
+  },
+  "transferUnsupported_torExclusive": {
+    "message": "Этот браузер поддерживает один режим Tor одновременно. Оба режима будут отключены, пока вы не выберете один."
+  },
+  "transferUnsupported_warpScope": {
+    "message": "Переключатели области WARP здесь относятся ко всему списку. Несогласованные переключатели будут отключены; проверьте их перед применением."
+  },
+  "rulesEditorHelp": {
+    "message": "Измените строку, добавьте или удалите правило. «Сохранить» сохраняет правки, «Применить» включает их. «Авто» убирает только эту запись: другие подходящие правила и автоматический источник продолжают действовать."
+  },
+  "rulesAllowlistHelp": {
+    "message": "В этом же списке отдельно отмечены записи списка режима «Авто». Если он не пуст, остальные сайты идут напрямую, кроме сайтов с явным правилом. Запись в списке не принуждает к режиму «Авто»."
+  },
+  "rulesAdd": {
+    "message": "Добавить правило сайта"
+  },
+  "rulesDelete": {
+    "message": "Удалить правило"
+  },
+  "rulesEmpty": {
+    "message": "Правил сайтов пока нет. Используется режим «Авто»."
+  },
+  "rulesHost": {
+    "message": "Сайт или домен"
+  },
+  "rulesScope": {
+    "message": "Область правила"
+  },
+  "rulesRoute": {
+    "message": "Маршрут / тип правила"
+  },
+  "rulesScopeHost": {
+    "message": "Только этот хост"
+  },
+  "rulesScopeDomain": {
+    "message": "Домен и поддомены"
+  },
+  "rulesScopePattern": {
+    "message": "Существующий шаблон (прежний синтаксис)"
+  },
+  "rulesAuto": {
+    "message": "Авто — убрать эту запись"
+  },
+  "rulesWhitelist": {
+    "message": "Список режима «Авто»"
+  },
+  "rulesHostError": {
+    "message": "Введите хост без звёздочки; для поддоменов выберите «Домен и поддомены»."
+  },
+  "unifiedSaveSection": {
+    "message": "Сохранить настройки"
+  },
+  "unifiedPopupConflict": {
+    "message": "Настройки изменены в другом окне. Проверьте текущее состояние и подтвердите применение заново."
+  },
+  "unifiedControlLost": {
+    "message": "Прокси контролируется браузером или другим расширением. Проверьте управление прокси перед повторным применением."
+  },
+  "unifiedUnproven": {
+    "message": "Не удалось подтвердить действующие настройки. Проверьте состояние и снова нажмите «Применить»."
+  },
+  "unifiedActions": {
+    "message": "Действия с настройками"
+  },
+  "unifiedApply": {
+    "message": "Применить"
+  },
+  "unifiedApplyOn": {
+    "message": "Применить и включить"
+  },
+  "unifiedApplyAll": {
+    "message": "Применить все сохранённые изменения"
+  },
+  "unifiedDiscard": {
+    "message": "Отменить несохранённые правки"
+  },
+  "unifiedReview": {
+    "message": "Проверить в настройках"
+  },
+  "unifiedActive": {
+    "message": "Защита включена"
+  },
+  "unifiedPending": {
+    "message": "Защита включена — изменения не применены"
+  },
+  "unifiedApplying": {
+    "message": "Применяем…"
+  },
+  "unifiedInactive": {
+    "message": "Защита выключена"
+  },
+  "unifiedBlocked": {
+    "message": "Требуется действие"
+  },
+  "unifiedUnsaved": {
+    "message": "Несохранённые изменения"
+  },
+  "unifiedConflict": {
+    "message": "Настройки изменены в другом окне. Ваши правки сохранены в этом окне. Отмените несохранённые правки, чтобы загрузить и проверить новые настройки."
+  },
+  "unifiedSaveFirst": {
+    "message": "Перед применением сохраните или отмените правки."
+  },
+  "unifiedSavedActive": {
+    "message": "Сохранено. Пока действуют прежние настройки."
+  },
+  "unifiedPreparing": {
+    "message": "Пока новые настройки подготавливаются, действуют прежние."
+  },
+  "unifiedApplyFailed": {
+    "message": "Изменения не применены. Прежние настройки продолжают действовать."
+  },
+  "unifiedSiteSaved": {
+    "message": "Правило сайта сохранено, но не применено. Прежние настройки продолжают действовать."
+  },
+  "unifiedPopupPending": {
+    "message": "Другие сохранённые настройки ещё не применены. Вместе с правилом сайта будут применены и они."
+  },
+  "unifiedTransition": {
+    "message": "Сейчас: $1. Выбрано: $2."
+  },
+  "unifiedCategory_siteRules": {
+    "message": "Изменены правила сайтов"
+  },
+  "unifiedCategory_proxyConnections": {
+    "message": "Изменены подключения к прокси"
+  },
+  "unifiedCategory_routingSettings": {
+    "message": "Изменены настройки маршрутизации"
+  },
+  "extensionName": {
+    "message": "Обход блокировок Рунета — Revived"
+  },
+  "extensionDescription": {
+    "message": "Независимый форк Anticensority. Управление маршрутами сайтов: автоматически, через прокси или напрямую."
+  },
+  "popupTitle": {
+    "message": "Состояние защиты"
+  },
+  "popupSubtitle": {
+    "message": "Управление маршрутизацией Firefox"
+  },
+  "popupLoading": {
+    "message": "Читаем текущее состояние…"
+  },
+  "popupLoadFailed": {
+    "message": "Не удалось прочитать состояние расширения."
+  },
+  "popupStateOff": {
+    "message": "Защита выключена"
+  },
+  "popupStateInitializing": {
+    "message": "Защита запускается"
+  },
+  "popupStateActive": {
+    "message": "Защита активна"
+  },
+  "popupStateRecovered": {
+    "message": "Защита восстановлена"
+  },
+  "popupStateBlocked": {
+    "message": "Защита заблокирована"
+  },
+  "popupStateExternal": {
+    "message": "Приоритет у другого контроллера"
+  },
+  "popupHelpOff": {
+    "message": "Включите защиту, когда будете готовы."
+  },
+  "popupHelpInitializing": {
+    "message": "До завершения восстановления защищённые запросы блокируются."
+  },
+  "popupHelpActive": {
+    "message": "Firefox использует проверенную локальную конфигурацию маршрутизации."
+  },
+  "popupHelpRecovered": {
+    "message": "Сеанс маршрутизации восстановлен после перезапуска фоновой страницы."
+  },
+  "popupHelpBlocked": {
+    "message": "Маршрутизация недоступна, а защищённые запросы блокируются. Защиту можно безопасно выключить."
+  },
+  "popupHelpPrivateBlocked": {
+    "message": "Доступ к приватным окнам отозван. Маршрутизация заблокирована, защиту можно безопасно выключить."
+  },
+  "popupHelpPrivateRequired": {
+    "message": "Перед включением разрешите расширению работу в приватных окнах."
+  },
+  "popupHelpExternal": {
+    "message": "Управление прокси Firefox изменено извне. Расширение остановило маршрутизацию и не будет перезаписывать чужую настройку."
+  },
+  "popupHelpDatasetMissing": {
+    "message": "Проверенные данные маршрутизации недоступны."
+  },
+  "popupErrorPrivateAccess": {
+    "message": "Нужен доступ к приватным окнам."
+  },
+  "popupErrorPrivateAccessCheck": {
+    "message": "Firefox не сообщил состояние доступа к приватным окнам. Защита не была включена."
+  },
+  "popupErrorDataset": {
+    "message": "Проверенные данные маршрутизации недоступны или повреждены."
+  },
+  "popupErrorSettings": {
+    "message": "Проверьте сохранённые настройки маршрутизации и учётные данные прокси."
+  },
+  "popupErrorProxyCandidate": {
+    "message": "Перед режимом Proxy настройте хотя бы одно прокси-соединение."
+  },
+  "popupErrorRevision": {
+    "message": "Настройки изменились в другом месте. Состояние текущего сайта перезагружено; проверьте его и повторите."
+  },
+  "popupErrorGeneric": {
+    "message": "Не удалось завершить операцию. Проверьте состояние защиты выше."
+  },
+  "popupOperationPending": {
+    "message": "Операция выполняется"
+  },
+  "popupDetails": {
+    "message": "Готовность"
+  },
+  "popupDataset": {
+    "message": "Данные маршрутизации"
+  },
+  "popupPrivateAccess": {
+    "message": "Доступ к приватным окнам"
+  },
+  "permissionPrivateAccessTitle": {
+    "message": "Нужен доступ к приватным окнам"
+  },
+  "permissionPrivateAccessExplanation": {
+    "message": "Сейчас расширение управляет общими настройками прокси Firefox, которые действуют и в приватных окнах. Доступ нужен, чтобы расширение не показывало защиту включённой, пока приватные окна остаются вне его управления."
+  },
+  "permissionPrivateAccessUnknown": {
+    "message": "Firefox не сообщил текущее состояние разрешения. Включение останется недоступным, пока расширение не сможет его проверить."
+  },
+  "permissionPrivateAccessSteps": {
+    "message": "Откройте меню Firefox → Дополнения и темы → Расширения. Выберите «Обход блокировок Рунета — Revived», затем в разделе «Работа в приватных окнах» выберите «Разрешить». После этого вернитесь сюда."
+  },
+  "permissionCheckAgain": {
+    "message": "Проверить снова"
+  },
+  "permissionRestrictedSitesInfo": {
+    "message": "Разрешение Firefox «Работа на сайтах с ограничениями» настраивается отдельно и для включения защиты не требуется. Расширение не умеет проверять его состояние; изменяйте его вручную, только если Firefox ограничивает обычный сайт. Страницы about: нельзя маршрутизировать."
+  },
+  "valueAvailable": {
+    "message": "Доступен"
+  },
+  "valueUnavailable": {
+    "message": "Недоступен"
+  },
+  "valueGranted": {
+    "message": "Разрешён"
+  },
+  "valueDenied": {
+    "message": "Запрещён"
+  },
+  "valueUnknown": {
+    "message": "Неизвестно"
+  },
+  "actionEnable": {
+    "message": "Включить"
+  },
+  "actionDisable": {
+    "message": "Выключить"
+  },
+  "actionSettings": {
+    "message": "Настройки"
+  },
+  "actionRetry": {
+    "message": "Повторить"
+  },
+  "popupApplyChanges": {
+    "message": "Применить"
+  },
+  "popupTurnOff": {
+    "message": "Выключить"
+  },
+  "popupPillOFF": {
+    "message": "Выкл."
+  },
+  "popupPillACTIVE": {
+    "message": "Активно"
+  },
+  "popupPillRECOVERED": {
+    "message": "Восстановлено"
+  },
+  "popupPillINITIALIZING": {
+    "message": "Запуск"
+  },
+  "popupPillBLOCKED": {
+    "message": "Блокировка"
+  },
+  "popupPillEXTERNAL": {
+    "message": "Внешнее"
+  },
+  "popupCurrentSiteRouting": {
+    "message": "Текущий сайт"
+  },
+  "popupCurrentTabUnavailable": {
+    "message": "Эта страница недоступна"
+  },
+  "popupPageCannotBeControlledHelp": {
+    "message": "Firefox не разрешает правила маршрутизации для этой страницы браузера или расширения."
+  },
+  "popupSiteModeGroup": {
+    "message": "Режим маршрутизации для $1"
+  },
+  "popupModeAUTO": {
+    "message": "Авто"
+  },
+  "popupModePROXY": {
+    "message": "Через прокси"
+  },
+  "popupModeDIRECT": {
+    "message": "Напрямую"
+  },
+  "popupAutoModeDescription": {
+    "message": "Использовать для сайта встроенные правила маршрутизации Anticensority."
+  },
+  "popupProxyModeDescription": {
+    "message": "Всегда использовать для сайта настроенные прокси-подключения."
+  },
+  "popupDirectModeDescription": {
+    "message": "Открывать сайт напрямую, вне режима «Авто»."
+  },
+  "popupProxyRouteNeedsMethod": {
+    "message": "Для режима «Через прокси» нужно хотя бы одно включённое прокси-подключение."
+  },
+  "popupConfigureProxyMethods": {
+    "message": "Настроить прокси-соединения"
+  },
+  "popupScope": {
+    "message": "Область правила"
+  },
+  "popupHostOnly": {
+    "message": "Точный хост"
+  },
+  "popupDomainAndSubdomains": {
+    "message": "Домен и поддомены"
+  },
+  "popupRulePreview": {
+    "message": "Правило: $1"
+  },
+  "popupNotApplied": {
+    "message": "Не применено"
+  },
+  "popupAutomaticRouting": {
+    "message": "Источник правил"
+  },
+  "popupAutomaticSource": {
+    "message": "«Автоматически» использует выбранный в настройках источник. В ручном режиме действуют только ваши правила и подключения."
+  },
+  "actionSave": {
+    "message": "Сохранить настройки"
+  },
+  "actionReload": {
+    "message": "Перезагрузить"
+  },
+  "actionAddProxy": {
+    "message": "Добавить свой прокси"
+  },
+  "actionAddWarp": {
+    "message": "Добавить кандидата WARP"
+  },
+  "actionMoveUp": {
+    "message": "Выше"
+  },
+  "actionMoveDown": {
+    "message": "Ниже"
+  },
+  "actionRemove": {
+    "message": "Удалить"
+  },
+  "optionsTitle": {
+    "message": "Настройки маршрутизации Firefox"
+  },
+  "optionsSubtitle": {
+    "message": "Настройте маршрутизацию и прокси-подключения для Firefox."
+  },
+  "optionsNavigationLabel": {
+    "message": "Разделы настроек"
+  },
+  "optionsNavOverview": {
+    "message": "Обзор"
+  },
+  "optionsNavAutomaticRouting": {
+    "message": "Источник правил"
+  },
+  "optionsNavSiteRules": {
+    "message": "Правила сайтов"
+  },
+  "optionsNavProxyConnections": {
+    "message": "Прокси-соединения"
+  },
+  "optionsNavMaintenance": {
+    "message": "Обслуживание"
+  },
+  "optionsNavAdvanced": {
+    "message": "Расширенные"
+  },
+  "optionsNavAbout": {
+    "message": "О расширении"
+  },
+  "optionsSectionEyebrow": {
+    "message": "Firefox"
+  },
+  "optionsProtectionState": {
+    "message": "Защита"
+  },
+  "optionsAutomaticSourceHelp": {
+    "message": "Выберите источник списка сайтов или используйте только свои правила и подключения. Сохранение смены источника не применяет её."
+  },
+  "optionsSourceLabel": {
+    "message": "Источник маршрутизации"
+  },
+  "optionsManualSource": {
+    "message": "Только мои правила и подключения"
+  },
+  "optionsManualSourceHelp": {
+    "message": "Ручной режим работает без базы Anticensority. Действуют ваши правила сайтов, маршруты onion и настройки подключений; остальные сайты используют Direct при стандартных настройках маршрутизации. Обновления базы остаются подготовленными до выбора и применения Anticensority."
+  },
+  "optionsAnticensoritySource": {
+    "message": "Встроенные данные маршрутизации Anticensority"
+  },
+  "optionsMaintenanceHelp": {
+    "message": "Проверьте данные маршрутизации, затем подготовьте обновление. Проверенные данные можно применить при включённой защите; сохранённые настройки при этом не применяются."
+  },
+  "optionsLocalDatasetTitle": {
+    "message": "Текущие данные маршрутизации"
+  },
+  "providerUpdateTitle": {
+    "message": "Обновление данных маршрутизации"
+  },
+  "providerUpdateHelp": {
+    "message": "«Обновить данные» проверяет источник и применяет проверенные изменения, когда защита готова или выключена. Обновление при включённой защите не прерывает её и не применяет сохранённые настройки. Автоматическая проверка выполняется каждые 12 часов; при блокировке обновление остаётся подготовленным."
+  },
+  "providerUpdateChannel": {
+    "message": "Проверка данных"
+  },
+  "providerUpdateChannel_HTTPS": {
+    "message": "HTTPS и строгая проверка данных; без подписи автора"
+  },
+  "providerUpdateChannel_SIGNED": {
+    "message": "Подпись автора и строгая проверка данных"
+  },
+  "providerUpdateChannel_NONE": {
+    "message": "Не настроено"
+  },
+  "providerUpdateSourceDate": {
+    "message": "Дата данных источника"
+  },
+  "providerUpdateCurrentVersion": {
+    "message": "Текущая версия"
+  },
+  "providerUpdateAvailableVersion": {
+    "message": "Доступная версия"
+  },
+  "providerUpdateLastCheck": {
+    "message": "Последняя проверка"
+  },
+  "providerUpdateErrorCategory": {
+    "message": "Последняя ошибка"
+  },
+  "providerUpdateCheck": {
+    "message": "Обновить данные"
+  },
+  "providerUpdateInstall": {
+    "message": "Применить обновление"
+  },
+  "providerUpdateActionRequired": {
+    "message": "Перед установкой устраните указанную выше проблему с защитой."
+  },
+  "providerUpdateActiveHelp": {
+    "message": "При обновлении действующие пользовательские настройки сохраняются, а сохранённые изменения остаются ожидающими применения. Применение не выключает защиту и не включает её, если она выключена. Дата данных источника отличается от даты проверки. Проверка данных не доказывает доступность прокси."
+  },
+  "providerUpdateChecked": {
+    "message": "Проверка данных маршрутизации завершена."
+  },
+  "providerUpdateInstalled": {
+    "message": "Обновление данных маршрутизации применено."
+  },
+  "providerUpdateStatusIdle": {
+    "message": "Готово"
+  },
+  "providerUpdateStatusChecking": {
+    "message": "Проверяем…"
+  },
+  "providerUpdateStatusCurrent": {
+    "message": "Обновлено"
+  },
+  "providerUpdateStatusAvailable": {
+    "message": "Доступно обновление"
+  },
+  "providerUpdateStatusUpdated": {
+    "message": "Установлено"
+  },
+  "providerUpdateStatusFailed": {
+    "message": "Ошибка проверки"
+  },
+  "providerUpdateStatusUnavailable": {
+    "message": "Не настроено"
+  },
+  "providerUpdateError_AUTHENTICATION_FAILED": {
+    "message": "Не удалось проверить подлинность или целостность данных маршрутизации"
+  },
+  "providerUpdateError_DATASET_REJECTED": {
+    "message": "Источник вернул некорректные данные маршрутизации"
+  },
+  "providerUpdateError_NETWORK_FAILED": {
+    "message": "Сетевая проверка не удалась"
+  },
+  "providerUpdateError_ROLLBACK_REJECTED": {
+    "message": "Старое обновление отклонено"
+  },
+  "providerUpdateError_SEQUENCE_CONFLICT": {
+    "message": "Обновление противоречит ранее проверенным данным"
+  },
+  "providerUpdateError_STORAGE_FAILED": {
+    "message": "Не удалось подготовить или сохранить обновление"
+  },
+  "providerUpdateError_TRUST_NOT_CONFIGURED": {
+    "message": "Удалённые обновления в этой сборке не настроены."
+  },
+  "providerUpdateError_UPDATE_INTERRUPTED": {
+    "message": "Предыдущая проверка была прервана"
+  },
+  "providerUpdateError_UPDATE_REJECTED": {
+    "message": "Обновление безопасно отклонено"
+  },
+  "optionsAdvancedHelp": {
+    "message": "Настройте замену Direct и маршруты через локальный Tor, Tor Browser или WARP."
+  },
+  "optionsAboutHelp": {
+    "message": "Обход блокировок Рунета — Revived для Firefox использует встроенные проверенные данные маршрутизации и не содержит удалённого исполняемого кода."
+  },
+  "optionsVersion": {
+    "message": "Версия $1"
+  },
+  "optionsLoading": {
+    "message": "Загружаем сохранённые настройки…"
+  },
+  "optionsLoadFailed": {
+    "message": "Не удалось загрузить сохранённые настройки."
+  },
+  "optionsReadOnlyHelp": {
+    "message": "Настройки доступны только для чтения, пока защита Firefox запускается или заблокирована. Сначала устраните указанную причину."
+  },
+  "optionsReadOnlyShort": {
+    "message": "Только чтение во время запуска или блокировки."
+  },
+  "optionsReady": {
+    "message": "«Сохранить настройки» сохраняет правки. «Применить» делает сохранённые изменения действующими; несохранённые правки не применяются."
+  },
+  "optionsSaved": {
+    "message": "Настройки сохранены. Текущая маршрутизация не изменится, пока вы не нажмёте «Применить»."
+  },
+  "optionsApplySaved": {
+    "message": "Применить"
+  },
+  "optionsApplied": {
+    "message": "Сохранённые настройки теперь действуют."
+  },
+  "optionsRevisionConflict": {
+    "message": "Настройки изменились в другой вкладке. Загружены последние сохранённые настройки; проверьте правки перед повторным сохранением."
+  },
+  "optionsErrorReadOnly": {
+    "message": "Операция недоступна в текущем состоянии защиты. Проверьте указанное выше состояние и повторите попытку."
+  },
+  "optionsErrorValidation": {
+    "message": "Проверьте значения маршрутизации и прокси. Фоновая проверка отклонила конфигурацию."
+  },
+  "optionsErrorGeneric": {
+    "message": "Операция с настройками безопасно завершилась ошибкой."
+  },
+  "optionsRulesTitle": {
+    "message": "Правила сайтов"
+  },
+  "optionsRulesHelp": {
+    "message": "Обычное имя совпадает только с этим хостом. Область «Домен и поддомены» включает и сам указанный домен. Правила хранятся в этом профиле браузера и не синхронизируются с другим браузером."
+  },
+  "optionsRulesPlaceholder": {
+    "message": "example.com\n*.example.org"
+  },
+  "optionsDirectRules": {
+    "message": "Правила Direct"
+  },
+  "optionsProxyRules": {
+    "message": "Правила Proxy"
+  },
+  "optionsWhitelistRules": {
+    "message": "Правила белого списка"
+  },
+  "optionsRoutingFlags": {
+    "message": "Параметры маршрутизации"
+  },
+  "flagUseProviderProxies": {
+    "message": "Использовать прокси провайдера"
+  },
+  "flagOwnProxiesOnlyForOwnSites": {
+    "message": "Использовать настроенные прокси только для явных правил Proxy"
+  },
+  "flagReplaceDirectWithProxy": {
+    "message": "Заменять Direct провайдера настроенными прокси"
+  },
+  "flagNoDirect": {
+    "message": "Убирать резервный Direct провайдера"
+  },
+  "optionsOwnProxies": {
+    "message": "Свои прокси"
+  },
+  "optionsOwnProxiesHelp": {
+    "message": "Кандидаты пробуются в показанном порядке перед локальным Tor, Tor Browser и WARP. Аутентификация HTTP/HTTPS поддерживается; аутентификация SOCKS зависит от поддержки браузера и расширения."
+  },
+  "optionsOwnProxyUntitled": {
+    "message": "Свой прокси"
+  },
+  "optionsLocalTor": {
+    "message": "Локальный Tor"
+  },
+  "optionsTorBrowser": {
+    "message": "Tor Browser"
+  },
+  "optionsWarp": {
+    "message": "WARP"
+  },
+  "optionsWarpUntitled": {
+    "message": "Кандидат WARP"
+  },
+  "optionsPasswordKept": {
+    "message": "Сохранённый пароль остаётся прежним, но никогда не загружается на эту страницу."
+  },
+  "optionsPasswordEmpty": {
+    "message": "Для этого прокси нет сохранённого пароля."
+  },
+  "optionsNone": {
+    "message": "Нет"
+  },
+  "fieldId": {
+    "message": "Идентификатор"
+  },
+  "fieldType": {
+    "message": "Тип прокси"
+  },
+  "fieldHost": {
+    "message": "Хост"
+  },
+  "fieldPort": {
+    "message": "Порт"
+  },
+  "fieldFailoverTimeout": {
+    "message": "Тайм-аут переключения (секунды, необязательно)"
+  },
+  "fieldProxyDns": {
+    "message": "Разрешать имена сайтов через SOCKS-прокси (SOCKS4A / SOCKS5)"
+  },
+  "fieldEnabled": {
+    "message": "Включён для явных правил Proxy"
+  },
+  "fieldUseForProxyRules": {
+    "message": "Использовать для явных правил Proxy"
+  },
+  "fieldUseForOnion": {
+    "message": "Использовать для .onion"
+  },
+  "fieldUseAsDirectReplacement": {
+    "message": "Использовать для замены Direct провайдера"
+  },
+  "fieldCredentials": {
+    "message": "Учётные данные"
+  },
+  "fieldUsername": {
+    "message": "Имя пользователя"
+  },
+  "fieldNewPassword": {
+    "message": "Новый пароль"
+  },
+  "credentialKEEP": {
+    "message": "Сохранить пароль"
+  },
+  "credentialSET": {
+    "message": "Заменить пароль"
+  },
+  "credentialNONE": {
+    "message": "Без пароля / удалить"
+  },
+  "actionTitleExternal": {
+    "message": "Настройками прокси управляет другой контроллер. Откройте расширение для безопасного восстановления."
+  },
+  "actionTitleApplying": {
+    "message": "Включение защиты Firefox…"
+  },
+  "actionTitleClearing": {
+    "message": "Выключение защиты Firefox…"
+  },
+  "actionTitleChecking": {
+    "message": "Проверяем настроенное подключение…"
+  },
+  "actionTitleLoading": {
+    "message": "Проверка состояния защиты Firefox…"
+  },
+  "actionTitleOff": {
+    "message": "Защита выключена. Firefox использует исходные настройки прокси."
+  },
+  "actionTitleError": {
+    "message": "Защита Firefox требует внимания. Откройте расширение для подробностей."
+  },
+  "actionTitleHealthWarning": {
+    "message": "Последняя проверка соединения завершилась ошибкой. Откройте расширение и повторите её."
+  },
+  "actionTitleActiveAuto": {
+    "message": "Защита включена — текущий сайт: Авто"
+  },
+  "actionTitleActiveProxy": {
+    "message": "Защита включена — текущий сайт: Прокси"
+  },
+  "actionTitleActiveDirect": {
+    "message": "Защита включена — текущий сайт: Напрямую"
+  },
+  "actionTitleActiveUnavailable": {
+    "message": "Защита включена — маршрутизация текущей страницы недоступна"
+  },
+  "healthConnectionTitle": {
+    "message": "Проверка соединения"
+  },
+  "healthConnectionHelp": {
+    "message": "Проверяет последний сайт с явным режимом Прокси через активную сессию Firefox. Маршрутизация и настройки не изменяются."
+  },
+  "healthStatusOk": {
+    "message": "Соединение установлено"
+  },
+  "healthStatusError": {
+    "message": "Ошибка соединения"
+  },
+  "healthStatusInconclusive": {
+    "message": "Нет однозначного результата"
+  },
+  "healthStatusUnknown": {
+    "message": "Не проверялось"
+  },
+  "healthCheckAction": {
+    "message": "Проверить соединение"
+  },
+  "healthCheckAgain": {
+    "message": "Проверить снова"
+  },
+  "healthLastChecked": {
+    "message": "Последняя проверка"
+  },
+  "healthCheckedCandidate": {
+    "message": "Первый настроенный способ"
+  },
+  "healthCode_HEALTH_CHECK_FAILED": {
+    "message": "Соединение не удалось, маршрутизация не изменена. Проверьте прокси и адрес назначения и повторите попытку."
+  },
+  "healthCode_HEALTH_CHECK_INTERRUPTED": {
+    "message": "Предыдущая проверка была прервана при остановке фоновой страницы."
+  },
+  "healthCode_HEALTH_CHECK_SUPERSEDED": {
+    "message": "Состояние защиты изменилось во время проверки."
+  },
+  "healthCode_HEALTH_CHECK_TIMEOUT": {
+    "message": "Время проверки соединения истекло."
+  },
+  "healthCode_HEALTH_NOT_ACTIVE": {
+    "message": "Перед проверкой включите защиту."
+  },
+  "healthCode_HEALTH_PROXY_CANDIDATE_UNAVAILABLE": {
+    "message": "Для проверки нет включённого прокси-кандидата."
+  },
+  "healthCode_HEALTH_PROXY_RULE_REQUIRED": {
+    "message": "Выберите явный режим Прокси для сайта и сначала запустите проверку из его popup."
+  },
+  "healthCode_HEALTH_TARGET_REQUIRED": {
+    "message": "Сначала запустите проверку из popup сайта с явным режимом Прокси."
+  },
+  "diagnosticsTitle": {
+    "message": "Безопасная диагностика"
+  },
+  "diagnosticsRedactionHelp": {
+    "message": "Отчёт не содержит адресов посещённых страниц, адресов и учётных данных прокси, ссылок аутентификации, идентификаторов данных маршрутизации и внутреннего состояния защиты."
+  },
+  "diagnosticsExtensionVersion": {
+    "message": "Версия расширения"
+  },
+  "diagnosticsBrowserVersion": {
+    "message": "Версия браузера"
+  },
+  "diagnosticsRuntimeState": {
+    "message": "Состояние защиты"
+  },
+  "diagnosticsRecoveryState": {
+    "message": "Состояние восстановления"
+  },
+  "diagnosticsControlState": {
+    "message": "Управление прокси"
+  },
+  "diagnosticsDatasetVersion": {
+    "message": "Версия данных маршрутизации"
+  },
+  "diagnosticsProxyCounts": {
+    "message": "Включённые/настроенные способы прокси"
+  },
+  "diagnosticsProxyTypes": {
+    "message": "Настроенные типы прокси"
+  },
+  "diagnosticsControlOwned": {
+    "message": "Управляется этим расширением"
+  },
+  "diagnosticsControlAvailable": {
+    "message": "Доступно"
+  },
+  "diagnosticsControlExternal": {
+    "message": "Управляется другим расширением"
+  },
+  "diagnosticsControlPolicy": {
+    "message": "Управляется политикой браузера"
+  },
+  "diagnosticsDownload": {
+    "message": "Скачать безопасную диагностику"
+  },
+  "notificationsAttentionTitle": {
+    "message": "Уведомления о защите"
+  },
+  "notificationsAttentionEnabled": {
+    "message": "Firefox уведомит только о потере управления защитой, заблокированном восстановлении или неудачной запрошенной проверке соединения."
+  },
+  "notificationsAttentionUnavailable": {
+    "message": "Уведомления браузера недоступны."
+  },
+  "notificationProtectionTitle": {
+    "message": "Защита требует внимания"
+  },
+  "notificationHealthTitle": {
+    "message": "Ошибка проверки соединения"
+  },
+  "notificationControlLoss": {
+    "message": "Другой контроллер изменил настройки прокси Firefox. Защита безопасно остановлена и не возобновлена."
+  },
+  "notificationPrivateAccessBlocked": {
+    "message": "Доступ в приватных окнах отозван. Защита заблокирована, её можно безопасно выключить."
+  },
+  "notificationRecoveryBlocked": {
+    "message": "Firefox не смог восстановить защищённую сессию. Откройте расширение, чтобы проверить состояние или выключить его."
+  },
+  "notificationHealthFailure": {
+    "message": "Запрошенная проверка прокси завершилась ошибкой. Откройте раздел Обслуживание для безопасного результата."
+  },
   "uiThemeLabel": {
     "message": "Тема"
   },
@@ -352,5 +1012,209 @@
   },
   "optionsEditConnection": {
     "message": "Настройки сервера и авторизация"
+  },
+  "antifilterSourceLabel": {
+    "message": "Antifilter"
+  },
+  "antifilterSourceHelp": {
+    "message": "Antifilter предоставляет список точных имён сайтов, без прокси. Загрузите список, настройте свои прокси и разрешите их использование ниже. «Сохранить» подготавливает настройки, «Применить» включает их. Для поддоменов нужна отдельная запись в списке."
+  },
+  "antifilterProxyConsent": {
+    "message": "Использовать подключения для правил «Прокси» на сайтах из списка Antifilter"
+  },
+  "antifilterProxyHelp": {
+    "message": "Порядок подключений: включённые собственные прокси, локальный Tor, Tor Browser, WARP. Разрешение относится только к совпадениям в Antifilter; остальные сайты используют прежние правила маршрутизации. Сервис прокси не предоставляется."
+  },
+  "antifilterPrepare": {
+    "message": "Загрузить список Antifilter"
+  },
+  "antifilterProxyRequired": {
+    "message": "Включите хотя бы одно подключение для правил «Прокси» и разрешите его использование для Antifilter. Маршруты источника должны быть включены. Поддерживается не более 32 подключений."
+  },
+  "antifilterPreparationRequired": {
+    "message": "Загрузите список Antifilter перед сохранением этого источника."
+  },
+  "antifilterCurrentSource": {
+    "message": "Текущий источник маршрутизации"
+  },
+  "antifilterPrepared": {
+    "message": "Список Antifilter готов. Сохраните выбранный источник и настройки прокси, затем нажмите «Применить»."
+  },
+  "routingDataTitle": {
+    "message": "База маршрутизации"
+  },
+  "routingDataUnavailable": {
+    "message": "Статус обновления недоступен. Повторите проверку в настройках."
+  },
+  "routingDataUnknown": {
+    "message": "Неизвестно"
+  },
+  "routingDataSourceDate": {
+    "message": "Дата данных источника"
+  },
+  "routingDataLastCheck": {
+    "message": "Успешная проверка"
+  },
+  "routingDataCheck": {
+    "message": "Проверить обновления"
+  },
+  "routingDataChecking": {
+    "message": "Проверяем обновления…"
+  },
+  "routingDataAge_UNKNOWN": {
+    "message": "Дата данных неизвестна. Успешная проверка не подтверждает их актуальность."
+  },
+  "routingDataAge_OLD": {
+    "message": "Данным источника больше 30 дней. Это предупреждение не отключает защиту."
+  },
+  "routingDataNoSource": {
+    "message": "Загружаемый список не выбран. Выберите источник в настройках."
+  },
+  "routingDataResult_UNCHANGED": {
+    "message": "Проверено: новых данных маршрутизации нет."
+  },
+  "routingDataResult_APPLIED": {
+    "message": "База обновлена и применена. Ожидающие настройки не применялись."
+  },
+  "routingDataResult_PREPARED": {
+    "message": "Данные подготовлены. До применения состояние защиты не изменится."
+  },
+  "routingDataResult_DEFERRED": {
+    "message": "Данные подготовлены, но пока не применены. Проверьте состояние защиты."
+  },
+  "routingDataResult_FAILED": {
+    "message": "Не удалось завершить обновление. Проверьте состояние защиты и повторите попытку или откройте настройки."
+  },
+  "routingDataResult_UNAVAILABLE": {
+    "message": "Обновление недоступно для текущего источника."
+  },
+  "routingDataSource_none": {
+    "message": "Источник не выбран"
+  },
+  "routingDataSource_manual": {
+    "message": "Ручные правила"
+  },
+  "routingDataSource_antifilter": {
+    "message": "Antifilter"
+  },
+  "routingDataSource_anticensority": {
+    "message": "Anticensority"
+  },
+  "routingDataSource_antizapret": {
+    "message": "Antizapret"
+  },
+  "routingDataSource_custom": {
+    "message": "Пользовательский источник"
+  },
+  "resourcesTitle": {
+    "message": "Ресурсы сайта"
+  },
+  "resourcesIntro": {
+    "message": "Запустите сбор, повторите проблему в исходной вкладке, затем остановите сбор и выберите нужные домены."
+  },
+  "resourcesPrivacy": {
+    "message": "Сбор только этой обычной вкладки: до 2 минут, 100 доменов и 1000 запросов. Только домены, типы и счётчики; без адресов страниц, содержимого и паролей. Результат хранится в памяти этой страницы до очистки, закрытия, перехода на другой сайт или 10 минут с начала."
+  },
+  "resourcesStart": {
+    "message": "Начать сбор"
+  },
+  "resourcesStop": {
+    "message": "Остановить и посмотреть"
+  },
+  "resourcesReload": {
+    "message": "Перезагрузить исходную вкладку"
+  },
+  "resourcesClear": {
+    "message": "Очистить результат"
+  },
+  "resourcesSettings": {
+    "message": "Открыть настройки"
+  },
+  "resourcesCapturing": {
+    "message": "Сбор включён. Найдено доменов: $1. Воспроизведите проблему в исходной вкладке."
+  },
+  "resourcesIdle": {
+    "message": "Сбор выключен. Нажмите «Начать сбор», когда будете готовы."
+  },
+  "resourcesUnavailable": {
+    "message": "Откройте этот инструмент из панели расширения на обычном сайте. Приватные и служебные вкладки не поддерживаются."
+  },
+  "resourcesNavigated": {
+    "message": "Вкладка закрыта или перешла на другой сайт. Результат очищен; откройте инструмент заново."
+  },
+  "resourcesExpired": {
+    "message": "Время хранения истекло. Результат очищен."
+  },
+  "resourcesCleared": {
+    "message": "Сбор выключен. Результат очищен."
+  },
+  "resourcesReadFailed": {
+    "message": "Не удалось прочитать настройки. Нажмите «Остановить и посмотреть» ещё раз или начните новый сбор."
+  },
+  "resourcesStopped": {
+    "message": "Сбор остановлен. Домены для просмотра: $1."
+  },
+  "resourcesLimited": {
+    "message": "Достигнут предел сбора. Показаны первые $1 доменов; список может быть неполным."
+  },
+  "resourcesResults": {
+    "message": "Выберите только нужные домены"
+  },
+  "resourcesCaution": {
+    "message": "Ошибка не всегда означает блокировку. Не выбирайте рекламу и аналитику, если они не нужны."
+  },
+  "resourcesEmpty": {
+    "message": "Дополнительные домены не найдены. При новом сборе перезагрузите сайт и запустите видео или другое проблемное действие."
+  },
+  "resourcesCounts": {
+    "message": "Запросов: $1 · Ошибок: $2"
+  },
+  "resourcesRuleDIRECT": {
+    "message": "Уже есть правило «Напрямую» — сохранено без изменений."
+  },
+  "resourcesRulePROXY": {
+    "message": "Уже охвачен правилом «Прокси»."
+  },
+  "resourcesProxyRequired": {
+    "message": "Сначала настройте подключение для режима «Прокси»: свой прокси, Tor, Tor Browser или WARP. Список сайтов сам по себе не предоставляет подключение."
+  },
+  "resourcesGlobalScope": {
+    "message": "Правила действуют во всём браузере, включая другие сайты. Сохраняются только точные домены. Для включения нажмите «Применить» в настройках."
+  },
+  "resourcesSave": {
+    "message": "Сохранить выбранные правила"
+  },
+  "resourcesSaved": {
+    "message": "Правила сохранены, но не применены. Откройте настройки, проверьте все ожидающие изменения и нажмите «Применить»."
+  },
+  "resourcesSaveFailed": {
+    "message": "Правила не сохранены. Настройки могли измениться в другой вкладке: начните новый просмотр результата и выберите домены снова. Действующая маршрутизация не менялась."
+  },
+  "resourcesType_image": {
+    "message": "изображения"
+  },
+  "resourcesType_media": {
+    "message": "видео/аудио"
+  },
+  "resourcesType_script": {
+    "message": "скрипты"
+  },
+  "resourcesType_stylesheet": {
+    "message": "стили"
+  },
+  "resourcesType_xmlhttprequest": {
+    "message": "данные/API"
+  },
+  "resourcesType_sub_frame": {
+    "message": "встроенные страницы"
+  },
+  "resourcesType_other": {
+    "message": "другое"
+  },
+  "resourcesPrivacySummary": {
+    "message": "Только домены выбранной вкладки, до 2 минут. Результат остаётся в памяти этого экрана."
+  },
+  "resourcesDetails": {
+    "message": "Что собирается и когда удаляется"
   }
 }

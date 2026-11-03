@@ -94,6 +94,8 @@
         SETTINGS_CREDENTIAL_AMBIGUOUS: 'SETTINGS_CREDENTIAL_AMBIGUOUS',
         SETTINGS_CREDENTIAL_STALE: 'SETTINGS_CREDENTIAL_STALE',
         SETTINGS_DATASET_BINDING_FAILED: 'SETTINGS_DATASET_BINDING_FAILED',
+        ANTIFILTER_PREPARATION_REQUIRED: 'ANTIFILTER_PREPARATION_REQUIRED',
+        ANTIFILTER_PROXY_REQUIRED: 'ANTIFILTER_PROXY_REQUIRED',
         SETTINGS_MALFORMED: 'SETTINGS_MALFORMED',
         SETTINGS_MUTATION_REQUIRES_OFF: 'SETTINGS_MUTATION_REQUIRES_OFF',
         SETTINGS_REVISION_CONFLICT: 'SETTINGS_REVISION_CONFLICT',
@@ -174,16 +176,18 @@
 
       function canonicalFlags(value) {
 
-        if (!hasExactKeys(value, FLAG_KEYS) ||
+        const keys = value && Object.prototype.hasOwnProperty.call(value, 'useProxyRulesForAntifilter') ?
+          [...FLAG_KEYS, 'useProxyRulesForAntifilter'] : FLAG_KEYS;
+        if (!hasExactKeys(value, keys) || keys.some((key) => typeof value[key] !== 'boolean') ||
             FLAG_KEYS.some((key) => typeof value[key] !== 'boolean')) {
           throw settingsError(ERRORS.SETTINGS_MALFORMED);
         }
-        return {
+        return Object.assign({
           noDirect: value.noDirect,
           ownProxiesOnlyForOwnSites: value.ownProxiesOnlyForOwnSites,
           replaceDirectWithProxy: value.replaceDirectWithProxy,
           useProviderProxies: value.useProviderProxies,
-        };
+        }, value.useProxyRulesForAntifilter ? {useProxyRulesForAntifilter: true} : {});
 
       }
 
@@ -320,7 +324,7 @@
           value = Object.assign({source: 'anticensority'}, value);
         }
         if (!hasExactKeys(value, SETTINGS_KEYS) ||
-            !['anticensority', 'manual'].includes(value.source) ||
+            !['anticensority', 'manual', 'antifilter'].includes(value.source) ||
             !Array.isArray(value.ownProxies) ||
             value.ownProxies.length > MAX_PUBLIC_PROXIES) {
           throw settingsError(ERRORS.SETTINGS_MALFORMED);
@@ -380,7 +384,7 @@
       function buildRoutingSnapshot(settings, current = null) {
 
         const base = ProductionProvider.createProductionRoutingConfig();
-        if (settings.source === 'manual') base.providerCandidates = [];
+        if (settings.source !== 'anticensority') base.providerCandidates = [];
         const configured = emptyGroup();
         const directReplacement = emptyGroup();
         const onion = emptyGroup();
@@ -482,9 +486,20 @@
         const sanitizedSettings = Object.assign({}, settings, {
           ownProxies: sanitizedOwn,
         });
+        if (settings.source === 'antifilter') {
+          base.providerCandidates = ['own', 'localTor', 'torBrowser', 'warp']
+              .flatMap((key) => configured[key]);
+          if (!settings.flags.useProxyRulesForAntifilter || !settings.flags.useProviderProxies ||
+              !base.providerCandidates.length || base.providerCandidates.length > 32) {
+            throw settingsError(ERRORS.ANTIFILTER_PROXY_REQUIRED);
+          }
+          base.providerFallback = 'FAIL_CLOSED';
+        }
+        const routingFlags = Object.assign({}, settings.flags);
+        delete routingFlags.useProxyRulesForAntifilter;
         const routingConfig = {
           candidateGroups: {configured, directReplacement, onion},
-          flags: settings.flags,
+          flags: routingFlags,
           providerCandidates: base.providerCandidates,
           providerFallback: base.providerFallback,
           rules: settings.rules,
@@ -675,7 +690,7 @@
             throw settingsError(ERRORS.SETTINGS_STATE_UNAVAILABLE);
           }
           const config = verified.config;
-          if (![ProductionProvider.PROVIDER_KEY, 'manual'].includes(config.providerKey)) {
+          if (![ProductionProvider.PROVIDER_KEY, 'manual', 'antifilter'].includes(config.providerKey)) {
             throw settingsError(ERRORS.SETTINGS_DATASET_BINDING_FAILED);
           }
           // Saved configuration is editable even when its provider data is
@@ -804,9 +819,13 @@
           let datasetIdentity = current.config.datasetIdentity;
           if (settings.source === 'manual') {
             datasetIdentity = DatasetRuntime.MANUAL_IDENTITY;
-          } else if (current.config.providerKey === 'manual') {
+          } else if (current.config.providerKey !== settings.source) {
             datasetIdentity = typeof options.currentProviderDatasetIdentity === 'function' ?
-              await options.currentProviderDatasetIdentity() : ProductionProvider.datasetIdentity();
+              await options.currentProviderDatasetIdentity(settings.source) :
+              settings.source === 'anticensority' ? ProductionProvider.datasetIdentity() : null;
+            if (!datasetIdentity || datasetIdentity.providerKey !== settings.source) {
+              throw settingsError(ERRORS.ANTIFILTER_PREPARATION_REQUIRED);
+            }
           }
           const config = await ProductConfig.createProductConfig({
             configurationKey: ProductionProvider.CONFIGURATION_KEY,

@@ -38,6 +38,11 @@ const EXPECTED_FILES = Object.freeze([
   'background/configuration-transfer.js',
   'background/common/provider-dataset-state.js',
   'background/common/provider-dataset.js',
+  'background/common/domain-source-policy.js',
+  'background/common/domain-stream-import.js',
+  'background/common/antifilter-source.js',
+  'background/common/domain-candidate-store.js',
+  'background/common/domain-block-codec.js',
   'background/common/routing-contract.js',
   'background/dataset-promotion.js',
   'background/dataset-runtime.js',
@@ -52,6 +57,7 @@ const EXPECTED_FILES = Object.freeze([
   'background/provider-updater.js',
   'background/anticensority-source.js',
   'background/provider-source-updater.js',
+  'background/antifilter-updater.js',
   'background/proxy-auth.js',
   'background/proxy-control.js',
   'background/routing-adapter.js',
@@ -66,10 +72,17 @@ const EXPECTED_FILES = Object.freeze([
   'pages/popup/index.html',
   'pages/popup/index.js',
   'pages/popup/popup.css',
+  'pages/resources/index.html',
+  'pages/resources/index.js',
+  'pages/shared/site-resources.js',
+  'pages/shared/site-resources-ui.js',
+  'pages/shared/site-resources.css',
   'pages/shared/ui-runtime.js',
   'pages/shared/ui-tokens.css',
   'pages/shared/ui-theme.css',
   'pages/shared/ui-theme.js',
+  'pages/shared/routing-data-status.js',
+  'pages/shared/routing-data-status.css',
   'provider/anticensority-hosts-v1.data',
   'provider/anticensority-hosts-v1.envelope.json',
 ].concat(EXPECTED_ICON_FILES, Object.keys(NOTICE_SOURCES)).sort());
@@ -120,7 +133,10 @@ function verifyPackage(packageRoot, sourceRoot) {
     if (NOTICE_SOURCES[relativePath]) {
       sourcePath = NOTICE_SOURCES[relativePath];
     } else if (relativePath.startsWith('background/common/') ||
-        ['pages/shared/ui-theme.js', 'pages/shared/ui-theme.css'].includes(relativePath)) {
+        ['pages/shared/ui-theme.js', 'pages/shared/ui-theme.css',
+          'pages/shared/site-resources.js', 'pages/shared/site-resources-ui.js',
+          'pages/shared/site-resources.css',
+          'pages/shared/routing-data-status.js', 'pages/shared/routing-data-status.css'].includes(relativePath)) {
       sourcePath = Path.resolve(
           sourceRoot,
           '..',
@@ -168,7 +184,12 @@ function verifyPackage(packageRoot, sourceRoot) {
   Assert.deepStrictEqual(manifest.background.scripts, [
     'background/vendor/tldts/dist/index.umd.min.js',
     'background/common/routing-contract.js',
+    'background/common/domain-block-codec.js',
     'background/common/provider-dataset.js',
+    'background/common/domain-source-policy.js',
+    'background/common/domain-stream-import.js',
+    'background/common/antifilter-source.js',
+    'background/common/domain-candidate-store.js',
     'background/common/provider-dataset-state.js',
     'background/off-state.js',
     'background/proxy-control.js',
@@ -176,6 +197,7 @@ function verifyPackage(packageRoot, sourceRoot) {
     'background/provider-updater.js',
     'background/anticensority-source.js',
     'background/provider-source-updater.js',
+    'background/antifilter-updater.js',
     'background/provider-update-control.js',
     'background/provider-lookup.js',
     'background/dataset-runtime.js',

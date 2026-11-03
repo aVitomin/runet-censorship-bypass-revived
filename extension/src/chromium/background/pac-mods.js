@@ -31,6 +31,7 @@
     useAsDirectReplacement: false,
   });
   const DEFAULT_PAC_MODS = Object.freeze({
+    useProxyRulesForAntifilter: false,
     usePacScriptProxies: true,
     ownProxiesOnlyForOwnSites: true,
     ownProxies: Object.freeze([]),
@@ -362,6 +363,7 @@
           source.usePacScriptProxies,
           normalizeBoolean(source.ifUsePacScriptProxies, true),
       ),
+      useProxyRulesForAntifilter: normalizeBoolean(source.useProxyRulesForAntifilter, false),
       ownProxiesOnlyForOwnSites: normalizeBoolean(
           source.ownProxiesOnlyForOwnSites,
           normalizeBoolean(source.ifUseOwnProxiesOnlyForOwnSites, true),

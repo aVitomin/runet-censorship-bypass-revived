@@ -1,0 +1,50 @@
+.routing-data-card {
+  display: grid;
+  gap: var(--ui-space-1);
+  min-width: 0;
+}
+
+.routing-data-card h2,
+.routing-data-card p,
+.routing-data-card dl,
+.routing-data-card dd {
+  margin: 0;
+}
+
+.routing-data-card h2 {
+  font-size: var(--ui-font-size-heading);
+}
+
+.routing-data-facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--ui-space-0-5) var(--ui-space-1);
+  font-size: var(--ui-font-size-small);
+}
+
+.routing-data-facts dd {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.routing-data-note,
+.routing-data-facts dt {
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-font-size-small);
+}
+
+.routing-data-warning,
+.routing-data-error {
+  padding: var(--ui-space-1);
+  border: 1px solid currentColor;
+  border-radius: var(--ui-radius-small);
+  font-size: var(--ui-font-size-small);
+}
+
+.routing-data-warning { color: var(--ui-color-warning); }
+.routing-data-error { color: var(--ui-color-error); }
+
+.routing-data-button {
+  width: 100%;
+  white-space: normal;
+}

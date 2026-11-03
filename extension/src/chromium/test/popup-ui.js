@@ -317,6 +317,7 @@ function createPopupHarness(options = {}) {
 
   const document = createDocument();
   const calls = [];
+  const createdTabs = [];
   const storageListeners = [];
   const proxyListeners = [];
   let activeLanguage = options.language || 'en';
@@ -368,7 +369,13 @@ function createPopupHarness(options = {}) {
       tabs: {
         query(query, callback) {
 
-          callback([{url: options.tabUrl || 'https://audit.example/'}]);
+          callback([Object.assign({id: 77, incognito: false,
+            url: options.tabUrl || 'https://audit.example/'}, options.tab)]);
+
+        },
+        create(value) {
+
+          createdTabs.push(value);
 
         },
       },
@@ -379,6 +386,7 @@ function createPopupHarness(options = {}) {
   });
   context.window = context;
   context.close = () => undefined;
+  context.rucbRoutingDataStatus = require('../../shared/routing-data-status');
   context.mv3Rpc = {
     async callBackground(method, params) {
 
@@ -402,6 +410,7 @@ function createPopupHarness(options = {}) {
   Vm.runInContext(POPUP_SOURCE, context, {filename: 'pages/popup/index.js'});
   return {
     calls,
+    createdTabs,
     context,
     document,
     root: document.root,
@@ -489,6 +498,52 @@ function createDeferred() {
 }
 
 describe('Chromium popup UI', () => {
+  it('opens resource discovery by tab ID only and disables private or unsupported targets',
+      async () => {
+
+        for (const tab of [
+          {id: 77, incognito: false, url: 'https://audit.example/private?token=synthetic'},
+          {id: 78, incognito: true, url: 'https://audit.example/'},
+          {id: 79, incognito: false, url: 'chrome://settings/'},
+        ]) {
+          const harness = createPopupHarness({tab});
+          harness.start();
+          await flushUi();
+          const button = findButton(harness.root, 'Website resources');
+          expect(button.disabled).to.equal(tab.id !== 77);
+          if (!button.disabled) {
+            button.onclick();
+            expect(harness.createdTabs.map((value) => value.url)).to.deep.equal([
+              'chrome-extension://popup-test/pages/resources/index.html#77',
+            ]);
+          }
+          expect(harness.calls.map((call) => call.method)).to.deep.equal(['getPopupState']);
+        }
+
+      });
+  it('checks routing data once, preserves the site draft, and renders only sanitized outcomes', async function() {
+    const state = createPopupState({routingData: {source: 'antizapret',
+      sourceUpdatedAt: Date.UTC(2025, 0, 1), lastCheckedAt: Date.now(),
+      canCheck: true, updating: false, active: true}});
+    const deferred = createDeferred();
+    const harness = createPopupHarness({rpcHandler: async (method) =>
+      method === 'refreshRoutingData' ? deferred.promise : state});
+    harness.start(); await flushUi();
+    expect(harness.root.textContent).to.include('over 30 days old');
+    const direct = getRadios(harness.root, 'site-mode').find((input) => input.value === 'direct');
+    direct.checked = true; direct.onchange();
+    const button = findButton(harness.root, 'Check for updates');
+    const first = button.onclick(); button.onclick();
+    expect(findButton(harness.root, 'Checking for updates…').disabled).to.equal(true);
+    deferred.resolve({status: 'DEFERRED', privateValue: 'synthetic-secret'});
+    await first;
+    expect(harness.calls.filter((call) => call.method === 'refreshRoutingData')).to.have.length(1);
+    expect(harness.calls.some((call) => /apply|save|set/i.test(call.method))).to.equal(false);
+    expect(getRadios(harness.root, 'site-mode').find((input) => input.value === 'direct').checked).to.equal(true);
+    expect(harness.root.textContent).to.include('could not be applied now');
+    expect(harness.root.textContent).not.to.include('synthetic-secret');
+  });
+
   function pendingConfiguration() {
 
     return {savedRevision: 5, effectiveId: 'generation-a', active: true, pending: true,

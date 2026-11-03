@@ -5,6 +5,7 @@ const Chai = require('chai');
 const Mocha = require('mocha');
 const vm = require('vm');
 const {loadBackgroundModules} = require('./background-modules');
+const {Dataset, compactArtifact} = require('../../tooling/test-support/domain-dataset');
 
 const PROVIDER = Object.freeze({key: 'test-provider'});
 const PROVIDER_PROXY_RESULT = 'PROXY 192.0.2.10:8080';
@@ -90,6 +91,51 @@ Mocha.describe('Chromium PAC routing regressions', function() {
 
     loadBackgroundModules();
 
+  });
+
+  Mocha.it('routes compact exact-host data through the existing rule cooker', async function() {
+    const verified = await Dataset.verifyProviderDataset(compactArtifact());
+    const raw = global.mv3DomainProviderPac.createProviderPac(verified, [
+      'PROXY 192.0.2.10:8080', 'SOCKS5 127.0.0.1:9050',
+    ]);
+    const cases = [
+      [{}, 'blocked.example', 'PROXY 192.0.2.10:8080; SOCKS5 127.0.0.1:9050'],
+      [{}, 'child.blocked.example', 'DIRECT'],
+      [{}, 'blocked.example..', 'DIRECT'],
+      [{}, 'BLOCKED.EXAMPLE.', 'PROXY 192.0.2.10:8080; SOCKS5 127.0.0.1:9050'],
+      [{}, 'ordinary.example', 'DIRECT'],
+      [{exceptions: [{pattern: 'blocked.example', action: 'DIRECT'}]},
+        'blocked.example', 'DIRECT'],
+      [{whitelist: ['elsewhere.example']}, 'blocked.example', 'DIRECT'],
+      [{localTor: {enabled: true}}, 'service.onion', 'SOCKS5 localhost:9050; SOCKS5 localhost:9150'],
+      [{noDirect: true}, 'ordinary.example', ''],
+      [{noDirect: true, exceptions: [{pattern: 'blocked.example', action: 'DIRECT'}]},
+        'blocked.example', 'DIRECT'],
+      [{usePacScriptProxies: false}, 'blocked.example', 'DIRECT'],
+      [{ownProxies: [ownProxy('192.0.2.20', 443)],
+        exceptions: [{pattern: 'ordinary.example', action: 'PROXY'}]},
+      'ordinary.example', 'HTTPS 192.0.2.20:443'],
+    ];
+    for (const [mods, host, expected] of cases) {
+      const cooked = await cook(mods, raw);
+      Chai.expect(cooked.ok).to.equal(true);
+      Chai.expect(evaluatePac(cooked.cookedPacData, host)).to.equal(expected);
+    }
+  });
+
+  Mocha.it('requires an explicit credential-free route for compact provider PAC', async function() {
+    const verified = await Dataset.verifyProviderDataset(compactArtifact());
+    for (const candidates of [[], ['DIRECT'], ['PROXY user:password@proxy.test:80'],
+      ['PROXY proxy.test:80; DIRECT'], ['PROXY proxy.test:65536'], ['SOCKS4A proxy.test:1080'],
+      ['PROXY [bad]:1080'], ['PROXY 999.999.999.999:1080'], ['PROXY bad..test:80']]) {
+      Chai.expect(() => global.mv3DomainProviderPac.createProviderPac(verified, candidates))
+          .to.throw();
+    }
+    const untrusted = await Dataset.verifyProviderDataset(compactArtifact({
+      trust: Dataset.TRUST.REMOTE_UNAUTHENTICATED,
+    }));
+    Chai.expect(() => global.mv3DomainProviderPac.createProviderPac(untrusted,
+        ['PROXY 127.0.0.1:8000'])).to.throw('INVALID_DOMAIN_PROVIDER_DATASET');
   });
 
   Mocha.it('fresh defaults route only onion through both local Tor endpoints', async function() {

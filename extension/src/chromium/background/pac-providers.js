@@ -10,6 +10,13 @@
   // Keep this metadata in sync with the legacy provider list where practical.
   const BUILT_IN_PROVIDERS = Object.freeze([
     {
+      key: 'antifilter',
+      label: 'Antifilter',
+      description: 'Exact-host list; requires explicitly selected user-managed proxies.',
+      urls: Object.freeze(['https://antifilter.download/list/domains.lst']),
+      order: 2,
+    },
+    {
       key: 'Антизапрет',
       label: 'Antizapret',
       description: 'Main PAC script from the Antizapret project.',

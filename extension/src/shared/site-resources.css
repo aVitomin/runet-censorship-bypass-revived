@@ -1,0 +1,22 @@
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px; color: var(--ui-color-text); background: var(--ui-color-canvas); font: 16px/1.55 system-ui, sans-serif; }
+main { max-width: 880px; margin: 0 auto; }
+h1 { font-size: 1.65rem; line-height: 1.25; }
+h2 { font-size: 1.25rem; }
+.resource-target { font-weight: 650; overflow-wrap: anywhere; }
+.resource-muted, small { color: var(--ui-color-text-muted); }
+.resource-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+button { font: inherit; padding: 10px 16px; border: 1px solid var(--ui-color-border); border-radius: 8px; color: var(--ui-color-text); background: var(--ui-color-surface); cursor: pointer; }
+button:hover:enabled { border-color: var(--ui-color-accent); }
+button:disabled { opacity: .65; cursor: default; }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--ui-color-focus); outline-offset: 3px; }
+.resource-privacy { margin: 16px 0; }
+summary { cursor: pointer; color: var(--ui-color-accent); }
+.resource-status { font-weight: 600; }
+.resource-warning { padding: 12px; border-radius: 8px; color: var(--ui-color-warning); background: var(--ui-color-warning-surface); }
+.resource-warning:empty { display: none; }
+.resource-row { display: flex; gap: 12px; padding: 14px; border: 1px solid var(--ui-color-border); border-radius: 8px; background: var(--ui-color-surface); margin: 8px 0; align-items: flex-start; }
+.resource-row input { margin-top: 6px; width: 18px; height: 18px; flex: 0 0 18px; accent-color: var(--ui-color-accent); }
+.resource-row span { min-width: 0; overflow-wrap: anywhere; }
+.resource-row strong, .resource-row small { display: block; }
+@media (max-width: 440px) { body { padding: 16px; } .resource-actions button { flex: 1 1 100%; } }

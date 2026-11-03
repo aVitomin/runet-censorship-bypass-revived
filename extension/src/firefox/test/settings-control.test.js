@@ -113,6 +113,42 @@ async function rejectsCode(operation, code) {
 
 describe('Firefox production settings control plane', function() {
 
+  it('requires explicit Antifilter route permission, reuses configured order and never borrows provider endpoints', function() {
+    const settings = Settings.createDefaultSettings();
+    settings.source = 'antifilter';
+    settings.ownProxies = [ownProxy()];
+    Assert.throws(() => Settings.buildRoutingSnapshot(settings), /ANTIFILTER_PROXY_REQUIRED/);
+    settings.flags.useProxyRulesForAntifilter = true;
+    settings.localTor.useForProxyRules = true;
+    const built = Settings.buildRoutingSnapshot(settings);
+    Assert.deepStrictEqual(built.routingConfig.providerCandidates
+        .map((value) => [value.host, value.port]),
+    [['proxy.example', 8443], ['localhost', 9050]]);
+    Assert.equal(built.routingConfig.flags.ownProxiesOnlyForOwnSites, true);
+    Assert.equal(built.routingConfig.providerFallback, 'FAIL_CLOSED');
+    settings.flags.useProviderProxies = false;
+    Assert.throws(() => Settings.buildRoutingSnapshot(settings), /ANTIFILTER_PROXY_REQUIRED/);
+  });
+
+  it('resolves the requested source identity on Save without promoting it or changing Effective settings', async function() {
+    const store = await initialStorage();
+    const identity = {providerKey: 'antifilter', datasetVersion: 'source-ready', artifactSha256: 'a'.repeat(64)};
+    const control = Settings.createController({storageArea: store.area, sha256,
+      activationSnapshot: () => activation(), datasetIdentityAvailable: () => true,
+      currentProviderDatasetIdentity: async (source) => {
+        Assert.equal(source, 'antifilter'); return identity;
+      }});
+    const current = await control.get();
+    const next = current.settings;
+    next.source = 'antifilter';
+    next.flags.useProxyRulesForAntifilter = true;
+    next.localTor.useForProxyRules = true;
+    await control.replace(current.revision, next);
+    Assert.deepStrictEqual(store.values[Config.CONFIG_STORAGE_KEY].datasetIdentity, identity);
+    Assert.equal(store.values[Config.EFFECTIVE_STORAGE_KEY], undefined);
+    Assert.equal((await control.get()).settings.source, 'antifilter');
+  });
+
   it('maps defaults exactly to the packaged production routing config', function() {
 
     const settings = Settings.createDefaultSettings();

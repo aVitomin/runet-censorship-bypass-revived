@@ -1,334 +1,994 @@
 {
-  "providerLifecycleControlHelp": {"message": "Check the protection status above. Updated routing data alone does not confirm that routing is active."},
-  "providerLifecycleHelp": {"message": "Check for updates → Verify data → Prepare → Apply update."},
-  "providerLifecycleName": {"message": "Routing data"},
-  "providerLifecycleLastResult": {"message": "Last check/update result"},
-  "providerLifecycleUnknown": {"message": "Unknown"},
-  "providerLifecycleUnknownHelp": {"message": "No update result is available yet."},
-  "providerLifecycleChecking": {"message": "Checking…"},
-  "providerLifecycleApplying": {"message": "Preparing and applying…"},
-  "providerLifecycleVerified": {"message": "Verified"},
-  "providerLifecycleVerifiedHelp": {"message": "The routing data passed the available integrity checks. This does not test proxy connections."},
-  "providerLifecyclePrepared": {"message": "Ready to apply"},
-  "providerLifecyclePreparedHelp": {"message": "The data passed verification and the update is ready to apply. Saved settings have not been applied."},
-  "providerLifecycleApplied": {"message": "Applied"},
-  "providerLifecycleAppliedHelp": {"message": "The current routing data is active. Availability of connections depends on the configured proxy services."},
-  "providerLifecycleAppliedOff": {"message": "Data updated"},
-  "providerLifecycleAppliedOffHelp": {"message": "The routing data was updated. Protection remains off."},
-  "providerLifecycleFailed": {"message": "Failed"},
-  "providerLifecyclePreparationFailed": {"message": "The update could not be prepared or applied. Check the protection status."},
-  "providerLifecycleBusyHelp": {"message": "The update operation is in progress. Existing routing continues during preparation; saved settings stay pending."},
-  "providerLifecycleCheck": {"message": "Check for updates"},
-  "transferCredentialsMissingLabel": {"message":"Credentials required"},
-  "transferUnsupported_authentication": {"message":"Firefox has no global proxy-authentication switch. Review imported profiles before Apply; missing credentials still require re-entry."},
-  "transferTitle": {"message":"Import / Export"},
-  "transferHelp": {"message":"Manual transfer of saved settings, not synchronization. Files contain site rules and proxy addresses, but no usernames or passwords. Export ignores unsaved edits. Import saves settings without applying or turning protection on."},
-  "transferExport": {"message":"Export settings"},
-  "transferImport": {"message":"Import settings: choose a JSON file"},
-  "transferSupport": {"message":"Export for support"},
-  "transferSupportHelp": {"message":"Support files contain only environment and status information, without site rules or proxy addresses. They cannot be imported as settings."},
-  "transferPreview": {"message":"Import preview"},
-  "transferCounts": {"message":"Rules: $1 (added/removed entries: $2). Proxy profiles: $3. Credentials to re-enter: $4."},
-  "transferReplaceWarning": {"message":"This replaces saved routing settings. Missing credentials must be entered before Apply. Review the unsupported fields below; they are not transferred."},
-  "transferConfirm": {"message":"Save imported settings"},
-  "transferCancel": {"message":"Cancel import"},
-  "transferImported": {"message":"Settings imported. They are saved but not applied."},
-  "transferExported": {"message":"Export prepared. Keep settings files private."},
-  "transferInvalid": {"message":"The file is not a valid settings export. Nothing was imported."},
-  "transferSocks4aUnsupported": {"message":"This file contains SOCKS4A connections, which Chromium does not support. Nothing was imported. Use Firefox, or configure SOCKS5 if your proxy server supports it."},
-  "transferVersion": {"message":"This export format version is not supported."},
-  "transferLimit": {"message":"The import exceeds the size or complexity limit (maximum file size: 1 MiB)."},
-  "transferDraft": {"message":"Review and save or discard your edits before importing. Your edits have been preserved."},
-  "transferNoConfiguration": {"message":"This is a support file, not a settings export."},
-  "transferConflict": {"message":"Settings changed elsewhere. Choose the file again to review a fresh preview."},
-  "transferCredentialsRequired": {"message":"Credentials were omitted: enter them before Apply, or explicitly select no authentication."},
-  "transferUnsupported_source": {"message":"Source selection is not transferred to this browser. Review the routing source before Apply. Custom source addresses are omitted from exports because they may contain access tokens."},
-  "transferUnsupported_language": {"message":"This browser does not import the interface language preference."},
-  "transferUnsupported_disabledRules": {"message":"Disabled rules are not stored by this browser and will be omitted."},
-  "transferUnsupported_proxyOptions": {"message":"Per-proxy DNS and timeout preferences are not supported here; browser defaults remain in use."},
-  "transferUnsupported_torScope": {"message":"This browser cannot use a disabled Tor mode for only .onion or Direct replacement. Review the Tor mode after import."},
-  "transferUnsupported_torExclusive": {"message":"This browser supports one Tor mode at a time. Both modes will be disabled until you choose one."},
-  "transferUnsupported_warpScope": {"message":"WARP scope switches apply to the whole list here. Mixed switches are conservatively disabled; review them before Apply."},
-  "rulesEditorHelp": {"message": "Edit a row, add a rule, or delete it. Save keeps your changes; Apply activates them. Auto removes only that row's override; other matching rules and the automatic source still apply."},
-  "rulesAllowlistHelp": {"message": "Auto allowlist entries are shown separately from overrides in this list. When the allowlist is nonempty, unmatched sites use Direct unless an explicit rule takes precedence. The allowlist does not force Auto."},
-  "rulesAdd": {"message": "Add site rule"},
-  "rulesDelete": {"message": "Delete rule"},
-  "rulesEmpty": {"message": "No site rules. Sites use Auto."},
-  "rulesHost": {"message": "Site or domain"},
-  "rulesScope": {"message": "Scope"},
-  "rulesRoute": {"message": "Route / rule type"},
-  "rulesScopeHost": {"message": "This exact host"},
-  "rulesScopeDomain": {"message": "Domain and subdomains"},
-  "rulesScopePattern": {"message": "Existing pattern (unchanged syntax)"},
-  "rulesAuto": {"message": "Auto — remove this entry"},
-  "rulesWhitelist": {"message": "Auto allowlist"},
-  "rulesHostError": {"message": "Enter a host without a wildcard; choose Domain and subdomains to include subdomains."},
-  "unifiedSaveSection": {"message": "Save settings"},
-  "unifiedPopupConflict": {"message": "Settings changed elsewhere. Review the current state and confirm again."},
-  "unifiedControlLost": {"message": "The browser or another extension controls the proxy. Check proxy control before applying again."},
-  "unifiedUnproven": {"message": "The active settings could not be confirmed. Review the status and select Apply again."},
-  "unifiedActions": {"message": "Settings actions"},
-  "unifiedApply": {"message": "Apply"},
-  "unifiedApplyOn": {"message": "Apply and turn on"},
-  "unifiedApplyAll": {"message": "Apply all saved changes"},
-  "unifiedDiscard": {"message": "Discard edits"},
-  "unifiedReview": {"message": "Review in Options"},
-  "unifiedActive": {"message": "Protection active"},
-  "unifiedPending": {"message": "Protection active — changes not applied"},
-  "unifiedApplying": {"message": "Applying…"},
-  "unifiedInactive": {"message": "Inactive"},
-  "unifiedBlocked": {"message": "Action required"},
-  "unifiedUnsaved": {"message": "Unsaved changes"},
-  "unifiedConflict": {"message": "Settings changed elsewhere. Your edits are preserved. Discard edits to load the latest saved settings and review again."},
-  "unifiedSaveFirst": {"message": "Save or discard your edits before applying."},
-  "unifiedSavedActive": {"message": "Saved. Previous settings are still active."},
-  "unifiedPreparing": {"message": "Previous settings remain active while the new configuration is prepared."},
-  "unifiedApplyFailed": {"message": "Changes were not applied. Previous settings remain active."},
-  "unifiedSiteSaved": {"message": "Site rule saved, but not applied. Previous settings remain active."},
-  "unifiedPopupPending": {"message": "Other saved settings have not been applied. Applying this site rule will also apply those settings."},
-  "unifiedTransition": {"message": "Currently: $1. Selected: $2."},
-  "unifiedCategory_siteRules": {"message": "Site rules changed"},
-  "unifiedCategory_proxyConnections": {"message": "Proxy connections changed"},
-  "unifiedCategory_routingSettings": {"message": "Routing settings changed"},
-  "extensionName": {"message": "Runet Censorship Bypass — Revived"},
-  "extensionDescription": {"message": "Independent Anticensority fork. Control website routing with Auto, Proxy and Direct rules."},
-  "popupTitle": {"message": "Protection status"},
-  "popupSubtitle": {"message": "Firefox routing control"},
-  "popupLoading": {"message": "Reading the current state…"},
-  "popupLoadFailed": {"message": "The extension state could not be read."},
-  "popupStateOff": {"message": "Protection is off"},
-  "popupStateInitializing": {"message": "Protection is starting"},
-  "popupStateActive": {"message": "Protection is active"},
-  "popupStateRecovered": {"message": "Protection recovered"},
-  "popupStateBlocked": {"message": "Protection is blocked"},
-  "popupStateExternal": {"message": "Another controller has priority"},
-  "popupHelpOff": {"message": "Enable protection when you are ready."},
-  "popupHelpInitializing": {"message": "Requests that need protection remain blocked until recovery finishes."},
-  "popupHelpActive": {"message": "Firefox is using the verified local routing configuration."},
-  "popupHelpRecovered": {"message": "The routing session was restored after the background page restarted."},
-  "popupHelpBlocked": {"message": "Routing is unavailable, so requests that need protection remain blocked. You can disable protection safely."},
-  "popupHelpPrivateBlocked": {"message": "Private-window access was removed. Routing is blocked and can be disabled safely."},
-  "popupHelpPrivateRequired": {"message": "Allow this extension in private windows before enabling protection."},
-  "popupHelpExternal": {"message": "Firefox proxy control changed externally. This extension stopped routing and will not overwrite the other setting."},
-  "popupHelpDatasetMissing": {"message": "Verified routing data is unavailable."},
-  "popupErrorPrivateAccess": {"message": "Private-window access is required."},
-  "popupErrorPrivateAccessCheck": {"message": "Firefox did not return the private-window permission state. Protection was not enabled."},
-  "popupErrorDataset": {"message": "Verified routing data is unavailable or damaged."},
-  "popupErrorSettings": {"message": "Check the saved routing and proxy credential settings."},
-  "popupErrorProxyCandidate": {"message": "Configure at least one proxy connection before using Proxy mode."},
-  "popupErrorRevision": {"message": "Settings changed elsewhere. The current site state was reloaded; review it and try again."},
-  "popupErrorGeneric": {"message": "The operation could not be completed. Check the protection status above."},
-  "popupOperationPending": {"message": "Operation in progress"},
-  "popupDetails": {"message": "Readiness"},
-  "popupDataset": {"message": "Routing data"},
-  "popupPrivateAccess": {"message": "Private-window access"},
-  "permissionPrivateAccessTitle": {"message": "Private-window access is required"},
-  "permissionPrivateAccessExplanation": {"message": "This extension currently controls Firefox's browser-wide proxy settings, which also affect private windows. Access is required so protection is not reported while private windows remain outside the extension's control."},
-  "permissionPrivateAccessUnknown": {"message": "Firefox did not return the current permission state. Activation remains unavailable until the extension can verify it."},
-  "permissionPrivateAccessSteps": {"message": "Open the Firefox menu → Add-ons and themes → Extensions. Select Runet Censorship Bypass — Revived, then under Run in Private Windows choose Allow. Return here when finished."},
-  "permissionCheckAgain": {"message": "Check again"},
-  "permissionRestrictedSitesInfo": {"message": "Firefox's Run on sites with restrictions permission is separate and is not required for activation. This extension cannot read that setting; review it manually only when a normal website is restricted. Firefox about: pages cannot be routed."},
-  "valueAvailable": {"message": "Available"},
-  "valueUnavailable": {"message": "Unavailable"},
-  "valueGranted": {"message": "Granted"},
-  "valueDenied": {"message": "Denied"},
-  "valueUnknown": {"message": "Unknown"},
-  "actionEnable": {"message": "Enable"},
-  "actionDisable": {"message": "Disable"},
-  "actionSettings": {"message": "Settings"},
-  "actionRetry": {"message": "Retry"},
-  "popupApplyChanges": {"message": "Apply"},
-  "popupTurnOff": {"message": "Turn off"},
-  "popupPillOFF": {"message": "Off"},
-  "popupPillACTIVE": {"message": "Active"},
-  "popupPillRECOVERED": {"message": "Recovered"},
-  "popupPillINITIALIZING": {"message": "Starting"},
-  "popupPillBLOCKED": {"message": "Blocked"},
-  "popupPillEXTERNAL": {"message": "External"},
-  "popupCurrentSiteRouting": {"message": "Current site"},
-  "popupCurrentTabUnavailable": {"message": "This page is unavailable"},
-  "popupPageCannotBeControlledHelp": {"message": "Firefox does not allow routing rules for this browser or extension page."},
-  "popupSiteModeGroup": {"message": "Routing mode for $1"},
-  "popupModeAUTO": {"message": "Auto"},
-  "popupModePROXY": {"message": "Proxy"},
-  "popupModeDIRECT": {"message": "Direct"},
-  "popupAutoModeDescription": {"message": "Use the built-in Anticensority routing rules for this site."},
-  "popupProxyModeDescription": {"message": "Always use your configured proxy connections for this site."},
-  "popupDirectModeDescription": {"message": "Open this site directly, outside Auto."},
-  "popupProxyRouteNeedsMethod": {"message": "Proxy mode needs at least one enabled proxy connection."},
-  "popupConfigureProxyMethods": {"message": "Configure proxy connections"},
-  "popupScope": {"message": "Rule scope"},
-  "popupHostOnly": {"message": "Exact host"},
-  "popupDomainAndSubdomains": {"message": "Domain + subdomains"},
-  "popupRulePreview": {"message": "Rule: $1"},
-  "popupNotApplied": {"message": "Not applied"},
-  "popupAutomaticRouting": {"message": "Routing source"},
-  "popupAutomaticSource": {"message": "Auto follows the source selected in Settings. With the manual source, only your rules and connections are used."},
-  "actionSave": {"message": "Save settings"},
-  "actionReload": {"message": "Reload"},
-  "actionAddProxy": {"message": "Add own proxy"},
-  "actionAddWarp": {"message": "Add WARP candidate"},
-  "actionMoveUp": {"message": "Move up"},
-  "actionMoveDown": {"message": "Move down"},
-  "actionRemove": {"message": "Remove"},
-  "optionsTitle": {"message": "Firefox routing settings"},
-  "optionsSubtitle": {"message": "Configure routing and proxy connections for Firefox."},
-  "optionsNavigationLabel": {"message": "Settings sections"},
-  "optionsNavOverview": {"message": "Overview"},
-  "optionsNavAutomaticRouting": {"message": "Routing source"},
-  "optionsNavSiteRules": {"message": "Site rules"},
-  "optionsNavProxyConnections": {"message": "Proxy connections"},
-  "optionsNavMaintenance": {"message": "Maintenance"},
-  "optionsNavAdvanced": {"message": "Advanced"},
-  "optionsNavAbout": {"message": "About"},
-  "optionsSectionEyebrow": {"message": "Firefox"},
-  "optionsProtectionState": {"message": "Protection"},
-  "optionsAutomaticSourceHelp": {"message": "Choose Anticensority data for automatic routing or use only your own rules and connections. Saving a source change does not apply it."},
-  "optionsSourceLabel": {"message": "Routing source"},
-  "optionsManualSource": {"message": "Only my rules and connections"},
-  "optionsManualSourceHelp": {"message": "Manual mode works without the Anticensority database. Your site rules, onion routes and connection settings still apply; other sites use Direct with default routing settings. Database updates stay prepared until Anticensority is selected and applied."},
-  "optionsAnticensoritySource": {"message": "Built-in Anticensority routing data"},
-  "optionsMaintenanceHelp": {"message": "Check and verify routing data, then prepare an update. Applying verified data can keep protection active and does not apply saved changes."},
-  "optionsLocalDatasetTitle": {"message": "Current routing data"},
-  "providerUpdateTitle": {"message": "Routing data update"},
-  "providerUpdateHelp": {"message": "Update routing data checks the source and applies verified changes when protection is ready or off. Updates keep protection active and do not apply saved settings. Automatic checks run every 12 hours; blocked updates remain prepared for later."},
-  "providerUpdateChannel": {"message": "Validation"},
-  "providerUpdateChannel_HTTPS": {"message": "HTTPS and strict data validation; no author signature"},
-  "providerUpdateChannel_SIGNED": {"message": "Author signature and strict data validation"},
-  "providerUpdateChannel_NONE": {"message": "Not configured"},
-  "providerUpdateSourceDate": {"message": "Source data date"},
-  "providerUpdateCurrentVersion": {"message": "Current version"},
-  "providerUpdateAvailableVersion": {"message": "Available version"},
-  "providerUpdateLastCheck": {"message": "Last check"},
-  "providerUpdateErrorCategory": {"message": "Last error"},
-  "providerUpdateCheck": {"message": "Update routing data"},
-  "providerUpdateInstall": {"message": "Apply update"},
-  "providerUpdateActionRequired": {"message": "Resolve the protection status shown above before installing this update."},
-  "providerUpdateActiveHelp": {"message": "Verified updates keep current user settings in use; saved changes stay pending. Applying does not turn protection off or enable it if it is off. Source data dates are separate from check dates. Data validation does not prove proxy availability."},
-  "providerUpdateChecked": {"message": "Routing data check completed."},
-  "providerUpdateInstalled": {"message": "Routing data update applied."},
-  "providerUpdateStatusIdle": {"message": "Ready"},
-  "providerUpdateStatusChecking": {"message": "Checking…"},
-  "providerUpdateStatusCurrent": {"message": "Up to date"},
-  "providerUpdateStatusAvailable": {"message": "Update available"},
-  "providerUpdateStatusUpdated": {"message": "Updated"},
-  "providerUpdateStatusFailed": {"message": "Check failed"},
-  "providerUpdateStatusUnavailable": {"message": "Not configured"},
-  "providerUpdateError_AUTHENTICATION_FAILED": {"message": "Routing data verification failed"},
-  "providerUpdateError_DATASET_REJECTED": {"message": "The source returned invalid routing data"},
-  "providerUpdateError_NETWORK_FAILED": {"message": "Network check failed"},
-  "providerUpdateError_ROLLBACK_REJECTED": {"message": "Older update rejected"},
-  "providerUpdateError_SEQUENCE_CONFLICT": {"message": "The update conflicts with previously verified data"},
-  "providerUpdateError_STORAGE_FAILED": {"message": "The update could not be prepared or saved"},
-  "providerUpdateError_TRUST_NOT_CONFIGURED": {"message": "Remote updates are not configured in this build."},
-  "providerUpdateError_UPDATE_INTERRUPTED": {"message": "The previous check was interrupted"},
-  "providerUpdateError_UPDATE_REJECTED": {"message": "Update rejected safely"},
-  "optionsAdvancedHelp": {"message": "Configure Direct replacement and local Tor, Tor Browser, or WARP routes."},
-  "optionsAboutHelp": {"message": "Runet Censorship Bypass — Revived for Firefox uses built-in verified routing data and contains no remote executable code."},
-  "optionsVersion": {"message": "Version $1"},
-  "optionsLoading": {"message": "Loading the saved settings…"},
-  "optionsLoadFailed": {"message": "The saved settings could not be loaded."},
-  "optionsReadOnlyHelp": {"message": "Settings are read-only while Firefox protection is initializing or blocked. Resolve the reported state before editing."},
-  "optionsReadOnlyShort": {"message": "Read-only while initializing or blocked."},
-  "optionsReady": {"message": "Save settings stores your edits. Apply makes saved changes active; unsaved edits are not applied."},
-  "optionsSaved": {"message": "Settings saved. Current routing is unchanged until you select Apply."},
-  "optionsApplySaved": {"message": "Apply"},
-  "optionsApplied": {"message": "Saved settings are now active."},
-  "optionsRevisionConflict": {"message": "Settings changed in another tab. The latest saved settings were loaded; review your changes before saving again."},
-  "optionsErrorReadOnly": {"message": "This operation is unavailable in the current protection state. Check the status shown above and try again."},
-  "optionsErrorValidation": {"message": "Review the highlighted routing or proxy values. The background validator rejected the configuration."},
-  "optionsErrorGeneric": {"message": "The settings operation failed safely."},
-  "optionsRulesTitle": {"message": "Site rules"},
-  "optionsRulesHelp": {"message": "A host matches only that host. Domain and subdomains includes the named domain itself. Rules are saved in this browser profile, not synchronized with another browser."},
-  "optionsRulesPlaceholder": {"message": "example.com\n*.example.org"},
-  "optionsDirectRules": {"message": "Direct rules"},
-  "optionsProxyRules": {"message": "Proxy rules"},
-  "optionsWhitelistRules": {"message": "Whitelist rules"},
-  "optionsRoutingFlags": {"message": "Routing preferences"},
-  "flagUseProviderProxies": {"message": "Use provider proxies"},
-  "flagOwnProxiesOnlyForOwnSites": {"message": "Use configured proxies only for explicit Proxy rules"},
-  "flagReplaceDirectWithProxy": {"message": "Replace provider Direct with configured proxies"},
-  "flagNoDirect": {"message": "Remove provider Direct fallback"},
-  "optionsOwnProxies": {"message": "Own proxies"},
-  "optionsOwnProxiesHelp": {"message": "Candidates are tried in the displayed order before local Tor, Tor Browser, and WARP. HTTP/HTTPS proxy authentication is supported; SOCKS authentication depends on browser and extension support."},
-  "optionsOwnProxyUntitled": {"message": "Own proxy"},
-  "optionsLocalTor": {"message": "Local Tor"},
-  "optionsTorBrowser": {"message": "Tor Browser"},
-  "optionsWarp": {"message": "WARP"},
-  "optionsWarpUntitled": {"message": "WARP candidate"},
-  "optionsPasswordKept": {"message": "The stored password is kept but is never loaded into this page."},
-  "optionsPasswordEmpty": {"message": "No stored password is attached to this proxy."},
-  "optionsNone": {"message": "None"},
-  "fieldId": {"message": "Identifier"},
-  "fieldType": {"message": "Proxy type"},
-  "fieldHost": {"message": "Host"},
-  "fieldPort": {"message": "Port"},
-  "fieldFailoverTimeout": {"message": "Failover timeout (seconds, optional)"},
-  "fieldProxyDns": {"message": "Resolve hostnames through the SOCKS proxy (SOCKS4A / SOCKS5)"},
-  "fieldEnabled": {"message": "Enabled for explicit Proxy rules"},
-  "fieldUseForProxyRules": {"message": "Use for explicit Proxy rules"},
-  "fieldUseForOnion": {"message": "Use for .onion"},
-  "fieldUseAsDirectReplacement": {"message": "Use to replace provider Direct"},
-  "fieldCredentials": {"message": "Credentials"},
-  "fieldUsername": {"message": "Username"},
-  "fieldNewPassword": {"message": "New password"},
-  "credentialKEEP": {"message": "Keep stored password"},
-  "credentialSET": {"message": "Replace password"},
-  "credentialNONE": {"message": "No password / clear"},
-  "actionTitleExternal": {"message": "Proxy settings are controlled externally. Open the extension for safe recovery."},
-  "actionTitleApplying": {"message": "Applying Firefox protection…"},
-  "actionTitleClearing": {"message": "Turning off Firefox protection…"},
-  "actionTitleChecking": {"message": "Checking configured connection…"},
-  "actionTitleLoading": {"message": "Checking Firefox protection state…"},
-  "actionTitleOff": {"message": "Protection is off. Firefox uses its underlying proxy settings."},
-  "actionTitleError": {"message": "Firefox protection needs attention. Open the extension for details."},
-  "actionTitleHealthWarning": {"message": "The last connection check failed. Open the extension to test again."},
-  "actionTitleActiveAuto": {"message": "Protection is active — Current site: Auto"},
-  "actionTitleActiveProxy": {"message": "Protection is active — Current site: Proxy"},
-  "actionTitleActiveDirect": {"message": "Protection is active — Current site: Direct"},
-  "actionTitleActiveUnavailable": {"message": "Protection is active — Current page routing is unavailable"},
-  "healthConnectionTitle": {"message": "Connection check"},
-  "healthConnectionHelp": {"message": "Checks the last explicit Proxy site through the active Firefox routing session. It does not change routing or settings."},
-  "healthStatusOk": {"message": "Connection succeeded"},
-  "healthStatusError": {"message": "Connection failed"},
-  "healthStatusInconclusive": {"message": "No conclusive result"},
-  "healthStatusUnknown": {"message": "Not checked"},
-  "healthCheckAction": {"message": "Check connection"},
-  "healthCheckAgain": {"message": "Check again"},
-  "healthLastChecked": {"message": "Last checked"},
-  "healthCheckedCandidate": {"message": "First configured method"},
-  "healthCode_HEALTH_CHECK_FAILED": {"message": "The connection failed without changing routing. Check the proxy and destination, then try again."},
-  "healthCode_HEALTH_CHECK_INTERRUPTED": {"message": "The previous check was interrupted when the event page stopped."},
-  "healthCode_HEALTH_CHECK_SUPERSEDED": {"message": "Protection changed while the check was running."},
-  "healthCode_HEALTH_CHECK_TIMEOUT": {"message": "The connection check timed out."},
-  "healthCode_HEALTH_NOT_ACTIVE": {"message": "Enable protection before checking the connection."},
-  "healthCode_HEALTH_PROXY_CANDIDATE_UNAVAILABLE": {"message": "No enabled proxy candidate is available for this check."},
-  "healthCode_HEALTH_PROXY_RULE_REQUIRED": {"message": "Choose explicit Proxy for a site and run the check from its popup first."},
-  "healthCode_HEALTH_TARGET_REQUIRED": {"message": "Run the check from the popup of an explicit Proxy site first."},
-  "diagnosticsTitle": {"message": "Sanitized diagnostics"},
-  "diagnosticsRedactionHelp": {"message": "This report excludes browsing URLs, proxy endpoints, credentials, authentication references, routing-data identifiers, and internal protection state."},
-  "diagnosticsExtensionVersion": {"message": "Extension version"},
-  "diagnosticsBrowserVersion": {"message": "Browser version"},
-  "diagnosticsRuntimeState": {"message": "Protection state"},
-  "diagnosticsRecoveryState": {"message": "Recovery state"},
-  "diagnosticsControlState": {"message": "Proxy control"},
-  "diagnosticsDatasetVersion": {"message": "Routing data version"},
-  "diagnosticsProxyCounts": {"message": "Enabled/configured proxy methods"},
-  "diagnosticsProxyTypes": {"message": "Configured proxy types"},
-  "diagnosticsControlOwned": {"message": "Controlled by this extension"},
-  "diagnosticsControlAvailable": {"message": "Available"},
-  "diagnosticsControlExternal": {"message": "Controlled by another extension"},
-  "diagnosticsControlPolicy": {"message": "Controlled by browser policy"},
-  "diagnosticsDownload": {"message": "Download sanitized diagnostics"},
-  "notificationsAttentionTitle": {"message": "Protection notifications"},
-  "notificationsAttentionEnabled": {"message": "Firefox will notify you only when protection control is lost, recovery is blocked, or a requested connection check fails."},
-  "notificationsAttentionUnavailable": {"message": "Browser notifications are unavailable."},
-  "notificationProtectionTitle": {"message": "Protection needs attention"},
-  "notificationHealthTitle": {"message": "Connection check failed"},
-  "notificationControlLoss": {"message": "Another controller changed Firefox proxy settings. Protection stopped safely and was not resumed."},
-  "notificationPrivateAccessBlocked": {"message": "Private-window access was removed. Protection is blocked and can be turned off safely."},
-  "notificationRecoveryBlocked": {"message": "Firefox could not restore the protected session. Open the extension to review or turn it off."},
-  "notificationHealthFailure": {"message": "The requested proxy connection check failed. Open Maintenance to review the sanitized result."},
+  "providerLifecycleControlHelp": {
+    "message": "Check the protection status above. Updated routing data alone does not confirm that routing is active."
+  },
+  "providerLifecycleHelp": {
+    "message": "Check for updates → Verify data → Prepare → Apply update."
+  },
+  "providerLifecycleName": {
+    "message": "Routing data"
+  },
+  "providerLifecycleLastResult": {
+    "message": "Last check/update result"
+  },
+  "providerLifecycleUnknown": {
+    "message": "Unknown"
+  },
+  "providerLifecycleUnknownHelp": {
+    "message": "No update result is available yet."
+  },
+  "providerLifecycleChecking": {
+    "message": "Checking…"
+  },
+  "providerLifecycleApplying": {
+    "message": "Preparing and applying…"
+  },
+  "providerLifecycleVerified": {
+    "message": "Verified"
+  },
+  "providerLifecycleVerifiedHelp": {
+    "message": "The routing data passed the available integrity checks. This does not test proxy connections."
+  },
+  "providerLifecyclePrepared": {
+    "message": "Ready to apply"
+  },
+  "providerLifecyclePreparedHelp": {
+    "message": "The data passed verification and the update is ready to apply. Saved settings have not been applied."
+  },
+  "providerLifecycleApplied": {
+    "message": "Applied"
+  },
+  "providerLifecycleAppliedHelp": {
+    "message": "The current routing data is active. Availability of connections depends on the configured proxy services."
+  },
+  "providerLifecycleAppliedOff": {
+    "message": "Data updated"
+  },
+  "providerLifecycleAppliedOffHelp": {
+    "message": "The routing data was updated. Protection remains off."
+  },
+  "providerLifecycleFailed": {
+    "message": "Failed"
+  },
+  "providerLifecyclePreparationFailed": {
+    "message": "The update could not be prepared or applied. Check the protection status."
+  },
+  "providerLifecycleBusyHelp": {
+    "message": "The update operation is in progress. Existing routing continues during preparation; saved settings stay pending."
+  },
+  "providerLifecycleCheck": {
+    "message": "Check for updates"
+  },
+  "transferCredentialsMissingLabel": {
+    "message": "Credentials required"
+  },
+  "transferUnsupported_authentication": {
+    "message": "Firefox has no global proxy-authentication switch. Review imported profiles before Apply; missing credentials still require re-entry."
+  },
+  "transferTitle": {
+    "message": "Import / Export"
+  },
+  "transferHelp": {
+    "message": "Manual transfer of saved settings, not synchronization. Files contain site rules and proxy addresses, but no usernames or passwords. Export ignores unsaved edits. Import saves settings without applying or turning protection on."
+  },
+  "transferExport": {
+    "message": "Export settings"
+  },
+  "transferImport": {
+    "message": "Import settings: choose a JSON file"
+  },
+  "transferSupport": {
+    "message": "Export for support"
+  },
+  "transferSupportHelp": {
+    "message": "Support files contain only environment and status information, without site rules or proxy addresses. They cannot be imported as settings."
+  },
+  "transferPreview": {
+    "message": "Import preview"
+  },
+  "transferCounts": {
+    "message": "Rules: $1 (added/removed entries: $2). Proxy profiles: $3. Credentials to re-enter: $4."
+  },
+  "transferReplaceWarning": {
+    "message": "This replaces saved routing settings. Missing credentials must be entered before Apply. Review the unsupported fields below; they are not transferred."
+  },
+  "transferConfirm": {
+    "message": "Save imported settings"
+  },
+  "transferCancel": {
+    "message": "Cancel import"
+  },
+  "transferImported": {
+    "message": "Settings imported. They are saved but not applied."
+  },
+  "transferExported": {
+    "message": "Export prepared. Keep settings files private."
+  },
+  "transferInvalid": {
+    "message": "The file is not a valid settings export. Nothing was imported."
+  },
+  "transferSocks4aUnsupported": {
+    "message": "This file contains SOCKS4A connections, which Chromium does not support. Nothing was imported. Use Firefox, or configure SOCKS5 if your proxy server supports it."
+  },
+  "transferVersion": {
+    "message": "This export format version is not supported."
+  },
+  "transferLimit": {
+    "message": "The import exceeds the size or complexity limit (maximum file size: 1 MiB)."
+  },
+  "transferDraft": {
+    "message": "Review and save or discard your edits before importing. Your edits have been preserved."
+  },
+  "transferNoConfiguration": {
+    "message": "This is a support file, not a settings export."
+  },
+  "transferConflict": {
+    "message": "Settings changed elsewhere. Choose the file again to review a fresh preview."
+  },
+  "transferCredentialsRequired": {
+    "message": "Credentials were omitted: enter them before Apply, or explicitly select no authentication."
+  },
+  "transferUnsupported_source": {
+    "message": "Source selection is not transferred to this browser. Review the routing source before Apply. Custom source addresses are omitted from exports because they may contain access tokens."
+  },
+  "transferUnsupported_language": {
+    "message": "This browser does not import the interface language preference."
+  },
+  "transferUnsupported_disabledRules": {
+    "message": "Disabled rules are not stored by this browser and will be omitted."
+  },
+  "transferUnsupported_proxyOptions": {
+    "message": "Per-proxy DNS and timeout preferences are not supported here; browser defaults remain in use."
+  },
+  "transferUnsupported_torScope": {
+    "message": "This browser cannot use a disabled Tor mode for only .onion or Direct replacement. Review the Tor mode after import."
+  },
+  "transferUnsupported_torExclusive": {
+    "message": "This browser supports one Tor mode at a time. Both modes will be disabled until you choose one."
+  },
+  "transferUnsupported_warpScope": {
+    "message": "WARP scope switches apply to the whole list here. Mixed switches are conservatively disabled; review them before Apply."
+  },
+  "rulesEditorHelp": {
+    "message": "Edit a row, add a rule, or delete it. Save keeps your changes; Apply activates them. Auto removes only that row's override; other matching rules and the automatic source still apply."
+  },
+  "rulesAllowlistHelp": {
+    "message": "Auto allowlist entries are shown separately from overrides in this list. When the allowlist is nonempty, unmatched sites use Direct unless an explicit rule takes precedence. The allowlist does not force Auto."
+  },
+  "rulesAdd": {
+    "message": "Add site rule"
+  },
+  "rulesDelete": {
+    "message": "Delete rule"
+  },
+  "rulesEmpty": {
+    "message": "No site rules. Sites use Auto."
+  },
+  "rulesHost": {
+    "message": "Site or domain"
+  },
+  "rulesScope": {
+    "message": "Scope"
+  },
+  "rulesRoute": {
+    "message": "Route / rule type"
+  },
+  "rulesScopeHost": {
+    "message": "This exact host"
+  },
+  "rulesScopeDomain": {
+    "message": "Domain and subdomains"
+  },
+  "rulesScopePattern": {
+    "message": "Existing pattern (unchanged syntax)"
+  },
+  "rulesAuto": {
+    "message": "Auto — remove this entry"
+  },
+  "rulesWhitelist": {
+    "message": "Auto allowlist"
+  },
+  "rulesHostError": {
+    "message": "Enter a host without a wildcard; choose Domain and subdomains to include subdomains."
+  },
+  "unifiedSaveSection": {
+    "message": "Save settings"
+  },
+  "unifiedPopupConflict": {
+    "message": "Settings changed elsewhere. Review the current state and confirm again."
+  },
+  "unifiedControlLost": {
+    "message": "The browser or another extension controls the proxy. Check proxy control before applying again."
+  },
+  "unifiedUnproven": {
+    "message": "The active settings could not be confirmed. Review the status and select Apply again."
+  },
+  "unifiedActions": {
+    "message": "Settings actions"
+  },
+  "unifiedApply": {
+    "message": "Apply"
+  },
+  "unifiedApplyOn": {
+    "message": "Apply and turn on"
+  },
+  "unifiedApplyAll": {
+    "message": "Apply all saved changes"
+  },
+  "unifiedDiscard": {
+    "message": "Discard edits"
+  },
+  "unifiedReview": {
+    "message": "Review in Options"
+  },
+  "unifiedActive": {
+    "message": "Protection active"
+  },
+  "unifiedPending": {
+    "message": "Protection active — changes not applied"
+  },
+  "unifiedApplying": {
+    "message": "Applying…"
+  },
+  "unifiedInactive": {
+    "message": "Inactive"
+  },
+  "unifiedBlocked": {
+    "message": "Action required"
+  },
+  "unifiedUnsaved": {
+    "message": "Unsaved changes"
+  },
+  "unifiedConflict": {
+    "message": "Settings changed elsewhere. Your edits are preserved. Discard edits to load the latest saved settings and review again."
+  },
+  "unifiedSaveFirst": {
+    "message": "Save or discard your edits before applying."
+  },
+  "unifiedSavedActive": {
+    "message": "Saved. Previous settings are still active."
+  },
+  "unifiedPreparing": {
+    "message": "Previous settings remain active while the new configuration is prepared."
+  },
+  "unifiedApplyFailed": {
+    "message": "Changes were not applied. Previous settings remain active."
+  },
+  "unifiedSiteSaved": {
+    "message": "Site rule saved, but not applied. Previous settings remain active."
+  },
+  "unifiedPopupPending": {
+    "message": "Other saved settings have not been applied. Applying this site rule will also apply those settings."
+  },
+  "unifiedTransition": {
+    "message": "Currently: $1. Selected: $2."
+  },
+  "unifiedCategory_siteRules": {
+    "message": "Site rules changed"
+  },
+  "unifiedCategory_proxyConnections": {
+    "message": "Proxy connections changed"
+  },
+  "unifiedCategory_routingSettings": {
+    "message": "Routing settings changed"
+  },
+  "extensionName": {
+    "message": "Runet Censorship Bypass — Revived"
+  },
+  "extensionDescription": {
+    "message": "Independent Anticensority fork. Control website routing with Auto, Proxy and Direct rules."
+  },
+  "popupTitle": {
+    "message": "Protection status"
+  },
+  "popupSubtitle": {
+    "message": "Firefox routing control"
+  },
+  "popupLoading": {
+    "message": "Reading the current state…"
+  },
+  "popupLoadFailed": {
+    "message": "The extension state could not be read."
+  },
+  "popupStateOff": {
+    "message": "Protection is off"
+  },
+  "popupStateInitializing": {
+    "message": "Protection is starting"
+  },
+  "popupStateActive": {
+    "message": "Protection is active"
+  },
+  "popupStateRecovered": {
+    "message": "Protection recovered"
+  },
+  "popupStateBlocked": {
+    "message": "Protection is blocked"
+  },
+  "popupStateExternal": {
+    "message": "Another controller has priority"
+  },
+  "popupHelpOff": {
+    "message": "Enable protection when you are ready."
+  },
+  "popupHelpInitializing": {
+    "message": "Requests that need protection remain blocked until recovery finishes."
+  },
+  "popupHelpActive": {
+    "message": "Firefox is using the verified local routing configuration."
+  },
+  "popupHelpRecovered": {
+    "message": "The routing session was restored after the background page restarted."
+  },
+  "popupHelpBlocked": {
+    "message": "Routing is unavailable, so requests that need protection remain blocked. You can disable protection safely."
+  },
+  "popupHelpPrivateBlocked": {
+    "message": "Private-window access was removed. Routing is blocked and can be disabled safely."
+  },
+  "popupHelpPrivateRequired": {
+    "message": "Allow this extension in private windows before enabling protection."
+  },
+  "popupHelpExternal": {
+    "message": "Firefox proxy control changed externally. This extension stopped routing and will not overwrite the other setting."
+  },
+  "popupHelpDatasetMissing": {
+    "message": "Verified routing data is unavailable."
+  },
+  "popupErrorPrivateAccess": {
+    "message": "Private-window access is required."
+  },
+  "popupErrorPrivateAccessCheck": {
+    "message": "Firefox did not return the private-window permission state. Protection was not enabled."
+  },
+  "popupErrorDataset": {
+    "message": "Verified routing data is unavailable or damaged."
+  },
+  "popupErrorSettings": {
+    "message": "Check the saved routing and proxy credential settings."
+  },
+  "popupErrorProxyCandidate": {
+    "message": "Configure at least one proxy connection before using Proxy mode."
+  },
+  "popupErrorRevision": {
+    "message": "Settings changed elsewhere. The current site state was reloaded; review it and try again."
+  },
+  "popupErrorGeneric": {
+    "message": "The operation could not be completed. Check the protection status above."
+  },
+  "popupOperationPending": {
+    "message": "Operation in progress"
+  },
+  "popupDetails": {
+    "message": "Readiness"
+  },
+  "popupDataset": {
+    "message": "Routing data"
+  },
+  "popupPrivateAccess": {
+    "message": "Private-window access"
+  },
+  "permissionPrivateAccessTitle": {
+    "message": "Private-window access is required"
+  },
+  "permissionPrivateAccessExplanation": {
+    "message": "This extension currently controls Firefox's browser-wide proxy settings, which also affect private windows. Access is required so protection is not reported while private windows remain outside the extension's control."
+  },
+  "permissionPrivateAccessUnknown": {
+    "message": "Firefox did not return the current permission state. Activation remains unavailable until the extension can verify it."
+  },
+  "permissionPrivateAccessSteps": {
+    "message": "Open the Firefox menu → Add-ons and themes → Extensions. Select Runet Censorship Bypass — Revived, then under Run in Private Windows choose Allow. Return here when finished."
+  },
+  "permissionCheckAgain": {
+    "message": "Check again"
+  },
+  "permissionRestrictedSitesInfo": {
+    "message": "Firefox's Run on sites with restrictions permission is separate and is not required for activation. This extension cannot read that setting; review it manually only when a normal website is restricted. Firefox about: pages cannot be routed."
+  },
+  "valueAvailable": {
+    "message": "Available"
+  },
+  "valueUnavailable": {
+    "message": "Unavailable"
+  },
+  "valueGranted": {
+    "message": "Granted"
+  },
+  "valueDenied": {
+    "message": "Denied"
+  },
+  "valueUnknown": {
+    "message": "Unknown"
+  },
+  "actionEnable": {
+    "message": "Enable"
+  },
+  "actionDisable": {
+    "message": "Disable"
+  },
+  "actionSettings": {
+    "message": "Settings"
+  },
+  "actionRetry": {
+    "message": "Retry"
+  },
+  "popupApplyChanges": {
+    "message": "Apply"
+  },
+  "popupTurnOff": {
+    "message": "Turn off"
+  },
+  "popupPillOFF": {
+    "message": "Off"
+  },
+  "popupPillACTIVE": {
+    "message": "Active"
+  },
+  "popupPillRECOVERED": {
+    "message": "Recovered"
+  },
+  "popupPillINITIALIZING": {
+    "message": "Starting"
+  },
+  "popupPillBLOCKED": {
+    "message": "Blocked"
+  },
+  "popupPillEXTERNAL": {
+    "message": "External"
+  },
+  "popupCurrentSiteRouting": {
+    "message": "Current site"
+  },
+  "popupCurrentTabUnavailable": {
+    "message": "This page is unavailable"
+  },
+  "popupPageCannotBeControlledHelp": {
+    "message": "Firefox does not allow routing rules for this browser or extension page."
+  },
+  "popupSiteModeGroup": {
+    "message": "Routing mode for $1"
+  },
+  "popupModeAUTO": {
+    "message": "Auto"
+  },
+  "popupModePROXY": {
+    "message": "Proxy"
+  },
+  "popupModeDIRECT": {
+    "message": "Direct"
+  },
+  "popupAutoModeDescription": {
+    "message": "Use the built-in Anticensority routing rules for this site."
+  },
+  "popupProxyModeDescription": {
+    "message": "Always use your configured proxy connections for this site."
+  },
+  "popupDirectModeDescription": {
+    "message": "Open this site directly, outside Auto."
+  },
+  "popupProxyRouteNeedsMethod": {
+    "message": "Proxy mode needs at least one enabled proxy connection."
+  },
+  "popupConfigureProxyMethods": {
+    "message": "Configure proxy connections"
+  },
+  "popupScope": {
+    "message": "Rule scope"
+  },
+  "popupHostOnly": {
+    "message": "Exact host"
+  },
+  "popupDomainAndSubdomains": {
+    "message": "Domain + subdomains"
+  },
+  "popupRulePreview": {
+    "message": "Rule: $1"
+  },
+  "popupNotApplied": {
+    "message": "Not applied"
+  },
+  "popupAutomaticRouting": {
+    "message": "Routing source"
+  },
+  "popupAutomaticSource": {
+    "message": "Auto follows the source selected in Settings. With the manual source, only your rules and connections are used."
+  },
+  "actionSave": {
+    "message": "Save settings"
+  },
+  "actionReload": {
+    "message": "Reload"
+  },
+  "actionAddProxy": {
+    "message": "Add own proxy"
+  },
+  "actionAddWarp": {
+    "message": "Add WARP candidate"
+  },
+  "actionMoveUp": {
+    "message": "Move up"
+  },
+  "actionMoveDown": {
+    "message": "Move down"
+  },
+  "actionRemove": {
+    "message": "Remove"
+  },
+  "optionsTitle": {
+    "message": "Firefox routing settings"
+  },
+  "optionsSubtitle": {
+    "message": "Configure routing and proxy connections for Firefox."
+  },
+  "optionsNavigationLabel": {
+    "message": "Settings sections"
+  },
+  "optionsNavOverview": {
+    "message": "Overview"
+  },
+  "optionsNavAutomaticRouting": {
+    "message": "Routing source"
+  },
+  "optionsNavSiteRules": {
+    "message": "Site rules"
+  },
+  "optionsNavProxyConnections": {
+    "message": "Proxy connections"
+  },
+  "optionsNavMaintenance": {
+    "message": "Maintenance"
+  },
+  "optionsNavAdvanced": {
+    "message": "Advanced"
+  },
+  "optionsNavAbout": {
+    "message": "About"
+  },
+  "optionsSectionEyebrow": {
+    "message": "Firefox"
+  },
+  "optionsProtectionState": {
+    "message": "Protection"
+  },
+  "optionsAutomaticSourceHelp": {
+    "message": "Choose a website list source or use only your own rules and connections. Saving a source change does not apply it."
+  },
+  "optionsSourceLabel": {
+    "message": "Routing source"
+  },
+  "optionsManualSource": {
+    "message": "Only my rules and connections"
+  },
+  "optionsManualSourceHelp": {
+    "message": "Manual mode works without the Anticensority database. Your site rules, onion routes and connection settings still apply; other sites use Direct with default routing settings. Database updates stay prepared until Anticensority is selected and applied."
+  },
+  "optionsAnticensoritySource": {
+    "message": "Built-in Anticensority routing data"
+  },
+  "optionsMaintenanceHelp": {
+    "message": "Check and verify routing data, then prepare an update. Applying verified data can keep protection active and does not apply saved changes."
+  },
+  "optionsLocalDatasetTitle": {
+    "message": "Current routing data"
+  },
+  "providerUpdateTitle": {
+    "message": "Routing data update"
+  },
+  "providerUpdateHelp": {
+    "message": "Update routing data checks the source and applies verified changes when protection is ready or off. Updates keep protection active and do not apply saved settings. Automatic checks run every 12 hours; blocked updates remain prepared for later."
+  },
+  "providerUpdateChannel": {
+    "message": "Validation"
+  },
+  "providerUpdateChannel_HTTPS": {
+    "message": "HTTPS and strict data validation; no author signature"
+  },
+  "providerUpdateChannel_SIGNED": {
+    "message": "Author signature and strict data validation"
+  },
+  "providerUpdateChannel_NONE": {
+    "message": "Not configured"
+  },
+  "providerUpdateSourceDate": {
+    "message": "Source data date"
+  },
+  "providerUpdateCurrentVersion": {
+    "message": "Current version"
+  },
+  "providerUpdateAvailableVersion": {
+    "message": "Available version"
+  },
+  "providerUpdateLastCheck": {
+    "message": "Last check"
+  },
+  "providerUpdateErrorCategory": {
+    "message": "Last error"
+  },
+  "providerUpdateCheck": {
+    "message": "Update routing data"
+  },
+  "providerUpdateInstall": {
+    "message": "Apply update"
+  },
+  "providerUpdateActionRequired": {
+    "message": "Resolve the protection status shown above before installing this update."
+  },
+  "providerUpdateActiveHelp": {
+    "message": "Verified updates keep current user settings in use; saved changes stay pending. Applying does not turn protection off or enable it if it is off. Source data dates are separate from check dates. Data validation does not prove proxy availability."
+  },
+  "providerUpdateChecked": {
+    "message": "Routing data check completed."
+  },
+  "providerUpdateInstalled": {
+    "message": "Routing data update applied."
+  },
+  "providerUpdateStatusIdle": {
+    "message": "Ready"
+  },
+  "providerUpdateStatusChecking": {
+    "message": "Checking…"
+  },
+  "providerUpdateStatusCurrent": {
+    "message": "Up to date"
+  },
+  "providerUpdateStatusAvailable": {
+    "message": "Update available"
+  },
+  "providerUpdateStatusUpdated": {
+    "message": "Updated"
+  },
+  "providerUpdateStatusFailed": {
+    "message": "Check failed"
+  },
+  "providerUpdateStatusUnavailable": {
+    "message": "Not configured"
+  },
+  "providerUpdateError_AUTHENTICATION_FAILED": {
+    "message": "Routing data verification failed"
+  },
+  "providerUpdateError_DATASET_REJECTED": {
+    "message": "The source returned invalid routing data"
+  },
+  "providerUpdateError_NETWORK_FAILED": {
+    "message": "Network check failed"
+  },
+  "providerUpdateError_ROLLBACK_REJECTED": {
+    "message": "Older update rejected"
+  },
+  "providerUpdateError_SEQUENCE_CONFLICT": {
+    "message": "The update conflicts with previously verified data"
+  },
+  "providerUpdateError_STORAGE_FAILED": {
+    "message": "The update could not be prepared or saved"
+  },
+  "providerUpdateError_TRUST_NOT_CONFIGURED": {
+    "message": "Remote updates are not configured in this build."
+  },
+  "providerUpdateError_UPDATE_INTERRUPTED": {
+    "message": "The previous check was interrupted"
+  },
+  "providerUpdateError_UPDATE_REJECTED": {
+    "message": "Update rejected safely"
+  },
+  "optionsAdvancedHelp": {
+    "message": "Configure Direct replacement and local Tor, Tor Browser, or WARP routes."
+  },
+  "optionsAboutHelp": {
+    "message": "Runet Censorship Bypass — Revived for Firefox uses built-in verified routing data and contains no remote executable code."
+  },
+  "optionsVersion": {
+    "message": "Version $1"
+  },
+  "optionsLoading": {
+    "message": "Loading the saved settings…"
+  },
+  "optionsLoadFailed": {
+    "message": "The saved settings could not be loaded."
+  },
+  "optionsReadOnlyHelp": {
+    "message": "Settings are read-only while Firefox protection is initializing or blocked. Resolve the reported state before editing."
+  },
+  "optionsReadOnlyShort": {
+    "message": "Read-only while initializing or blocked."
+  },
+  "optionsReady": {
+    "message": "Save settings stores your edits. Apply makes saved changes active; unsaved edits are not applied."
+  },
+  "optionsSaved": {
+    "message": "Settings saved. Current routing is unchanged until you select Apply."
+  },
+  "optionsApplySaved": {
+    "message": "Apply"
+  },
+  "optionsApplied": {
+    "message": "Saved settings are now active."
+  },
+  "optionsRevisionConflict": {
+    "message": "Settings changed in another tab. The latest saved settings were loaded; review your changes before saving again."
+  },
+  "optionsErrorReadOnly": {
+    "message": "This operation is unavailable in the current protection state. Check the status shown above and try again."
+  },
+  "optionsErrorValidation": {
+    "message": "Review the highlighted routing or proxy values. The background validator rejected the configuration."
+  },
+  "optionsErrorGeneric": {
+    "message": "The settings operation failed safely."
+  },
+  "optionsRulesTitle": {
+    "message": "Site rules"
+  },
+  "optionsRulesHelp": {
+    "message": "A host matches only that host. Domain and subdomains includes the named domain itself. Rules are saved in this browser profile, not synchronized with another browser."
+  },
+  "optionsRulesPlaceholder": {
+    "message": "example.com\n*.example.org"
+  },
+  "optionsDirectRules": {
+    "message": "Direct rules"
+  },
+  "optionsProxyRules": {
+    "message": "Proxy rules"
+  },
+  "optionsWhitelistRules": {
+    "message": "Whitelist rules"
+  },
+  "optionsRoutingFlags": {
+    "message": "Routing preferences"
+  },
+  "flagUseProviderProxies": {
+    "message": "Use provider proxies"
+  },
+  "flagOwnProxiesOnlyForOwnSites": {
+    "message": "Use configured proxies only for explicit Proxy rules"
+  },
+  "flagReplaceDirectWithProxy": {
+    "message": "Replace provider Direct with configured proxies"
+  },
+  "flagNoDirect": {
+    "message": "Remove provider Direct fallback"
+  },
+  "optionsOwnProxies": {
+    "message": "Own proxies"
+  },
+  "optionsOwnProxiesHelp": {
+    "message": "Candidates are tried in the displayed order before local Tor, Tor Browser, and WARP. HTTP/HTTPS proxy authentication is supported; SOCKS authentication depends on browser and extension support."
+  },
+  "optionsOwnProxyUntitled": {
+    "message": "Own proxy"
+  },
+  "optionsLocalTor": {
+    "message": "Local Tor"
+  },
+  "optionsTorBrowser": {
+    "message": "Tor Browser"
+  },
+  "optionsWarp": {
+    "message": "WARP"
+  },
+  "optionsWarpUntitled": {
+    "message": "WARP candidate"
+  },
+  "optionsPasswordKept": {
+    "message": "The stored password is kept but is never loaded into this page."
+  },
+  "optionsPasswordEmpty": {
+    "message": "No stored password is attached to this proxy."
+  },
+  "optionsNone": {
+    "message": "None"
+  },
+  "fieldId": {
+    "message": "Identifier"
+  },
+  "fieldType": {
+    "message": "Proxy type"
+  },
+  "fieldHost": {
+    "message": "Host"
+  },
+  "fieldPort": {
+    "message": "Port"
+  },
+  "fieldFailoverTimeout": {
+    "message": "Failover timeout (seconds, optional)"
+  },
+  "fieldProxyDns": {
+    "message": "Resolve hostnames through the SOCKS proxy (SOCKS4A / SOCKS5)"
+  },
+  "fieldEnabled": {
+    "message": "Enabled for explicit Proxy rules"
+  },
+  "fieldUseForProxyRules": {
+    "message": "Use for explicit Proxy rules"
+  },
+  "fieldUseForOnion": {
+    "message": "Use for .onion"
+  },
+  "fieldUseAsDirectReplacement": {
+    "message": "Use to replace provider Direct"
+  },
+  "fieldCredentials": {
+    "message": "Credentials"
+  },
+  "fieldUsername": {
+    "message": "Username"
+  },
+  "fieldNewPassword": {
+    "message": "New password"
+  },
+  "credentialKEEP": {
+    "message": "Keep stored password"
+  },
+  "credentialSET": {
+    "message": "Replace password"
+  },
+  "credentialNONE": {
+    "message": "No password / clear"
+  },
+  "actionTitleExternal": {
+    "message": "Proxy settings are controlled externally. Open the extension for safe recovery."
+  },
+  "actionTitleApplying": {
+    "message": "Applying Firefox protection…"
+  },
+  "actionTitleClearing": {
+    "message": "Turning off Firefox protection…"
+  },
+  "actionTitleChecking": {
+    "message": "Checking configured connection…"
+  },
+  "actionTitleLoading": {
+    "message": "Checking Firefox protection state…"
+  },
+  "actionTitleOff": {
+    "message": "Protection is off. Firefox uses its underlying proxy settings."
+  },
+  "actionTitleError": {
+    "message": "Firefox protection needs attention. Open the extension for details."
+  },
+  "actionTitleHealthWarning": {
+    "message": "The last connection check failed. Open the extension to test again."
+  },
+  "actionTitleActiveAuto": {
+    "message": "Protection is active — Current site: Auto"
+  },
+  "actionTitleActiveProxy": {
+    "message": "Protection is active — Current site: Proxy"
+  },
+  "actionTitleActiveDirect": {
+    "message": "Protection is active — Current site: Direct"
+  },
+  "actionTitleActiveUnavailable": {
+    "message": "Protection is active — Current page routing is unavailable"
+  },
+  "healthConnectionTitle": {
+    "message": "Connection check"
+  },
+  "healthConnectionHelp": {
+    "message": "Checks the last explicit Proxy site through the active Firefox routing session. It does not change routing or settings."
+  },
+  "healthStatusOk": {
+    "message": "Connection succeeded"
+  },
+  "healthStatusError": {
+    "message": "Connection failed"
+  },
+  "healthStatusInconclusive": {
+    "message": "No conclusive result"
+  },
+  "healthStatusUnknown": {
+    "message": "Not checked"
+  },
+  "healthCheckAction": {
+    "message": "Check connection"
+  },
+  "healthCheckAgain": {
+    "message": "Check again"
+  },
+  "healthLastChecked": {
+    "message": "Last checked"
+  },
+  "healthCheckedCandidate": {
+    "message": "First configured method"
+  },
+  "healthCode_HEALTH_CHECK_FAILED": {
+    "message": "The connection failed without changing routing. Check the proxy and destination, then try again."
+  },
+  "healthCode_HEALTH_CHECK_INTERRUPTED": {
+    "message": "The previous check was interrupted when the event page stopped."
+  },
+  "healthCode_HEALTH_CHECK_SUPERSEDED": {
+    "message": "Protection changed while the check was running."
+  },
+  "healthCode_HEALTH_CHECK_TIMEOUT": {
+    "message": "The connection check timed out."
+  },
+  "healthCode_HEALTH_NOT_ACTIVE": {
+    "message": "Enable protection before checking the connection."
+  },
+  "healthCode_HEALTH_PROXY_CANDIDATE_UNAVAILABLE": {
+    "message": "No enabled proxy candidate is available for this check."
+  },
+  "healthCode_HEALTH_PROXY_RULE_REQUIRED": {
+    "message": "Choose explicit Proxy for a site and run the check from its popup first."
+  },
+  "healthCode_HEALTH_TARGET_REQUIRED": {
+    "message": "Run the check from the popup of an explicit Proxy site first."
+  },
+  "diagnosticsTitle": {
+    "message": "Sanitized diagnostics"
+  },
+  "diagnosticsRedactionHelp": {
+    "message": "This report excludes browsing URLs, proxy endpoints, credentials, authentication references, routing-data identifiers, and internal protection state."
+  },
+  "diagnosticsExtensionVersion": {
+    "message": "Extension version"
+  },
+  "diagnosticsBrowserVersion": {
+    "message": "Browser version"
+  },
+  "diagnosticsRuntimeState": {
+    "message": "Protection state"
+  },
+  "diagnosticsRecoveryState": {
+    "message": "Recovery state"
+  },
+  "diagnosticsControlState": {
+    "message": "Proxy control"
+  },
+  "diagnosticsDatasetVersion": {
+    "message": "Routing data version"
+  },
+  "diagnosticsProxyCounts": {
+    "message": "Enabled/configured proxy methods"
+  },
+  "diagnosticsProxyTypes": {
+    "message": "Configured proxy types"
+  },
+  "diagnosticsControlOwned": {
+    "message": "Controlled by this extension"
+  },
+  "diagnosticsControlAvailable": {
+    "message": "Available"
+  },
+  "diagnosticsControlExternal": {
+    "message": "Controlled by another extension"
+  },
+  "diagnosticsControlPolicy": {
+    "message": "Controlled by browser policy"
+  },
+  "diagnosticsDownload": {
+    "message": "Download sanitized diagnostics"
+  },
+  "notificationsAttentionTitle": {
+    "message": "Protection notifications"
+  },
+  "notificationsAttentionEnabled": {
+    "message": "Firefox will notify you only when protection control is lost, recovery is blocked, or a requested connection check fails."
+  },
+  "notificationsAttentionUnavailable": {
+    "message": "Browser notifications are unavailable."
+  },
+  "notificationProtectionTitle": {
+    "message": "Protection needs attention"
+  },
+  "notificationHealthTitle": {
+    "message": "Connection check failed"
+  },
+  "notificationControlLoss": {
+    "message": "Another controller changed Firefox proxy settings. Protection stopped safely and was not resumed."
+  },
+  "notificationPrivateAccessBlocked": {
+    "message": "Private-window access was removed. Protection is blocked and can be turned off safely."
+  },
+  "notificationRecoveryBlocked": {
+    "message": "Firefox could not restore the protected session. Open the extension to review or turn it off."
+  },
+  "notificationHealthFailure": {
+    "message": "The requested proxy connection check failed. Open Maintenance to review the sanitized result."
+  },
   "uiThemeLabel": {
     "message": "Theme"
   },
@@ -352,5 +1012,209 @@
   },
   "optionsEditConnection": {
     "message": "Server and authentication settings"
+  },
+  "antifilterSourceLabel": {
+    "message": "Antifilter"
+  },
+  "antifilterSourceHelp": {
+    "message": "Antifilter supplies a list of exact website names, not proxies. Download the list, configure your proxies and allow their use below. Save prepares settings; Apply activates them. Subdomains need their own list entry."
+  },
+  "antifilterProxyConsent": {
+    "message": "Use my Proxy-rule connections for sites in the Antifilter list"
+  },
+  "antifilterProxyHelp": {
+    "message": "Uses enabled own proxies, local Tor, Tor Browser and WARP in that order. This permission applies only to Antifilter matches; other sites keep their existing routing rules. No proxy service is included."
+  },
+  "antifilterPrepare": {
+    "message": "Download Antifilter list"
+  },
+  "antifilterProxyRequired": {
+    "message": "Enable at least one proxy connection for Proxy rules and allow its use for Antifilter. Keep source routing enabled. At most 32 connections are supported."
+  },
+  "antifilterPreparationRequired": {
+    "message": "Download the Antifilter list before saving this source."
+  },
+  "antifilterCurrentSource": {
+    "message": "Current routing source"
+  },
+  "antifilterPrepared": {
+    "message": "Antifilter list is ready. Save the selected source and proxy settings, then Apply."
+  },
+  "routingDataTitle": {
+    "message": "Routing data"
+  },
+  "routingDataUnavailable": {
+    "message": "Update status is unavailable. Try again from Settings."
+  },
+  "routingDataUnknown": {
+    "message": "Unknown"
+  },
+  "routingDataSourceDate": {
+    "message": "Source data date"
+  },
+  "routingDataLastCheck": {
+    "message": "Last successful check"
+  },
+  "routingDataCheck": {
+    "message": "Check for updates"
+  },
+  "routingDataChecking": {
+    "message": "Checking for updates…"
+  },
+  "routingDataAge_UNKNOWN": {
+    "message": "The source data date is unknown. A successful check does not confirm freshness."
+  },
+  "routingDataAge_OLD": {
+    "message": "The source data is over 30 days old. This warning does not turn protection off."
+  },
+  "routingDataNoSource": {
+    "message": "No downloadable list is selected. Choose a source in Settings."
+  },
+  "routingDataResult_UNCHANGED": {
+    "message": "Checked: no new routing data."
+  },
+  "routingDataResult_APPLIED": {
+    "message": "Routing data updated and applied. Pending settings were not applied."
+  },
+  "routingDataResult_PREPARED": {
+    "message": "Data prepared. Protection remains off or unchanged until you apply it."
+  },
+  "routingDataResult_DEFERRED": {
+    "message": "Data prepared, but could not be applied now. Review the protection status."
+  },
+  "routingDataResult_FAILED": {
+    "message": "Could not complete the update. Check the protection status and try again or open Settings."
+  },
+  "routingDataResult_UNAVAILABLE": {
+    "message": "Updating is unavailable for the current source."
+  },
+  "routingDataSource_none": {
+    "message": "No source selected"
+  },
+  "routingDataSource_manual": {
+    "message": "Manual rules"
+  },
+  "routingDataSource_antifilter": {
+    "message": "Antifilter"
+  },
+  "routingDataSource_anticensority": {
+    "message": "Anticensority"
+  },
+  "routingDataSource_antizapret": {
+    "message": "Antizapret"
+  },
+  "routingDataSource_custom": {
+    "message": "Custom source"
+  },
+  "resourcesTitle": {
+    "message": "Website resources"
+  },
+  "resourcesIntro": {
+    "message": "Start capture, reproduce the problem in the source tab, then stop and review the domains."
+  },
+  "resourcesPrivacy": {
+    "message": "Capture covers only this non-private tab: up to 2 minutes, 100 domains and 1000 requests. Only hostnames, types and counts; no page addresses, content or passwords. Results stay in this page’s memory until cleared, closed, navigation to another site, or 10 minutes from start."
+  },
+  "resourcesStart": {
+    "message": "Start capture"
+  },
+  "resourcesStop": {
+    "message": "Stop and review"
+  },
+  "resourcesReload": {
+    "message": "Reload source tab"
+  },
+  "resourcesClear": {
+    "message": "Clear results"
+  },
+  "resourcesSettings": {
+    "message": "Open settings"
+  },
+  "resourcesCapturing": {
+    "message": "Capture is on. Domains found: $1. Reproduce the problem in the source tab."
+  },
+  "resourcesIdle": {
+    "message": "Capture is off. Select Start capture when ready."
+  },
+  "resourcesUnavailable": {
+    "message": "Open this tool from the extension popup on a normal website. Private and internal tabs are not supported."
+  },
+  "resourcesNavigated": {
+    "message": "The tab closed or navigated to another site. Results were cleared; open the tool again."
+  },
+  "resourcesExpired": {
+    "message": "Results expired and were cleared."
+  },
+  "resourcesCleared": {
+    "message": "Capture is off. Results cleared."
+  },
+  "resourcesReadFailed": {
+    "message": "Could not read settings. Select Stop and review again or start a new capture."
+  },
+  "resourcesStopped": {
+    "message": "Capture stopped. Domains to review: $1."
+  },
+  "resourcesLimited": {
+    "message": "Capture limit reached. Showing the first $1 domains; the list may be incomplete."
+  },
+  "resourcesResults": {
+    "message": "Select only the domains you need"
+  },
+  "resourcesCaution": {
+    "message": "A failure does not always mean censorship. Leave ads and analytics unselected unless needed."
+  },
+  "resourcesEmpty": {
+    "message": "No additional domains found. In a new capture, reload the site and play the video or repeat the action that fails."
+  },
+  "resourcesCounts": {
+    "message": "Requests: $1 · Failures: $2"
+  },
+  "resourcesRuleDIRECT": {
+    "message": "An existing Direct rule is preserved unchanged."
+  },
+  "resourcesRulePROXY": {
+    "message": "Already covered by a Proxy rule."
+  },
+  "resourcesProxyRequired": {
+    "message": "First configure a connection for Proxy rules: your proxy, Tor, Tor Browser or WARP. A website list does not provide a connection."
+  },
+  "resourcesGlobalScope": {
+    "message": "Rules affect the whole browser, including other sites. Only exact hosts are saved. To activate them, select Apply in settings."
+  },
+  "resourcesSave": {
+    "message": "Save selected rules"
+  },
+  "resourcesSaved": {
+    "message": "Rules saved, not applied. Open settings, review all pending changes, then select Apply."
+  },
+  "resourcesSaveFailed": {
+    "message": "Rules were not saved. Settings may have changed elsewhere: review the results again and reselect domains. Active routing was not changed."
+  },
+  "resourcesType_image": {
+    "message": "images"
+  },
+  "resourcesType_media": {
+    "message": "video/audio"
+  },
+  "resourcesType_script": {
+    "message": "scripts"
+  },
+  "resourcesType_stylesheet": {
+    "message": "styles"
+  },
+  "resourcesType_xmlhttprequest": {
+    "message": "data/API"
+  },
+  "resourcesType_sub_frame": {
+    "message": "embedded pages"
+  },
+  "resourcesType_other": {
+    "message": "other"
+  },
+  "resourcesPrivacySummary": {
+    "message": "Only domains from the selected tab, for up to 2 minutes. Results stay in this page’s memory."
+  },
+  "resourcesDetails": {
+    "message": "What is captured and when it is erased"
   }
 }

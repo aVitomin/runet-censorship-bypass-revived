@@ -1,11 +1,11 @@
-# Privacy notice — version 1.0
+# Privacy notice — version 1.0.2
 
 For Runet Censorship Bypass in
 [aVitomin/runet-censorship-bypass-revived](https://github.com/aVitomin/runet-censorship-bypass-revived).
-Effective date: 24 October 2026. This notice describes version `1.0.0` for
-Firefox and Chromium, including locally installed packages. The availability
-of each distribution channel is recorded separately on the project's release
-page; this notice does not announce a store listing.
+Effective date: 3 November 2026. Applies to version `1.0.2` for desktop Chromium
+and Firefox. This notice does not announce store availability; see
+[installation and channel status](../user/INSTALLATION.md).
+For versions 1.0.0 and 1.0.1, see the [previous notice](PRIVACY_1_0_1.md).
 The [earlier-release notice](../user/PRIVACY_AND_SECURITY.md) remains separate.
 
 ## Data used in your browser
@@ -25,6 +25,24 @@ authentication retry state. These are not exported as browsing history or
 uploaded to a developer service. Storage is local, not an encrypted password
 vault or cloud synchronization service. People/software with access to your
 browser profile may be able to access it.
+
+## Optional website resource helper
+
+Opening the helper does not start capture. After an explicit Start, this open
+extension page observes requests from one selected non-private tab for up to
+two minutes, 100 hosts or 1000 requests, with at most 256 pending correlations.
+It keeps hostnames, coarse resource types and request/failure counts in memory;
+request IDs are temporary correlations. It does not retain full URLs, queries,
+headers, bodies, credentials or raw request errors, write captured results to
+browser storage, include them in support reports or send them to a service.
+Clear, closing the tool or source tab, navigating the source to another host,
+or ten minutes from capture start erase the result. Browser restrictions and
+cache can make observations incomplete. Reload source tab reloads that page
+only when the user requests it, with ordinary website traffic and cookies.
+
+Saving explicitly selected hosts adds normal browser-wide Saved Proxy rules;
+those chosen rules then follow ordinary local storage/export behavior below.
+Existing Direct rules remain unchanged. Saving does not apply or enable routing.
 
 ## Data that leaves the browser
 
@@ -50,7 +68,7 @@ browser profile may be able to access it.
   source URLs may themselves contain sensitive access information, so keep
   them private. The extension does not upload your rule list or configured
   proxy passwords as a provider-update payload.
-- **Firefox routing data:** bundled verified data is read locally. Manual
+- **Firefox routing data:** bundled verified data is read locally. With Anticensority selected, manual
   refresh and scheduled checks every 12 hours fetch static routing data from
   fixed Anticensority sources on `anticensority.github.io` and
   `raw.githubusercontent.com`. Those servers receive ordinary request and
@@ -65,6 +83,24 @@ browser profile may be able to access it.
   pending user settings when on. Choosing Only my rules and connections does
   not disable these source requests; it defers provider installation while
   saved or applied settings select manual.
+- **Optional Antifilter source:** both browsers download an exact-host domain
+  list from https://antifilter.download/list/domains.lst when this source is
+  selected, including manual preparation and scheduled checks. Requests omit
+  website credentials and referrers and reject redirects. The server receives
+  ordinary connection metadata, including a network-visible IP address.
+  Requests do not upload site rules or proxy credentials as update payloads.
+  Format, size, dates, rule counts and locally computed SHA-256 hashes are
+  checked before the data is stored locally. No downloaded JavaScript is
+  executed to import this list. These checks do not authenticate an author's
+  signature. The source supplies data, not a proxy service; use of configured
+  Proxy connections for its sites requires explicit consent.
+- **Popup update control:** the button calls the existing source updater; it
+  adds no telemetry or periodic job. While routing is active it updates the
+  applied source with applied settings, leaving pending changes unapplied.
+  While routing is off, updating does not acquire proxy control. Source date
+  and successful-check time are separate. The manual-mode popup button is
+  unavailable; Firefox's existing Anticensority background maintenance can
+  still make requests as described above.
 - **Connection checks:** Firefox makes a user-requested GET to an eligible
   explicit-Proxy target origin, omits website credentials and referrer, does
   not follow redirects and discards the body. Chromium can check after popup

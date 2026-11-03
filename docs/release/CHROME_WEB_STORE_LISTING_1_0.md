@@ -1,21 +1,25 @@
-# Chrome Web Store listing — 1.0
+# Chrome Web Store — prepared next description
 
-Public version `1.0.0` and its installation button were verified on 2026-10-28:
+**Version 1.0.2 submission copy. Store submission is not yet confirmed.**
+
+Public version `1.0.1` was verified on 2026-10-30:
 [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph). The
 [reviewer notes](CHROME_REVIEWER_NOTES_1_0.md) retain the PAC disclosure and
 review requirements for future changes.
 The shorter descriptions below are repository drafts for a future listing
 edit; they have not replaced the submitted store copy or package metadata.
 
-## Prepared name for the next release
+## Published name
 
 - **English:** Runet Censorship Bypass — Revived.
 - **Russian:** Обход блокировок Рунета — Revived.
-- Chrome reads the localized name from the package manifest. Apply this name
-  with the next validated version of the existing store item; it is not live yet.
-- Keep the existing extension ID and store URL. Homepage, support and privacy
-  links already point to this fork; their canonical destinations are in the
+- Chrome reads the localized name from the package manifest. Both Revived names
+  are part of version 1.0.1; keep them when updating the existing store item.
+- Keep the existing extension ID and store URL. Canonical homepage, support and
+  privacy destinations are in the
   [link audit](LINK_AUDIT_1_0.md#revived-preparation--2026-10-28).
+  Repository URLs have changed; saving the corresponding dashboard fields
+  has not yet been verified. Earlier repository addresses redirect.
 
 ## Short description
 
@@ -39,7 +43,9 @@ proxy, or connect directly. Runet Censorship Bypass — Revived is an independen
 Anticensority fork that controls browser routing; it provides no VPN or proxy service.
 
 - Choose Auto, Proxy or Direct for a site, an exact host or a domain with subdomains.
-- Use built-in PAC sources, a custom source, or Only my rules and connections.
+- Use a built-in or custom PAC source, the optional Antifilter list, or Only my rules and connections.
+- Check source updates from the popup; source date and last successful check are shown separately.
+- Website resources: manually review hosts from one non-private tab and save selected browser-wide Proxy rules, without applying them. Capture stays in the open tool page only.
 - Configure your own proxies or connect to separately running Tor, Tor Browser or WARP.
 - Save settings for review, then Apply them. Existing settings stay active until Apply.
 - Transfer settings with import preview and create a separate sanitized support report.
@@ -50,6 +56,10 @@ Auto follows the selected source and rules; it can use a proxy. Explicit Direct
 takes priority over Proxy. Proxy needs a suitable enabled connection. Updates
 do not turn routing on or activate pending settings. The popup asks before
 including other saved changes; unsaved Options edits are not included.
+
+Antifilter supplies an exact-host list, not proxy servers. It uses your selected
+Proxy connections only after explicit consent. Old or unknown source dates show
+a warning without switching routing off.
 
 Settings and optional proxy credentials stay in your browser profile. There is
 no developer telemetry or cloud synchronization. Sources, proxies and connection
@@ -74,7 +84,9 @@ SOCKS authentication depends on the browser.
 VPN или прокси-сервер в комплект не входят.
 
 - Режимы «Авто», «Прокси» и «Напрямую» для одного хоста или домена с поддоменами.
-- Встроенные PAC-источники, свой источник или режим «Только мои правила и подключения».
+- Встроенный или свой PAC-источник, дополнительный список Antifilter либо режим «Только мои правила и подключения».
+- Проверка обновлений базы из панели; дата данных и время последней проверки показаны отдельно.
+- «Ресурсы сайта»: ручной просмотр доменов одной обычной вкладки и сохранение выбранных правил «Прокси» для всего браузера без применения. Сбор остаётся только в открытом инструменте.
 - Собственные прокси и подключение к отдельно запущенным Tor, Tor Browser или WARP.
 - Сохранение настроек отдельно от применения: прежние продолжают действовать до «Применить».
 - Перенос настроек с предварительным просмотром и отдельный очищенный отчёт для поддержки.
@@ -86,6 +98,10 @@ VPN или прокси-сервер в комплект не входят.
 включённое подключение. Обновление базы не включает маршрутизацию и не применяет
 отложенные настройки. Панель спрашивает перед применением других сохранённых
 изменений; несохранённые правки настроек в применение не входят.
+
+Antifilter предоставляет список точных имён сайтов, без прокси-серверов. Он
+использует выбранные вами подключения для правил «Прокси» с явного разрешения.
+Предупреждение о старой или неизвестной дате базы не отключает маршрутизацию.
 
 Настройки и учётные данные прокси хранятся в профиле браузера. Телеметрии
 разработчика и облачной синхронизации нет. Источники, прокси и проверки подключений
@@ -149,11 +165,10 @@ programs; those distinctions do not establish approval of this exact package.
 
 ## Images and submission scope
 
-Use the five [current Chromium store screenshots](../assets/releases/1.0/README.md),
-the 440x280 promotional PNG and the verified packaged icon. Native popup images
-are genuine documentation workflow captures, not padded 1280x800 store shots.
+Use the five [1.0.2 Chromium screenshots per locale](../assets/releases/1.0.2/README.md),
+the existing 440x280 promotional PNG and the verified packaged icon.
 Follow the [current listing guidance](https://developer.chrome.com/docs/webstore/cws-dashboard-listing/)
 and [image requirements](https://developer.chrome.com/docs/webstore/images).
-The existing public store link is recorded above. Its current name is still
-the 1.0.0 name. Recapture any screenshots displaying the name from the final
-Revived build before submitting the update; do not relabel old captures as new.
+The existing public store link is recorded above. Version 1.0.1 uses the Revived
+name. The 1.0.2 screenshots were captured from the exact local candidate.
+Their presence in the repository does not establish a store submission or approval.

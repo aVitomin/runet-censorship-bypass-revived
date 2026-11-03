@@ -5,6 +5,7 @@ const Routing = require('../../shared/routing-contract');
 const Adapter = require('../background/routing-adapter');
 const Runtime = require('../background/dataset-runtime');
 const Store = require('../background/dataset-store');
+const {compactArtifact} = require('../../tooling/test-support/domain-dataset');
 const {
   Dataset,
   PROVIDER_KEY,
@@ -72,6 +73,34 @@ function adapterForRuntime(runtime) {
 }
 
 describe('Firefox declarative dataset runtime', function() {
+
+  it('restores compact data through the store and enforces the normal request guard',
+      async function() {
+        const first = createStoredRuntime({providerKey: 'antifilter'});
+        // Synthetic package trust is test-only; no Antifilter baseline is shipped.
+        await first.store.commitPackagedBaseline(compactArtifact());
+        for (const context of [first,
+          createStoredRuntime({providerKey: 'antifilter', backend: first.backend})]) {
+          const initialized = await context.runtime.initialize();
+          Assert.strictEqual(initialized.state, 'READY', initialized.failureCode);
+          const adapter = adapterForRuntime(context.runtime);
+          const hit = {requestId: 'compact-hit', url: 'https://blocked.example/'};
+          const miss = {requestId: 'compact-miss', url: 'https://child.blocked.example/'};
+          const routed = adapter.onProxyRequest(hit);
+          Assert.strictEqual(routed[0].host, '127.0.0.1');
+          Assert.strictEqual(routed[0].port, 8080);
+          Assert.deepStrictEqual(adapter.onBeforeRequest(hit), {cancel: false});
+          Assert.deepStrictEqual(adapter.onBeforeRequest(hit), {cancel: true});
+          Assert.strictEqual(adapter.onProxyRequest(miss), null);
+          Assert.deepStrictEqual(adapter.onBeforeRequest(miss), {cancel: false});
+        }
+        const off = createStoredRuntime({providerKey: 'antifilter',
+          protectionIntended: false, backend: first.backend});
+        Assert.strictEqual((await off.runtime.initialize()).state, 'OFF');
+        Assert.strictEqual(adapterForRuntime(off.runtime).onProxyRequest({
+          requestId: 'off', url: 'https://blocked.example/',
+        }), undefined);
+      });
 
   it('runs the exact built-in manual policy without opening or indexing any dataset', async function() {
     const Settings = require('../background/settings-control');

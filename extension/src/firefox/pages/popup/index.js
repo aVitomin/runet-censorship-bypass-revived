@@ -5,7 +5,9 @@
 
   const runtime = typeof module === 'object' && module.exports ?
     require('../shared/ui-runtime') : root.rucbFirefoxUi;
-  const api = factory(runtime);
+  const dataStatus = typeof module === 'object' && module.exports ?
+    require('../../../shared/routing-data-status') : root.rucbRoutingDataStatus;
+  const api = factory(runtime, dataStatus);
   if (typeof module === 'object' && module.exports) {
     module.exports = api;
     return;
@@ -15,7 +17,7 @@
     api.mount(root.document, root.browser);
   });
 
-})(typeof globalThis === 'object' ? globalThis : this, function(Ui) {
+})(typeof globalThis === 'object' ? globalThis : this, function(Ui, DataStatus) {
 
   const SITE_KEYS = Object.freeze([
     'patterns', 'proxyCandidateAvailable', 'revision', 'route',
@@ -178,6 +180,8 @@
       tabUrl: '',
       configuration: null,
       notice: null,
+      routingData: null,
+      routingUpdateResult: null,
     };
 
     function snapshot() {
@@ -203,15 +207,17 @@
       }
       const result = await rpc.call({type: 'firefox.popup.get', tabUrl});
       if (!Ui.hasExactKeys(result, ['capabilities', 'site', 'operational',
-        'configuration'])) throw Ui.rpcError('UI_RPC_FAILED');
+        'configuration', 'routingData'])) throw Ui.rpcError('UI_RPC_FAILED');
       const capabilities = Ui.validateCapabilities(result.capabilities);
       const site = validateSiteState(result.site);
       const operational = Ui.validateOperationalStatus(result.operational);
       const configuration = Ui.validateConfiguration(result.configuration);
+      const routingData = DataStatus.validate(result.routingData);
       state.capabilities = capabilities;
       state.site = site;
       state.operational = operational;
       state.configuration = configuration;
+      state.routingData = routingData;
       state.tabUrl = tabUrl;
 
     }
@@ -348,8 +354,34 @@
 
     }
 
+    async function refreshRoutingData() {
+
+      if (state.pending || !state.routingData || !state.routingData.canCheck ||
+          state.routingData.updating) return false;
+      state = Object.assign({}, state, {
+        operation: 'DATA_UPDATE', pending: true, routingUpdateResult: null,
+      });
+      emit();
+      try {
+        const result = await rpc.call({type: 'firefox.routingData.refresh'});
+        state.routingUpdateResult = result && DataStatus.RESULTS.includes(result.status) ?
+          result.status : 'FAILED';
+        await readAll();
+        return state.routingUpdateResult !== 'FAILED';
+      } catch (_error) {
+        state.routingUpdateResult = 'FAILED';
+        return false;
+      } finally {
+        state.operation = null;
+        state.pending = false;
+        emit();
+      }
+
+    }
+
     return Object.freeze({
       apply: (draft, applyAll) => operate('ENABLE', draft, applyAll),
+      refreshRoutingData,
       checkHealth,
       checkPrivateAccess,
       clear: () => operate('DISABLE'),
@@ -369,6 +401,7 @@
       Ui.translate(browserApi, key, substitutions);
     let draft = null;
     let renderedRevision = null;
+    let resourceTab = null;
     const controller = createController({
       rpc: Ui.createRpc(browserApi),
       async getActiveTabUrl() {
@@ -380,6 +413,7 @@
           active: true,
           currentWindow: true,
         });
+        resourceTab = tabs && tabs[0] || null;
         return tabs && tabs[0] && typeof tabs[0].url === 'string' ?
           tabs[0].url : '';
 
@@ -625,22 +659,18 @@
       }
       renderRoute(root, state, view);
       const facts = Ui.append(root, 'section', 'card facts-card');
-      Ui.appendText(facts, 'h2', t('popupAutomaticRouting'));
-      Ui.appendText(facts, 'p', t('popupAutomaticSource'), 'muted');
-      const list = Ui.append(facts, 'dl', 'facts');
-      const rows = [
-        ['popupDataset', state.capabilities.providerDatasetAvailable ?
-          'valueAvailable' : 'valueUnavailable'],
-        ['popupPrivateAccess', state.capabilities.privateWindowAccess ===
-          'GRANTED' ? 'valueGranted' :
-            state.capabilities.privateWindowAccess === 'DENIED' ?
-              'valueDenied' : 'valueUnknown'],
-      ];
-      for (const [labelKey, valueKey] of rows) {
-        const row = Ui.append(list, 'div', 'fact');
-        Ui.appendText(row, 'dt', t(labelKey), 'muted');
-        Ui.appendText(row, 'dd', t(valueKey));
-      }
+      DataStatus.render(facts, {
+        status: state.routingData, pending: state.pending,
+        result: state.routingUpdateResult, translate: t,
+        onCheck: () => controller.refreshRoutingData(),
+      });
+      const resourcesButton = Ui.appendText(facts, 'button', t('resourcesTitle'));
+      resourcesButton.type = 'button';
+      resourcesButton.disabled = !resourceTab || resourceTab.incognito !== false ||
+        !Number.isSafeInteger(resourceTab.id) || !state.site.target.controllable;
+      resourcesButton.addEventListener('click', () => {
+        browserApi.tabs.create({url: browserApi.runtime.getURL(`pages/resources/index.html#${resourceTab.id}`)});
+      });
       const live = Ui.appendText(
           root,
           'p',

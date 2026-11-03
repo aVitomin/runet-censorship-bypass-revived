@@ -129,7 +129,7 @@ function fixture(options = {}) {
     cryptoSubtle: {},
     fetchImpl() {},
     now: options.now || (() => 1000),
-    providerKey: PROVIDER_KEY,
+    providerKey: options.providerKey || PROVIDER_KEY,
     readCurrentDatasetIdentity: async () => current,
     readCurrentDatasetInfo: options.sourceUpdatedAt ? async () => ({
       identity: current, sourceUpdatedAt: options.sourceUpdatedAt,
@@ -201,6 +201,24 @@ function fixture(options = {}) {
 }
 
 describe('Firefox production provider update control', function() {
+
+  it('tracks Antifilter independently and accepts full source-bound dataset versions', async function() {
+    const current = {providerKey: 'antifilter', datasetVersion: 'source-20261029000000000-' + 'a'.repeat(64),
+      artifactSha256: 'b'.repeat(64)};
+    const test = fixture({providerKey: 'antifilter', current, next: current,
+      sourceUpdateEnabled: true, trust: {enabled: false, manifestUrl: null,
+        providerKey: 'antifilter', trustedPublicKeys: {}}});
+    await test.controller.initialize();
+    await test.controller.check();
+    const status = await test.controller.publicStatus();
+    Assert.equal(status.updateConfigured, true);
+    Assert.equal(status.currentDatasetVersion, current.datasetVersion);
+    Assert.equal(status.updateAvailable, false);
+    Assert.equal(status.updateChannel, 'HTTPS');
+    Assert.equal(test.persisted.values[Control.STORAGE_KEY], undefined);
+    Assert.equal(test.persisted.values[Control.STORAGE_KEY + '.antifilter'].lastCheckStatus, 'STAGED');
+    Assert.equal(test.updaterInputs.length, 0);
+  });
 
   it('reports unavailable dataset storage without failing Options or rewriting check history', async function() {
     const test = fixture({storeUnavailable: true});

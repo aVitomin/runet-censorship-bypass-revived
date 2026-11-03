@@ -1,86 +1,250 @@
 {
-  "providerLifecycleControlHelp": {"message": "Check the protection status above. Updated routing data alone does not confirm that routing is active."},
-  "providerLifecycleHelp": {"message": "Check for updates → Verify data → Prepare → Apply update."},
-  "providerLifecycleName": {"message": "Routing data"},
-  "providerLifecycleVersion": {"message": "Data version"},
-  "providerLifecycleLastCheck": {"message": "Last check"},
-  "providerLifecycleLastApplied": {"message": "Last applied"},
-  "providerLifecycleUnknown": {"message": "Unknown"},
-  "providerLifecycleUnknownHelp": {"message": "No update result is available yet."},
-  "providerLifecycleChecking": {"message": "Checking…"},
-  "providerLifecyclePreparing": {"message": "Preparing…"},
-  "providerLifecycleApplying": {"message": "Preparing and applying…"},
-  "providerLifecycleVerified": {"message": "Verified"},
-  "providerLifecycleVerifiedHelp": {"message": "The routing data passed the available integrity checks. This does not test proxy connections."},
-  "providerLifecyclePrepared": {"message": "Ready to apply"},
-  "providerLifecyclePreparedHelp": {"message": "The data passed verification and the update is ready to apply. Saved settings have not been applied."},
-  "providerLifecyclePreparedOffHelp": {"message": "The data passed verification and preparation. Protection remains off; use the settings Apply action when you want to turn it on."},
-  "providerLifecycleApplied": {"message": "Applied"},
-  "providerLifecycleAppliedHelp": {"message": "The current routing data is active. Availability of connections depends on the configured proxy services."},
-  "providerLifecycleFailed": {"message": "Failed"},
-  "providerLifecycleFailedHelp": {"message": "The update could not be checked, prepared or applied. Review the protection status before trying again."},
-  "providerLifecycleVerificationFailed": {"message": "Routing data verification failed."},
-  "providerLifecycleInvalid": {"message": "The source returned invalid routing data."},
-  "providerLifecyclePreparationFailed": {"message": "The update could not be prepared or applied. Check the protection status."},
-  "providerLifecycleBusyHelp": {"message": "The update operation is in progress. Existing routing continues during preparation; saved settings stay pending."},
-  "providerLifecycleSafetyHelp": {"message": "Checking verifies and prepares routing data without changing active routing. Applying an update retains current user settings and keeps saved changes pending. Updates do not enable inactive protection or test proxy availability."},
-  "providerLifecycleApplyRechecks": {"message": "Apply update checks and prepares data again before safely applying it. If protection is off, data is only prepared; use the settings Apply action to turn protection on."},
-  "providerLifecycleCheck": {"message": "Check for updates"},
-  "transferCredentialsMissingLabel": {"message":"Credentials required"},
-  "transferUnsupported_authentication": {"message":"Firefox has no global proxy-authentication switch. Review imported profiles before Apply; missing credentials still require re-entry."},
-  "transferTitle": {"message":"Import / Export"},
-  "transferHelp": {"message":"Manual transfer of saved settings, not synchronization. Files contain site rules and proxy addresses, but no usernames or passwords. Export ignores unsaved edits. Import saves settings without applying or turning protection on."},
-  "transferExport": {"message":"Export settings"},
-  "transferImport": {"message":"Import settings: choose a JSON file"},
-  "transferSupport": {"message":"Export for support"},
-  "transferSupportHelp": {"message":"Support files contain only environment and status information, without site rules or proxy addresses. They cannot be imported as settings."},
-  "transferPreview": {"message":"Import preview"},
-  "transferCounts": {"message":"Rules: $1 (added/removed entries: $2). Proxy profiles: $3. Credentials to re-enter: $4."},
-  "transferReplaceWarning": {"message":"This replaces saved routing settings. Missing credentials must be entered before Apply. Review the unsupported fields below; they are not transferred."},
-  "transferConfirm": {"message":"Save imported settings"},
-  "transferCancel": {"message":"Cancel import"},
-  "transferImported": {"message":"Settings imported. They are saved but not applied."},
-  "transferExported": {"message":"Export prepared. Keep settings files private."},
-  "transferInvalid": {"message":"The file is not a valid settings export. Nothing was imported."},
-  "transferSocks4aUnsupported": {"message":"This file contains SOCKS4A connections, which Chromium does not support. Nothing was imported. Use Firefox, or configure SOCKS5 if your proxy server supports it."},
-  "transferVersion": {"message":"This export format version is not supported."},
-  "transferLimit": {"message":"The import exceeds the size or complexity limit (maximum file size: 1 MiB)."},
-  "transferDraft": {"message":"Review and save or discard your edits before importing. Your edits have been preserved."},
-  "transferNoConfiguration": {"message":"This is a support file, not a settings export."},
-  "transferConflict": {"message":"Settings changed elsewhere. Choose the file again to review a fresh preview."},
-  "transferCredentialsRequired": {"message":"Credentials were omitted: enter them before Apply, or explicitly select no authentication."},
-  "transferUnsupported_source": {"message":"Source selection is not transferred to this browser. Review the routing source before Apply. Custom source addresses are omitted from exports because they may contain access tokens."},
-  "transferUnsupported_language": {"message":"This browser does not import the interface language preference."},
-  "transferUnsupported_disabledRules": {"message":"Disabled rules are not stored by this browser and will be omitted."},
-  "transferUnsupported_proxyOptions": {"message":"Per-proxy DNS and timeout preferences are not supported here; browser defaults remain in use."},
-  "transferUnsupported_warpScope": {"message":"WARP scope switches apply to the whole list here. Mixed switches are conservatively disabled; review them before Apply."},
-  "unifiedSaveSection": {"message": "Save settings"},
-  "unifiedPopupConflict": {"message": "Settings changed elsewhere. Review the current state and confirm again."},
-  "unifiedControlLost": {"message": "The browser or another extension controls the proxy. Check proxy control before applying again."},
-  "unifiedUnproven": {"message": "The active settings could not be confirmed. Review the status and select Apply again."},
-  "unifiedActions": {"message": "Settings actions"},
-  "unifiedApply": {"message": "Apply"},
-  "unifiedApplyOn": {"message": "Apply and turn on"},
-  "unifiedApplyAll": {"message": "Apply all saved changes"},
-  "unifiedDiscard": {"message": "Discard edits"},
-  "unifiedReview": {"message": "Review in Options"},
-  "unifiedActive": {"message": "Protection active"},
-  "unifiedPending": {"message": "Protection active — changes not applied"},
-  "unifiedApplying": {"message": "Applying…"},
-  "unifiedInactive": {"message": "Inactive"},
-  "unifiedBlocked": {"message": "Action required"},
-  "unifiedUnsaved": {"message": "Unsaved changes"},
-  "unifiedConflict": {"message": "Settings changed elsewhere. Your edits are preserved. Discard edits to load the latest saved settings and review again."},
-  "unifiedSaveFirst": {"message": "Save or discard your edits before applying."},
-  "unifiedSavedActive": {"message": "Saved. Previous settings are still active."},
-  "unifiedPreparing": {"message": "Previous settings remain active while the new settings are prepared."},
-  "unifiedApplyFailed": {"message": "Changes were not applied. Previous settings remain active."},
-  "unifiedSiteSaved": {"message": "Site rule saved, but not applied. Previous settings remain active."},
-  "unifiedPopupPending": {"message": "Other saved settings have not been applied. Applying this site rule will also apply those settings."},
-  "unifiedTransition": {"message": "Currently: $1. Selected: $2."},
-  "unifiedCategory_siteRules": {"message": "Site rules changed"},
-  "unifiedCategory_proxyConnections": {"message": "Proxy connections changed"},
-  "unifiedCategory_routingSettings": {"message": "Routing settings changed"},
+  "providerLifecycleControlHelp": {
+    "message": "Check the protection status above. Updated routing data alone does not confirm that routing is active."
+  },
+  "providerLifecycleHelp": {
+    "message": "Check for updates → Verify data → Prepare → Apply update."
+  },
+  "providerLifecycleName": {
+    "message": "Routing data"
+  },
+  "providerLifecycleVersion": {
+    "message": "Data version"
+  },
+  "providerLifecycleLastCheck": {
+    "message": "Last check"
+  },
+  "providerLifecycleLastApplied": {
+    "message": "Last applied"
+  },
+  "providerLifecycleUnknown": {
+    "message": "Unknown"
+  },
+  "providerLifecycleUnknownHelp": {
+    "message": "No update result is available yet."
+  },
+  "providerLifecycleChecking": {
+    "message": "Checking…"
+  },
+  "providerLifecyclePreparing": {
+    "message": "Preparing…"
+  },
+  "providerLifecycleApplying": {
+    "message": "Preparing and applying…"
+  },
+  "providerLifecycleVerified": {
+    "message": "Verified"
+  },
+  "providerLifecycleVerifiedHelp": {
+    "message": "The routing data passed the available integrity checks. This does not test proxy connections."
+  },
+  "providerLifecyclePrepared": {
+    "message": "Ready to apply"
+  },
+  "providerLifecyclePreparedHelp": {
+    "message": "The data passed verification and the update is ready to apply. Saved settings have not been applied."
+  },
+  "providerLifecyclePreparedOffHelp": {
+    "message": "The data passed verification and preparation. Protection remains off; use the settings Apply action when you want to turn it on."
+  },
+  "providerLifecycleApplied": {
+    "message": "Applied"
+  },
+  "providerLifecycleAppliedHelp": {
+    "message": "The current routing data is active. Availability of connections depends on the configured proxy services."
+  },
+  "providerLifecycleFailed": {
+    "message": "Failed"
+  },
+  "providerLifecycleFailedHelp": {
+    "message": "The update could not be checked, prepared or applied. Review the protection status before trying again."
+  },
+  "providerLifecycleVerificationFailed": {
+    "message": "Routing data verification failed."
+  },
+  "providerLifecycleInvalid": {
+    "message": "The source returned invalid routing data."
+  },
+  "providerLifecyclePreparationFailed": {
+    "message": "The update could not be prepared or applied. Check the protection status."
+  },
+  "providerLifecycleBusyHelp": {
+    "message": "The update operation is in progress. Existing routing continues during preparation; saved settings stay pending."
+  },
+  "providerLifecycleSafetyHelp": {
+    "message": "Checking verifies and prepares routing data without changing active routing. Applying an update retains current user settings and keeps saved changes pending. Updates do not enable inactive protection or test proxy availability."
+  },
+  "providerLifecycleApplyRechecks": {
+    "message": "Apply update checks and prepares data again before safely applying it. If protection is off, data is only prepared; use the settings Apply action to turn protection on."
+  },
+  "providerLifecycleCheck": {
+    "message": "Check for updates"
+  },
+  "transferCredentialsMissingLabel": {
+    "message": "Credentials required"
+  },
+  "transferUnsupported_authentication": {
+    "message": "Firefox has no global proxy-authentication switch. Review imported profiles before Apply; missing credentials still require re-entry."
+  },
+  "transferTitle": {
+    "message": "Import / Export"
+  },
+  "transferHelp": {
+    "message": "Manual transfer of saved settings, not synchronization. Files contain site rules and proxy addresses, but no usernames or passwords. Export ignores unsaved edits. Import saves settings without applying or turning protection on."
+  },
+  "transferExport": {
+    "message": "Export settings"
+  },
+  "transferImport": {
+    "message": "Import settings: choose a JSON file"
+  },
+  "transferSupport": {
+    "message": "Export for support"
+  },
+  "transferSupportHelp": {
+    "message": "Support files contain only environment and status information, without site rules or proxy addresses. They cannot be imported as settings."
+  },
+  "transferPreview": {
+    "message": "Import preview"
+  },
+  "transferCounts": {
+    "message": "Rules: $1 (added/removed entries: $2). Proxy profiles: $3. Credentials to re-enter: $4."
+  },
+  "transferReplaceWarning": {
+    "message": "This replaces saved routing settings. Missing credentials must be entered before Apply. Review the unsupported fields below; they are not transferred."
+  },
+  "transferConfirm": {
+    "message": "Save imported settings"
+  },
+  "transferCancel": {
+    "message": "Cancel import"
+  },
+  "transferImported": {
+    "message": "Settings imported. They are saved but not applied."
+  },
+  "transferExported": {
+    "message": "Export prepared. Keep settings files private."
+  },
+  "transferInvalid": {
+    "message": "The file is not a valid settings export. Nothing was imported."
+  },
+  "transferSocks4aUnsupported": {
+    "message": "This file contains SOCKS4A connections, which Chromium does not support. Nothing was imported. Use Firefox, or configure SOCKS5 if your proxy server supports it."
+  },
+  "transferVersion": {
+    "message": "This export format version is not supported."
+  },
+  "transferLimit": {
+    "message": "The import exceeds the size or complexity limit (maximum file size: 1 MiB)."
+  },
+  "transferDraft": {
+    "message": "Review and save or discard your edits before importing. Your edits have been preserved."
+  },
+  "transferNoConfiguration": {
+    "message": "This is a support file, not a settings export."
+  },
+  "transferConflict": {
+    "message": "Settings changed elsewhere. Choose the file again to review a fresh preview."
+  },
+  "transferCredentialsRequired": {
+    "message": "Credentials were omitted: enter them before Apply, or explicitly select no authentication."
+  },
+  "transferUnsupported_source": {
+    "message": "Source selection is not transferred to this browser. Review the routing source before Apply. Custom source addresses are omitted from exports because they may contain access tokens."
+  },
+  "transferUnsupported_language": {
+    "message": "This browser does not import the interface language preference."
+  },
+  "transferUnsupported_disabledRules": {
+    "message": "Disabled rules are not stored by this browser and will be omitted."
+  },
+  "transferUnsupported_proxyOptions": {
+    "message": "Per-proxy DNS and timeout preferences are not supported here; browser defaults remain in use."
+  },
+  "transferUnsupported_warpScope": {
+    "message": "WARP scope switches apply to the whole list here. Mixed switches are conservatively disabled; review them before Apply."
+  },
+  "unifiedSaveSection": {
+    "message": "Save settings"
+  },
+  "unifiedPopupConflict": {
+    "message": "Settings changed elsewhere. Review the current state and confirm again."
+  },
+  "unifiedControlLost": {
+    "message": "The browser or another extension controls the proxy. Check proxy control before applying again."
+  },
+  "unifiedUnproven": {
+    "message": "The active settings could not be confirmed. Review the status and select Apply again."
+  },
+  "unifiedActions": {
+    "message": "Settings actions"
+  },
+  "unifiedApply": {
+    "message": "Apply"
+  },
+  "unifiedApplyOn": {
+    "message": "Apply and turn on"
+  },
+  "unifiedApplyAll": {
+    "message": "Apply all saved changes"
+  },
+  "unifiedDiscard": {
+    "message": "Discard edits"
+  },
+  "unifiedReview": {
+    "message": "Review in Options"
+  },
+  "unifiedActive": {
+    "message": "Protection active"
+  },
+  "unifiedPending": {
+    "message": "Protection active — changes not applied"
+  },
+  "unifiedApplying": {
+    "message": "Applying…"
+  },
+  "unifiedInactive": {
+    "message": "Inactive"
+  },
+  "unifiedBlocked": {
+    "message": "Action required"
+  },
+  "unifiedUnsaved": {
+    "message": "Unsaved changes"
+  },
+  "unifiedConflict": {
+    "message": "Settings changed elsewhere. Your edits are preserved. Discard edits to load the latest saved settings and review again."
+  },
+  "unifiedSaveFirst": {
+    "message": "Save or discard your edits before applying."
+  },
+  "unifiedSavedActive": {
+    "message": "Saved. Previous settings are still active."
+  },
+  "unifiedPreparing": {
+    "message": "Previous settings remain active while the new settings are prepared."
+  },
+  "unifiedApplyFailed": {
+    "message": "Changes were not applied. Previous settings remain active."
+  },
+  "unifiedSiteSaved": {
+    "message": "Site rule saved, but not applied. Previous settings remain active."
+  },
+  "unifiedPopupPending": {
+    "message": "Other saved settings have not been applied. Applying this site rule will also apply those settings."
+  },
+  "unifiedTransition": {
+    "message": "Currently: $1. Selected: $2."
+  },
+  "unifiedCategory_siteRules": {
+    "message": "Site rules changed"
+  },
+  "unifiedCategory_proxyConnections": {
+    "message": "Proxy connections changed"
+  },
+  "unifiedCategory_routingSettings": {
+    "message": "Routing settings changed"
+  },
   "extName": {
     "message": "Runet Censorship Bypass — Revived"
   },
@@ -1794,5 +1958,209 @@
   },
   "uiThemeSaveFailed": {
     "message": "Applied for this page. The browser could not save your theme."
+  },
+  "antifilterSourceLabel": {
+    "message": "Antifilter"
+  },
+  "antifilterSourceHelp": {
+    "message": "Antifilter supplies exact website names without proxy servers. Configure connections in Proxy connections and allow their use for Antifilter. Save prepares settings; Apply downloads the list and activates routing. Subdomains need their own list entry."
+  },
+  "antifilterProxyConsent": {
+    "message": "Use my Proxy-rule connections for sites in the Antifilter list"
+  },
+  "antifilterProxyHelp": {
+    "message": "Uses enabled own proxies, local Tor, Tor Browser and WARP in that order. This permission applies only to Antifilter matches; other sites keep their existing routing rules. No proxy service is included."
+  },
+  "antifilterPrepare": {
+    "message": "Download Antifilter list"
+  },
+  "antifilterProxyRequired": {
+    "message": "Enable at least one proxy connection for Proxy rules and allow its use for Antifilter. Keep source routing enabled. At most 32 connections are supported."
+  },
+  "antifilterPreparationRequired": {
+    "message": "Download the Antifilter list before saving this source."
+  },
+  "antifilterCurrentSource": {
+    "message": "Current routing source"
+  },
+  "antifilterPrepared": {
+    "message": "Antifilter list is ready. Save the selected source and proxy settings, then Apply."
+  },
+  "routingDataTitle": {
+    "message": "Routing data"
+  },
+  "routingDataUnavailable": {
+    "message": "Update status is unavailable. Try again from Settings."
+  },
+  "routingDataUnknown": {
+    "message": "Unknown"
+  },
+  "routingDataSourceDate": {
+    "message": "Source data date"
+  },
+  "routingDataLastCheck": {
+    "message": "Last successful check"
+  },
+  "routingDataCheck": {
+    "message": "Check for updates"
+  },
+  "routingDataChecking": {
+    "message": "Checking for updates…"
+  },
+  "routingDataAge_UNKNOWN": {
+    "message": "The source data date is unknown. A successful check does not confirm freshness."
+  },
+  "routingDataAge_OLD": {
+    "message": "The source data is over 30 days old. This warning does not turn protection off."
+  },
+  "routingDataNoSource": {
+    "message": "No downloadable list is selected. Choose a source in Settings."
+  },
+  "routingDataResult_UNCHANGED": {
+    "message": "Checked: no new routing data."
+  },
+  "routingDataResult_APPLIED": {
+    "message": "Routing data updated and applied. Pending settings were not applied."
+  },
+  "routingDataResult_PREPARED": {
+    "message": "Data prepared. Protection remains off or unchanged until you apply it."
+  },
+  "routingDataResult_DEFERRED": {
+    "message": "Data prepared, but could not be applied now. Review the protection status."
+  },
+  "routingDataResult_FAILED": {
+    "message": "Could not complete the update. Check the protection status and try again or open Settings."
+  },
+  "routingDataResult_UNAVAILABLE": {
+    "message": "Updating is unavailable for the current source."
+  },
+  "routingDataSource_none": {
+    "message": "No source selected"
+  },
+  "routingDataSource_manual": {
+    "message": "Manual rules"
+  },
+  "routingDataSource_antifilter": {
+    "message": "Antifilter"
+  },
+  "routingDataSource_anticensority": {
+    "message": "Anticensority"
+  },
+  "routingDataSource_antizapret": {
+    "message": "Antizapret"
+  },
+  "routingDataSource_custom": {
+    "message": "Custom source"
+  },
+  "resourcesTitle": {
+    "message": "Website resources"
+  },
+  "resourcesIntro": {
+    "message": "Start capture, reproduce the problem in the source tab, then stop and review the domains."
+  },
+  "resourcesPrivacy": {
+    "message": "Capture covers only this non-private tab: up to 2 minutes, 100 domains and 1000 requests. Only hostnames, types and counts; no page addresses, content or passwords. Results stay in this page’s memory until cleared, closed, navigation to another site, or 10 minutes from start."
+  },
+  "resourcesStart": {
+    "message": "Start capture"
+  },
+  "resourcesStop": {
+    "message": "Stop and review"
+  },
+  "resourcesReload": {
+    "message": "Reload source tab"
+  },
+  "resourcesClear": {
+    "message": "Clear results"
+  },
+  "resourcesSettings": {
+    "message": "Open settings"
+  },
+  "resourcesCapturing": {
+    "message": "Capture is on. Domains found: $1. Reproduce the problem in the source tab."
+  },
+  "resourcesIdle": {
+    "message": "Capture is off. Select Start capture when ready."
+  },
+  "resourcesUnavailable": {
+    "message": "Open this tool from the extension popup on a normal website. Private and internal tabs are not supported."
+  },
+  "resourcesNavigated": {
+    "message": "The tab closed or navigated to another site. Results were cleared; open the tool again."
+  },
+  "resourcesExpired": {
+    "message": "Results expired and were cleared."
+  },
+  "resourcesCleared": {
+    "message": "Capture is off. Results cleared."
+  },
+  "resourcesReadFailed": {
+    "message": "Could not read settings. Select Stop and review again or start a new capture."
+  },
+  "resourcesStopped": {
+    "message": "Capture stopped. Domains to review: $1."
+  },
+  "resourcesLimited": {
+    "message": "Capture limit reached. Showing the first $1 domains; the list may be incomplete."
+  },
+  "resourcesResults": {
+    "message": "Select only the domains you need"
+  },
+  "resourcesCaution": {
+    "message": "A failure does not always mean censorship. Leave ads and analytics unselected unless needed."
+  },
+  "resourcesEmpty": {
+    "message": "No additional domains found. In a new capture, reload the site and play the video or repeat the action that fails."
+  },
+  "resourcesCounts": {
+    "message": "Requests: $1 · Failures: $2"
+  },
+  "resourcesRuleDIRECT": {
+    "message": "An existing Direct rule is preserved unchanged."
+  },
+  "resourcesRulePROXY": {
+    "message": "Already covered by a Proxy rule."
+  },
+  "resourcesProxyRequired": {
+    "message": "First configure a connection for Proxy rules: your proxy, Tor, Tor Browser or WARP. A website list does not provide a connection."
+  },
+  "resourcesGlobalScope": {
+    "message": "Rules affect the whole browser, including other sites. Only exact hosts are saved. To activate them, select Apply in settings."
+  },
+  "resourcesSave": {
+    "message": "Save selected rules"
+  },
+  "resourcesSaved": {
+    "message": "Rules saved, not applied. Open settings, review all pending changes, then select Apply."
+  },
+  "resourcesSaveFailed": {
+    "message": "Rules were not saved. Settings may have changed elsewhere: review the results again and reselect domains. Active routing was not changed."
+  },
+  "resourcesType_image": {
+    "message": "images"
+  },
+  "resourcesType_media": {
+    "message": "video/audio"
+  },
+  "resourcesType_script": {
+    "message": "scripts"
+  },
+  "resourcesType_stylesheet": {
+    "message": "styles"
+  },
+  "resourcesType_xmlhttprequest": {
+    "message": "data/API"
+  },
+  "resourcesType_sub_frame": {
+    "message": "embedded pages"
+  },
+  "resourcesType_other": {
+    "message": "other"
+  },
+  "resourcesPrivacySummary": {
+    "message": "Only domains from the selected tab, for up to 2 minutes. Results stay in this page’s memory."
+  },
+  "resourcesDetails": {
+    "message": "What is captured and when it is erased"
   }
 }

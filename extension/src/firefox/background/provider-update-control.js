@@ -259,7 +259,7 @@
         return Boolean(value) && typeof value === 'object' &&
           value.providerKey === providerKey &&
           typeof value.datasetVersion === 'string' &&
-          IDENTIFIER_PATTERN.test(value.datasetVersion) &&
+          /^[A-Za-z0-9](?:[A-Za-z0-9._+-]{0,127})$/.test(value.datasetVersion) &&
           typeof value.artifactSha256 === 'string' &&
           SHA256_PATTERN.test(value.artifactSha256);
 
@@ -272,6 +272,7 @@
         const alarmsApi = options.alarmsApi;
         const sha256 = options.sha256;
         const providerKey = options.providerKey;
+        const storageKey = providerKey === 'antifilter' ? `${STORAGE_KEY}.antifilter` : STORAGE_KEY;
         const trust = inspectTrustConfiguration(
             options.trustConfiguration,
             providerKey,
@@ -279,7 +280,7 @@
         // HTTPS source validation is an explicit separate production channel.
         // An invalid/enabled signed configuration must never fall back to it.
         const sourceConfigured = options.sourceUpdateEnabled === true &&
-          providerKey === 'anticensority' && trust.reason === 'DISABLED';
+          ['anticensority', 'antifilter'].includes(providerKey) && trust.reason === 'DISABLED';
         const configured = trust.configured || sourceConfigured;
         const now = typeof options.now === 'function' ?
           options.now : () => Date.now();
@@ -311,7 +312,7 @@
 
           const normalized = normalizeState(next);
           try {
-            await storageArea.set({[STORAGE_KEY]: normalized});
+            await storageArea.set({[storageKey]: normalized});
           } catch (_error) {
             throw controlError(ERRORS.STATE_UNAVAILABLE);
           }
@@ -324,11 +325,11 @@
 
           let stored;
           try {
-            stored = await storageArea.get(STORAGE_KEY);
+            stored = await storageArea.get(storageKey);
           } catch (_error) {
             throw controlError(ERRORS.STATE_UNAVAILABLE);
           }
-          state = normalizeState(stored && stored[STORAGE_KEY]);
+          state = normalizeState(stored && stored[storageKey]);
           return state;
 
         }

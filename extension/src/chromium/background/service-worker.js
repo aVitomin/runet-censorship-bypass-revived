@@ -2,7 +2,7 @@
 
 /* global importScripts */
 /* global mv3ActionStatus, mv3Hash, mv3PacArtifacts, mv3PacCook, mv3PacDownload */
-/* global mv3PacMods, mv3PeriodicUpdate, mv3SiteScope */
+/* global mv3PacMods, mv3PeriodicUpdate, mv3SiteScope, mv3DomainProviderPac */
 /* global mv3Providers, mv3ProxyAuth, mv3ProxyHealth, mv3ProxySettings */
 /* global mv3State, mv3Effective, mv3ConfigurationTransfer, rucbConfigurationTransfer */
 
@@ -18,6 +18,13 @@ importScripts(
     'action-status.js',
     'periodic-update.js',
     'hash.js',
+    'common/domain-block-codec.js',
+    'common/provider-dataset.js',
+    'common/domain-source-policy.js',
+    'common/domain-stream-import.js',
+    'common/antifilter-source.js',
+    'common/domain-candidate-store.js',
+    'domain-provider-pac.js',
     'pac-download.js',
     'pac-cook.js',
     'proxy-auth.js',
@@ -57,6 +64,7 @@ const PHASE_TEN_STATUS = Object.freeze({
 
 let pacDownloadPromise = null;
 let pacCookPromise = null;
+let popupRoutingRefresh = null;
 let activeProxyHealthCheck = null;
 let pacProxyOperationQueue = Promise.resolve();
 let activePacApplyOperation = null;
@@ -1310,6 +1318,17 @@ const RPC_METHODS = Object.freeze({
 
   },
 
+  refreshRoutingData() {
+
+    if (!popupRoutingRefresh) {
+      popupRoutingRefresh = refreshPopupRoutingData().finally(() => {
+        popupRoutingRefresh = null;
+      });
+    }
+    return popupRoutingRefresh;
+
+  },
+
   async clearPeriodicUpdateEvents() {
 
     await mv3State.clearPeriodicUpdateEvents();
@@ -1996,6 +2015,56 @@ async function createPopupPipelineFailure(result, tabUrl) {
 
 }
 
+function popupRoutingDataStatus(state, effective) {
+
+  const values = effective ? mv3Effective.overlay(state, effective) : state;
+  const key = values.currentPacProviderKey;
+  const source = !key ? 'none' : key === 'onlyOwnSites' ? 'manual' :
+    key === 'Антизапрет' ? 'antizapret' : key === 'Антицензорити' ? 'anticensority' :
+      key === 'antifilter' ? 'antifilter' : 'custom';
+  const cache = values.pacCache && values.pacCache.providerKey === key ? values.pacCache : {};
+  const date = Date.parse(cache.lastModified);
+  const download = state.pacDownload || {};
+  const periodic = state.periodicUpdate || {};
+  const times = [cache.fetchedAt,
+    download.providerKey === key && ['success', 'not_modified'].includes(download.status) ?
+      download.finishedAt : null,
+    periodic.lastSuccessfulProviderKey === key ? periodic.lastSuccessfulUpdateAt : null,
+  ].filter((value) => Number.isSafeInteger(value) && value > 0);
+  return {
+    source,
+    sourceUpdatedAt: Number.isSafeInteger(date) && date > 0 &&
+      date <= Date.now() + 5 * 60 * 1000 ? date : null,
+    lastCheckedAt: times.length ? Math.max(...times) : null,
+    canCheck: !['none', 'manual'].includes(source) && Boolean(getProviderForState(values, key)) &&
+      !(!effective && state.proxyApply.status === 'applied'),
+    updating: Boolean(popupRoutingRefresh || periodic.status === 'running' ||
+      download.status === 'downloading'),
+    active: Boolean(effective),
+  };
+
+}
+
+async function refreshPopupRoutingData() {
+
+  const state = await mv3State.loadState();
+  const effective = await mv3Effective.current();
+  const before = popupRoutingDataStatus(state, effective);
+  if (!before.canCheck) return {status: 'UNAVAILABLE'};
+  const previousCache = effective ? effective.cookedPacCache : state.cookedPacCache;
+  // The existing periodic pipeline snapshots Effective and rechecks ownership.
+  // Never call applyPopupChanges/updatePac: that path can save the UI draft.
+  const result = await runPeriodicUpdate({trigger: 'manual', applyIfSafe: true});
+  if (!result || result.ok !== true) return {status: 'FAILED'};
+  if (result.autoApply && result.autoApply.applied) return {status: 'APPLIED'};
+  if (before.active && (!result.autoApply || result.autoApply.status !== 'unchanged')) {
+    return {status: 'DEFERRED'};
+  }
+  return {status: previousCache && previousCache.cookedPacSha256 === result.cookedPacSha256 ?
+    'UNCHANGED' : 'PREPARED'};
+
+}
+
 async function createPopupState(tabUrl, state, includeConfiguration = true) {
 
   const effective = includeConfiguration ? await mv3Effective.current() : null;
@@ -2050,6 +2119,7 @@ async function createPopupState(tabUrl, state, includeConfiguration = true) {
   const autoUpdate = getPacAutoUpdateSummary(state);
   return {
     configuration,
+    routingData: includeConfiguration ? popupRoutingDataStatus(state, effective) : null,
     uiLanguage: state.uiLanguage || 'auto',
     host: target.host || '',
     controllable: target.controllable,
@@ -2808,7 +2878,7 @@ async function configurationStatus(saved = null, knownEffective = undefined) {
     }
     // Categories are an allowlist, never values, hashes of credentials, or URLs.
     if (!categories.length || differs(['noDirect', 'replaceDirectWithProxy',
-      'ownProxiesOnlyForOwnSites', 'usePacScriptProxies']) ||
+      'ownProxiesOnlyForOwnSites', 'usePacScriptProxies', 'useProxyRulesForAntifilter']) ||
       effective.config.currentPacProviderKey !== saved.currentPacProviderKey ||
       configurationValue(effective.config.customPacProviders) !==
         configurationValue(saved.customPacProviders)) {
@@ -4814,7 +4884,8 @@ async function downloadPacAndPersist(params = {}, workflow = null) {
   }
 
   const cacheForHeaders = params.force ? null : state.pacCache;
-  const result = await mv3PacDownload.downloadPac(provider, cacheForHeaders);
+  const result = providerKey === 'antifilter' ? await mv3DomainProviderPac.download() :
+    await mv3PacDownload.downloadPac(provider, cacheForHeaders);
   const finishedAt = Date.now();
   if (!await getFreshPacWorkflowState(currentWorkflow)) {
     return createPacApplyStaleResult();

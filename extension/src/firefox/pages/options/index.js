@@ -101,14 +101,16 @@
 
   function validRedactedSettings(value) {
 
+    const flagKeys = value && value.flags && Object.prototype.hasOwnProperty.call(
+        value.flags, 'useProxyRulesForAntifilter') ? [...FLAG_KEYS, 'useProxyRulesForAntifilter'] : FLAG_KEYS;
     if (!Ui.hasExactKeys(value, SETTINGS_KEYS) ||
         value.schemaVersion !== 1 ||
-        !['anticensority', 'manual'].includes(value.source) ||
+        !['anticensority', 'manual', 'antifilter'].includes(value.source) ||
         !Ui.hasExactKeys(value.rules, RULE_KEYS) ||
         RULE_KEYS.some((key) => !Array.isArray(value.rules[key]) ||
           value.rules[key].some((rule) => typeof rule !== 'string')) ||
-        !Ui.hasExactKeys(value.flags, FLAG_KEYS) ||
-        FLAG_KEYS.some((key) => typeof value.flags[key] !== 'boolean') ||
+        !Ui.hasExactKeys(value.flags, flagKeys) ||
+        flagKeys.some((key) => typeof value.flags[key] !== 'boolean') ||
         !Array.isArray(value.ownProxies) ||
         !validCandidateFields(
             value.localTor, SCOPED_PROXY_KEYS,
@@ -604,6 +606,7 @@
 
     return Object.freeze({
       refresh,
+      prepareAntifilter: () => providerUpdateAction('firefox.antifilter.prepare', 'ANTIFILTER_PREPARED'),
       edit(dirty = true) {
 
         state.dirty = dirty;
@@ -690,6 +693,8 @@
 
   function userErrorKey(code) {
 
+    if (code === 'ANTIFILTER_PROXY_REQUIRED') return 'antifilterProxyRequired';
+    if (code === 'ANTIFILTER_PREPARATION_REQUIRED') return 'antifilterPreparationRequired';
     if (code === 'REQUIRED_CREDENTIAL_MISSING') return 'transferCredentialsRequired';
     if (code === 'SAVED_REVISION_CHANGED') return 'unifiedConflict';
     if (code === 'PRIVATE_ACCESS_REQUIRED') return 'popupErrorPrivateAccess';
@@ -1199,6 +1204,9 @@
 
       const next = Ui.clone(draft);
       next.source = form.elements.source.value;
+      if (form.elements.useProxyRulesForAntifilter.checked) {
+        next.flags.useProxyRulesForAntifilter = true;
+      } else delete next.flags.useProxyRulesForAntifilter;
       ruleRows = Array.from(form.querySelectorAll('[data-rule]')).map((row) => ({
         host: row.querySelector('[name="ruleHost"]').value,
         scope: row.querySelector('[name="ruleScope"]').value,
@@ -1463,13 +1471,20 @@
       sourceSelect.name = 'source';
       for (const [value, label] of [
         ['anticensority', 'optionsAnticensoritySource'], ['manual', 'optionsManualSource'],
+        ['antifilter', 'antifilterSourceLabel'],
       ]) {
         const option = Ui.append(sourceSelect, 'option');
         option.value = value;
         option.textContent = t(label);
       }
       sourceSelect.value = draft.source;
-      Ui.appendText(sourceCard, 'p', t('optionsManualSourceHelp'), 'muted');
+      const manualHelp = Ui.appendText(automatic, 'p', t('optionsManualSourceHelp'), 'muted');
+      const antifilterHelp = Ui.appendText(automatic, 'p', t('antifilterSourceHelp'), 'muted');
+      const prepareAntifilter = Ui.append(automatic, 'button', 'secondary');
+      prepareAntifilter.type = 'button';
+      prepareAntifilter.textContent = t('antifilterPrepare');
+      prepareAntifilter.disabled = state.pending;
+      prepareAntifilter.addEventListener('click', () => controller.prepareAntifilter());
       const sourceAvailability = Ui.appendText(
           sourceCard, 'span',
           state.capabilities.providerDatasetAvailable ?
@@ -1477,7 +1492,19 @@
           `pill ${state.capabilities.providerDatasetAvailable ?
             'success' : 'warning'}`,
       );
+      const renderSourceHints = () => {
+        manualHelp.hidden = sourceSelect.value !== 'manual';
+        antifilterHelp.hidden = sourceSelect.value !== 'antifilter';
+        prepareAntifilter.hidden = sourceSelect.value !== 'antifilter';
+        // Availability belongs to the verified Saved source, never a new draft.
+        sourceAvailability.hidden = sourceSelect.value !== state.settings.source;
+      };
+      renderSourceHints();
+      sourceSelect.addEventListener('change', renderSourceHints);
       const automaticFlags = Ui.append(automatic, 'div', 'flags');
+      check(automaticFlags, 'antifilterProxyConsent', 'useProxyRulesForAntifilter',
+          draft.flags.useProxyRulesForAntifilter === true);
+      Ui.appendText(automaticFlags, 'p', t('antifilterProxyHelp'), 'muted');
       for (const key of [
         'useProviderProxies',
         'ownProxiesOnlyForOwnSites',
@@ -1542,7 +1569,7 @@
             updateCard, 'p', t('providerUpdateHelp'), 'muted',
         );
         const updateFacts = Ui.append(updateCard, 'dl', 'overview-facts');
-        definition(updateFacts, 'providerLifecycleName', 'Anticensority');
+        definition(updateFacts, 'providerLifecycleName', t('antifilterCurrentSource'));
         definition(updateFacts, 'providerUpdateChannel', t(`providerUpdateChannel_${update.updateChannel}`));
         definition(
             updateFacts,
@@ -1785,16 +1812,17 @@
 
         Ui.clear(actions);
         actions.setAttribute('aria-label', t('unifiedActions'));
-        const save = Ui.append(actions, 'button', 'primary');
+        const buttons = Ui.append(actions, 'div', 'form-action-buttons');
+        const save = Ui.append(buttons, 'button', 'primary');
         save.type = 'submit';
         save.textContent = t('actionSave');
-        const apply = Ui.append(actions, 'button');
+        const apply = Ui.append(buttons, 'button');
         apply.type = 'button';
         apply.textContent = t('unifiedApply');
         apply.addEventListener('click', () => {
           controller.applySaved();
         });
-        const reload = Ui.append(actions, 'button');
+        const reload = Ui.append(buttons, 'button');
         reload.type = 'button';
         reload.textContent = t('unifiedDiscard');
         reload.addEventListener('click', () => {
@@ -1821,6 +1849,9 @@
         } else if (state.notice === 'APPLIED') {
           statusKey = 'optionsApplied';
           statusClass = 'status success';
+        } else if (state.notice === 'ANTIFILTER_PREPARED') {
+          statusKey = 'antifilterPrepared';
+          statusClass = 'status success';
         } else if (state.notice === 'UPDATE_CHECKED') {
           statusKey = providerUpdateView(state).help;
           statusClass = 'status success';
@@ -1831,7 +1862,8 @@
           statusKey = 'optionsReadOnlyShort';
           statusClass = 'status warning';
         }
-        status = Ui.appendText(actions, 'p', t(statusKey), statusClass);
+        status = Ui.appendText(actions, 'p', t(statusKey),
+            statusKey === 'optionsReady' ? 'muted technical-note' : statusClass);
         if (state.notice === 'APPLY_FAILED_SAFE' && state.errorCode === 'REQUIRED_CREDENTIAL_MISSING') {
           status.textContent += ` ${t('transferCredentialsRequired')}`;
         }

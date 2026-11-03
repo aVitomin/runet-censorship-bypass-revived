@@ -2,7 +2,7 @@
 
 exports.contexts = Object.freeze({
   chromium: Object.freeze({
-    version: '1.0.1',
-    storeVersion: '1.0.1',
+    version: '1.0.2',
+    storeVersion: '1.0.2',
   }),
 });

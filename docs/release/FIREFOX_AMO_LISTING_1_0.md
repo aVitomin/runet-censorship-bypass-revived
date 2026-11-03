@@ -1,18 +1,23 @@
-# Firefox Add-ons listing — 1.0
+# Firefox Add-ons — prepared next description
 
-Reference material for version `1.0.0`. The canonical package and reviewer
+**Version 1.0.2 submission copy. Store submission is not yet confirmed.**
+
+Submission material for version `1.0.2`. Historically, the 1.0.0 package and reviewer
 source archive were submitted to Mozilla on 2026-10-24 with English and Russian
 listing descriptions, current screenshots, a privacy notice and build notes.
-Public version `1.0.0` and its signed download were verified on 2026-10-28:
+Public version `1.0.1` and its signed download were verified on 2026-10-29;
+both-store availability was last checked on 2026-10-30:
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/). The shorter descriptions
 below are repository drafts for a future listing edit; they have not replaced
 the descriptions already submitted to Mozilla.
 
 ## Listing fields
 
-The Revived names and copy below are prepared for the next release, not applied
-to the live 1.0.0 listing. Update the existing AMO entry, preserving its Gecko ID
-and public URL. Canonical links: [link audit](LINK_AUDIT_1_0.md#revived-preparation--2026-10-28).
+Both localized Revived names are published with 1.0.1. The shorter description
+below remains a draft; its exact live text has not been reverified. Update the
+existing AMO entry, preserving its Gecko ID and public URL. Canonical links:
+[link audit](LINK_AUDIT_1_0.md#revived-preparation--2026-10-28). Saving the renamed
+repository URLs in the dashboard has not yet been verified; earlier URLs redirect.
 
 - **Title:** Runet Censorship Bypass — Revived
 - **Summary:** Choose Auto, Proxy or Direct for websites. Manage site rules and proxy connections, with separate Save and Apply controls.
@@ -27,8 +32,8 @@ and public URL. Canonical links: [link audit](LINK_AUDIT_1_0.md#revived-preparat
 - **Russian title:** Обход блокировок Рунета — Revived.
 - **Russian summary:** Выбирайте «Авто», «Прокси» или «Напрямую» для сайтов.
   Настраивайте правила и подключения, сохраняйте изменения и применяйте их отдельно.
-- **Screenshots:** [current 1.0 gallery](../assets/releases/1.0/README.md),
-  including a genuine Firefox toolbar popup.
+- **Screenshots:** [1.0.2 gallery](../assets/releases/1.0.2/README.md),
+  covering Options and Website resources in English and Russian.
 
 The summary is deliberately below Mozilla's 250-character limit. The
 [AMO listing guidance](https://extensionworkshop.com/documentation/develop/create-an-appealing-listing/)
@@ -43,21 +48,27 @@ Choose Auto, Proxy or Direct for websites in Firefox. The extension
 controls browser routing and provides no VPN or proxy service.
 
 - Set rules for one host or a domain and its subdomains.
-- Use Anticensority routing data or Only my rules and connections.
+- Use Anticensority data, the optional Antifilter list, or Only my rules and connections.
+- Check source updates from the popup; source date and last successful check are shown separately.
+- Website resources: manually review hosts from one non-private tab and save selected browser-wide Proxy rules, without applying them. Capture stays in the open tool page only.
 - Configure your own proxies and separately running local services.
 - Save settings, review changes, then Apply. Existing settings stay active until Apply.
 - Preview imported settings, export settings for transfer, or create a separate sanitized support report.
-- Refresh Anticensority data manually or automatically every 12 hours.
+- Refresh the selected source from the popup or automatically every 12 hours.
 - Find site rules with search and switch settings sections without losing unsaved edits.
 - Choose a light, dark or system appearance shared by Options and the popup.
 
-Automatic proxy routes need a suitable local service running separately.
+Anticensority proxy routes need a suitable local service running separately.
 Own proxies can be used for explicit Proxy rules. Auto follows the selected
 source and rules; it can use a proxy. Explicit Direct takes priority over Proxy.
 Updates do not turn routing on, apply pending settings or switch a manual source.
 The popup asks before including other saved changes; unsaved Options edits are
 not included. Enable private-window access before applying: Firefox requires it
 for the browser-wide proxy setting.
+
+Antifilter supplies an exact-host list, not proxy servers. It uses your selected
+Proxy connections only after explicit consent. Old or unknown source dates show
+a warning without switching routing off.
 
 Settings and optional proxy credentials stay in your browser profile. There is
 no developer telemetry or cloud synchronization. Routing-data downloads and
@@ -66,7 +77,7 @@ and traffic visible to their protocol, plus matching credentials when needed.
 Settings exports omit credentials but retain site rules and proxy addresses;
 keep them private. Review support reports before sharing.
 
-Firefox parses fixed Anticensority HTTPS downloads as static data without
+Firefox parses fixed Anticensority and Antifilter HTTPS downloads as static data without
 executing downloaded PAC JavaScript. The data is validated but has no author's
 cryptographic signature. Arbitrary/custom PAC sources are not supported here.
 The extension does not guarantee bypass, connectivity, anonymity or encryption
@@ -83,7 +94,9 @@ and does not route other applications. SOCKS authentication depends on Firefox.
 управляет маршрутами браузера; VPN или прокси-сервер в комплект не входят.
 
 - Правила для одного хоста или домена с поддоменами.
-- База Anticensority или режим «Только мои правила и подключения».
+- База Anticensority, дополнительный список Antifilter или режим «Только мои правила и подключения».
+- Проверка обновлений базы из панели; дата данных и время последней проверки показаны отдельно.
+- «Ресурсы сайта»: ручной просмотр доменов одной обычной вкладки и сохранение выбранных правил «Прокси» для всего браузера без применения. Сбор остаётся только в открытом инструменте.
 - Собственные прокси и подключение к отдельно запущенным локальным службам.
 - Сохранение, просмотр изменений и отдельное применение. До «Применить» действуют прежние настройки.
 - Перенос настроек с предварительным просмотром и отдельный очищенный отчёт для поддержки.
@@ -91,7 +104,7 @@ and does not route other applications. SOCKS authentication depends on Firefox.
 - Поиск правил и переключение разделов настроек с сохранением несохранённых правок.
 - Светлая, тёмная или системная тема для настроек и панели расширения.
 
-Автоматическим прокси-маршрутам нужна подходящая отдельно запущенная локальная
+Прокси-маршрутам Anticensority нужна подходящая отдельно запущенная локальная
 служба. Собственные прокси можно использовать для явных правил «Прокси».
 «Авто» следует источнику и правилам, поэтому может использовать прокси.
 Явное «Напрямую» приоритетнее «Прокси». Обновления не включают маршрутизацию,
@@ -100,6 +113,10 @@ and does not route other applications. SOCKS authentication depends on Firefox.
 в применение не входят. Перед включением разрешите работу в приватных окнах:
 это требование Firefox к общей настройке прокси.
 
+Antifilter предоставляет список точных имён сайтов, без прокси-серверов. Он
+использует выбранные вами подключения для правил «Прокси» с явного разрешения.
+Предупреждение о старой или неизвестной дате базы не отключает маршрутизацию.
+
 Настройки и учётные данные прокси хранятся в профиле браузера. Телеметрии
 разработчика и облачной синхронизации нет. Загрузка базы и проверки подключений
 выполняют сетевые запросы. Прокси получают адреса назначения, видимую им часть
@@ -107,7 +124,7 @@ and does not route other applications. SOCKS authentication depends on Firefox.
 учётные данные, но сохраняет правила сайтов и адреса прокси: храните его
 приватно. Отчёт для поддержки нужно просмотреть перед отправкой.
 
-Firefox обрабатывает данные с закреплённых HTTPS-источников Anticensority
+Firefox обрабатывает данные с закреплённых HTTPS-источников Anticensority и Antifilter
 без исполнения скачанного PAC-кода. Данные проходят проверки, но не имеют
 криптографической подписи автора. Произвольные PAC-источники не поддерживаются.
 Расширение не гарантирует обход, доступность, анонимность или шифрование
@@ -119,11 +136,9 @@ Firefox обрабатывает данные с закреплённых HTTPS-
 
 ## Maintainer attachments — not part of description
 
-Use the [current AMO reviewer notes](../development/FIREFOX_AMO_REVIEW.md),
-[permission/privacy audit](PERMISSIONS_AND_PRIVACY_1_0.md), and the five
-[Firefox screenshots](../assets/releases/1.0/README.md).
-The current gallery includes a genuine Firefox native popup. The English
-import screenshot has a Russian
-native file-input label; review whether to recapture for listing consistency.
-Do not claim Android support or expand tested desktop platforms from the
-manifest minimum alone.
+Use the version-specific 1.0.2 reviewer notes prepared for this submission,
+the [permission/privacy audit](PERMISSIONS_AND_PRIVACY_1_0.md), and the five
+[Firefox screenshots](../assets/releases/1.0.2/README.md) for each locale.
+These are actual 1280×800 captures from the local candidate, with demonstration
+settings and no personal data. Do not claim Android support or expand tested
+desktop platforms from the manifest minimum alone.

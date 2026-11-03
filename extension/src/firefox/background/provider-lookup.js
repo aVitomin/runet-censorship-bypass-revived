@@ -1,15 +1,18 @@
 'use strict';
+/* global require */
 
 (function publishFirefoxProviderLookup(root, factory) {
 
-  const api = factory();
+  const codec = typeof module === 'object' && module.exports ?
+    require('../../shared/domain-block-codec') : root.rucbDomainBlockCodec;
+  const api = factory(codec);
   if (typeof module === 'object' && module.exports) {
     module.exports = api;
     return;
   }
   root.rucbFirefoxProviderLookup = api;
 
-})(typeof globalThis === 'object' ? globalThis : this, function() {
+})(typeof globalThis === 'object' ? globalThis : this, function(Codec) {
 
   const KINDS = Object.freeze({
     PROVIDER_PROXY: 'PROVIDER_PROXY',
@@ -73,9 +76,35 @@
 
     if (!verification || verification.ok !== true ||
         verification.status !== 'VERIFIED' ||
-        !verification.dataset || !verification.dataset.payload ||
-        verification.dataset.payload.format !== 'HOST_BUCKETS_V1' ||
-        !Array.isArray(verification.dataset.payload.buckets)) {
+        !verification.dataset || !verification.dataset.payload) {
+      throw lookupError('INVALID_VERIFIED_DATASET');
+    }
+    const payload = verification.dataset.payload;
+    if (payload.format === Codec.FORMAT) {
+      if (!verification.dataset.envelope ||
+          verification.dataset.envelope.schemaVersion !== 2 ||
+          verification.dataset.envelope.providerKey !== 'antifilter' ||
+          payload.policy !== 'EXACT_HOST') {
+        throw lookupError('INVALID_VERIFIED_DATASET');
+      }
+      const index = Codec.createLookup(payload);
+      return Object.freeze({
+        blockCount: payload.blocks.length,
+        lookup(rawHostname) {
+          try {
+            normalizeHostname(rawHostname);
+            // Use the codec's exact canonicalization in both browsers. Legacy
+            // suffix lookup strips all trailing dots; compact data strips one.
+            return Object.freeze({kind: index.matches(rawHostname) ?
+              KINDS.PROVIDER_PROXY : KINDS.MISS});
+          } catch (error) {
+            return Object.freeze({kind: KINDS.FAILURE,
+              code: error.code || 'PROVIDER_LOOKUP_FAILED'});
+          }
+        },
+      });
+    }
+    if (payload.format !== 'HOST_BUCKETS_V1' || !Array.isArray(payload.buckets)) {
       throw lookupError('INVALID_VERIFIED_DATASET');
     }
     const byWidth = new Map();

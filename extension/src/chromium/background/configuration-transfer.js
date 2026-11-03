@@ -6,7 +6,8 @@
 
 })(self, function(Format, Mods) {
 
-  const PROVIDERS = {anticensority: 'Антицензорити', antizapret: 'Антизапрет', manual: 'onlyOwnSites'};
+  const PROVIDERS = {anticensority: 'Антицензорити', antizapret: 'Антизапрет',
+    manual: 'onlyOwnSites', antifilter: 'antifilter'};
   const type = (value) => value === 'PROXY' ? 'HTTP' : value;
   const chromiumType = (value) => value === 'HTTP' ? 'PROXY' : value;
 
@@ -43,6 +44,7 @@
     return Format.configuration({routes,
       allowlist: mods.whitelist.map((rule) => Format.fromPattern(rule.pattern, null, rule.enabled)),
       proxies, routing: {providerProxies: mods.usePacScriptProxies,
+        useProxyRulesForAntifilter: mods.useProxyRulesForAntifilter === true,
         proxyAuthentication: !state.proxyAuth || state.proxyAuth.enabled !== false,
         ownProxiesOnlyForOwnSites: mods.ownProxiesOnlyForOwnSites,
         replaceDirectWithProxy: mods.replaceDirectWithProxy, noDirect: mods.noDirect},
@@ -94,6 +96,7 @@
     mods.whitelist = config.allowlist.map((rule) =>
       ({pattern: Format.pattern(rule), enabled: rule.enabled}));
     Object.assign(mods, {usePacScriptProxies: config.routing.providerProxies,
+      useProxyRulesForAntifilter: config.routing.useProxyRulesForAntifilter === true,
       ownProxiesOnlyForOwnSites: config.routing.ownProxiesOnlyForOwnSites,
       replaceDirectWithProxy: config.routing.replaceDirectWithProxy,
       noDirect: config.routing.noDirect});

@@ -8,7 +8,112 @@
       "source": "https://github.com/yahoo/serialize-javascript/commit/4d36b828f7c1c6a1f0de9ef932fefadcca0edace",
       "reviewedAt": "2026-10-29T11:39:52Z",
       "reason": "Established Yahoo package already used by Mocha. The reviewed update fixes GHSA-m5mm-p8h7-m29v. Maintainers, registry source and BSD-3-Clause license are unchanged; the four-file tarball has no install hooks or new dependencies. Registry signatures and provenance attestations verify. Full npm and production audits report no vulnerabilities. The lock delta changes one development dependency only; no extension runtime dependency changes.",
-      "checks": ["source", "maintainers", "license", "contents", "code-diff", "registry-signature", "provenance", "advisories", "lock-delta"]
+      "checks": [
+        "source",
+        "maintainers",
+        "license",
+        "contents",
+        "code-diff",
+        "registry-signature",
+        "provenance",
+        "advisories",
+        "lock-delta"
+      ]
+    },
+    {
+      "name": "@isaacs/nonrecursive-glob-match",
+      "version": "1.0.3",
+      "integrity": "sha512-SI7kyKHq4XXDRozw+r9GlRZkia1ZkFrpLW98r2IC2Bpr8YkFGE3fvjzmxCG0x78A++69HmDNrDvSMYBZmHGpKA==",
+      "source": "https://github.com/isaacs/nonrecursive-glob-match/commit/ad4131ad08b78e80215add95cfd2afcc90518187",
+      "reviewedAt": "2026-11-02T18:19:55.274Z",
+      "reason": "New matcher component maintained by the existing minimatch maintainer, isaacs. Its complete TypeScript and generated CommonJS were reviewed: no network, filesystem, subprocess or dynamic-code execution. Polynomial matching paths and capped caches improve trusted development-pattern handling; this is not approval for arbitrary hostile patterns or a universal resource bound. Registry signatures and exact tarball integrity verify. BlueOak-1.0.0 license, contents, complete lock delta and lifecycle scripts reviewed; no new install hooks. Provenance evidence is a verified signed upstream tag and packaged/source-map source correspondence with direct generated-code inspection, not an npm SLSA attestation (none is published). No extension runtime dependency changes.",
+      "checks": [
+        "source",
+        "maintainers",
+        "license",
+        "contents",
+        "code-diff",
+        "registry-signature",
+        "provenance",
+        "advisories",
+        "lock-delta"
+      ]
+    },
+    {
+      "name": "glob",
+      "version": "14.0.3",
+      "integrity": "sha512-A1vjIwC3qpdCso45Iw127gnp7sPhqgY8lUQhDrArIs+GbmfaaVPFuoyy7WyLT9EPZCRZ7j7aLdwUhQmHWesEow==",
+      "source": "https://github.com/isaacs/node-glob/commit/fc93fd5dab2bd40ea02681e8a1f027dacca216ce",
+      "reviewedAt": "2026-11-02T18:19:55.275Z",
+      "reason": "Development-only Mocha file discovery; fixes GHSA-3g3m-2fjr-6pw4. The glob CLI dependency tree is removed. Bundled minimatch 11.0.2 and nonrecursive-glob-match 1.0.2, plus five other embedded dependencies, were matched to the upstream lock and source and checked separately for advisories. Actual Mocha discovery and ESLint file sets are unchanged. Registry signatures and exact tarball integrity verify. BlueOak-1.0.0 license, contents, complete lock delta and lifecycle scripts reviewed; no new install hooks. Provenance evidence is a verified signed upstream tag and packaged/source-map source correspondence with direct generated-code inspection, not an npm SLSA attestation (none is published). No extension runtime dependency changes.",
+      "checks": [
+        "source",
+        "maintainers",
+        "license",
+        "contents",
+        "code-diff",
+        "registry-signature",
+        "provenance",
+        "advisories",
+        "lock-delta"
+      ]
+    },
+    {
+      "name": "lru-cache",
+      "version": "11.5.3",
+      "integrity": "sha512-U4N8FgzmWxc8k1VH8Kr6lQg18U7Fjvby6wXHVRX/ZZ7IwWbRMgrRbP0Wrb5q5NVinryp4SQampHKdvtecItxUg==",
+      "source": "https://github.com/isaacs/node-lru-cache/commit/7e71a1f3babdc68dfbadde91f28eaeea919dad9b",
+      "reviewedAt": "2026-11-02T18:19:55.275Z",
+      "reason": "Development-only in-process cache required by path-scurry 3. Existing maintainer isaacs and source identity are retained. Node diagnostics channels are local subscribers, not a telemetry endpoint; fetch methods invoke caller-provided callbacks and do not independently initiate network requests. Registry signatures and exact tarball integrity verify. BlueOak-1.0.0 license, contents, complete lock delta and lifecycle scripts reviewed; no new install hooks. Provenance evidence is a verified signed upstream tag and packaged/source-map source correspondence with direct generated-code inspection, not an npm SLSA attestation (none is published). No extension runtime dependency changes.",
+      "checks": [
+        "source",
+        "maintainers",
+        "license",
+        "contents",
+        "code-diff",
+        "registry-signature",
+        "provenance",
+        "advisories",
+        "lock-delta"
+      ]
+    },
+    {
+      "name": "minimatch",
+      "version": "11.0.4",
+      "integrity": "sha512-/UJ1dEoVQTjPNDh6SGlUo+ueLMmoHTas4q+8yaAR/5t6nLAIiBDJtoYUh20IYleix7ehiQkgczb84PE3uzHkxg==",
+      "source": "https://github.com/isaacs/minimatch/commit/f24eba95d759c794f9f2529a650b6f9418544228",
+      "reviewedAt": "2026-11-02T18:19:55.275Z",
+      "reason": "Development-only ESLint/config-array and Mocha matching; fixes GHSA-g3hv-75wg-m249. Named minimatch, Minimatch.match and partial matching used by these callers were reviewed. Actual repository file sets and directory pruning are unchanged. Exploratory differences concern unused partial-match options and negative-extglob trailing-slash inputs, not these configured callers. Registry signatures and exact tarball integrity verify. BlueOak-1.0.0 license, contents, complete lock delta and lifecycle scripts reviewed; no new install hooks. Provenance evidence is a verified signed upstream tag and packaged/source-map source correspondence with direct generated-code inspection, not an npm SLSA attestation (none is published). No extension runtime dependency changes.",
+      "checks": [
+        "source",
+        "maintainers",
+        "license",
+        "contents",
+        "code-diff",
+        "registry-signature",
+        "provenance",
+        "advisories",
+        "lock-delta"
+      ]
+    },
+    {
+      "name": "path-scurry",
+      "version": "3.0.0",
+      "integrity": "sha512-1pTbQqH1wIwMi/eleQ5leFTTCkzFsPcgXNjwOA8YGGW/W4/kHT3dssE7Z6NH+zuqNLOzOB0uaD61yl7cAcVhgg==",
+      "source": "https://github.com/isaacs/path-scurry/commit/31124d97f3bb1e4c7e99e067cacbccc2fbc5dc66",
+      "reviewedAt": "2026-11-02T18:19:55.275Z",
+      "reason": "Development-only filesystem traversal required by glob 14. The new major version and LRU dependency were reviewed against actual synchronous Mocha discovery and ESLint patterns. Filesystem operations are expected directory/stat/readlink reads; no network, subprocess or install-time behavior was introduced. Registry signatures and exact tarball integrity verify. BlueOak-1.0.0 license, contents, complete lock delta and lifecycle scripts reviewed; no new install hooks. Provenance evidence is a verified signed upstream tag and packaged/source-map source correspondence with direct generated-code inspection, not an npm SLSA attestation (none is published). No extension runtime dependency changes.",
+      "checks": [
+        "source",
+        "maintainers",
+        "license",
+        "contents",
+        "code-diff",
+        "registry-signature",
+        "provenance",
+        "advisories",
+        "lock-delta"
+      ]
     }
   ]
 }

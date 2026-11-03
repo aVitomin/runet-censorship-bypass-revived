@@ -29,6 +29,7 @@
     return Format.configuration({routes,
       allowlist: settings.rules.whitelist.map((rule) => Format.fromPattern(rule)), proxies,
       routing: {providerProxies: settings.flags.useProviderProxies, proxyAuthentication: true,
+        useProxyRulesForAntifilter: settings.flags.useProxyRulesForAntifilter === true,
         ownProxiesOnlyForOwnSites: settings.flags.ownProxiesOnlyForOwnSites,
         replaceDirectWithProxy: settings.flags.replaceDirectWithProxy,
         noDirect: settings.flags.noDirect},
@@ -72,10 +73,11 @@
       else settings.rules.whitelist.push(Format.pattern(rule));
     }
     settings.flags = {useProviderProxies: config.routing.providerProxies,
+      useProxyRulesForAntifilter: config.routing.useProxyRulesForAntifilter === true,
       ownProxiesOnlyForOwnSites: config.routing.ownProxiesOnlyForOwnSites,
       replaceDirectWithProxy: config.routing.replaceDirectWithProxy,
       noDirect: config.routing.noDirect};
-    if (config.source.kind === 'builtin' && ['anticensority', 'manual'].includes(config.source.id)) {
+    if (config.source.kind === 'builtin' && ['anticensority', 'manual', 'antifilter'].includes(config.source.id)) {
       settings.source = config.source.id;
     } else {
       unsupported.push('source');
