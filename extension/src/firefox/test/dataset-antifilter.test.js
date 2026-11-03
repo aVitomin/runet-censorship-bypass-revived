@@ -34,6 +34,10 @@ function promotion(staged, currentDatasetIdentity = null) {
 }
 
 describe('Firefox independent Antifilter source lifecycle', function() {
+  // Build and verify the real 1.5M-host minimum; the default 2s budget is
+  // insufficient on CI/slow hosts. Keep the full payload and all assertions.
+  // eslint-disable-next-line no-invalid-this -- Mocha binds the suite context.
+  this.timeout(30000);
   let first;
   let second;
   before(function() {
