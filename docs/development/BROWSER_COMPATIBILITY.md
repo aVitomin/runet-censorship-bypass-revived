@@ -71,14 +71,17 @@ ESR на Debian/Linux есть [воспроизводимый сценарий]
 
 Для 1.0.2 выполнены локальные сценарии обновления в Chrome 156.0.8078.79
 и Firefox 159.0; на Windows Firefox 153.5.1 ESR — ограниченный сценарий
-с активными и отложенными настройками. Подписанное постоянное обновление
-Firefox 1.0.2 ещё не проверено. [Подробности](releases/1.0.2.md).
+с активными и отложенными настройками. На Windows Firefox 159.0 также проверены
+постоянное подписанное обновление 1.0.1 → 1.0.2 и перезапуск без переустановки:
+подпись обязательна, OFF, Effective и отложенные Saved сохраняются. Это проверка
+подписанного файла, не автоматической доставки магазина. [Подробности](releases/1.0.2.md).
 
 ## Доступные пакеты
 
 Chromium **1.0.2** доступен как ZIP; в Chrome Web Store — **1.0.1**, с минимумом
-**Chromium 108+**. Firefox **1.0.1** доступен в Mozilla Add-ons и как подписанный
-XPI с минимумом **140.0**. Публичные версии магазинов проверены 30 октября 2026.
+**Chromium 108+**. Firefox **1.0.2** доступен в Mozilla Add-ons и как подписанный
+XPI с минимумом **140.0**. Chrome 1.0.2 проходит проверку. Публичные версии
+магазинов проверены 3 ноября 2026.
 Старые пакеты не изменяются задним числом. Матрица выполненных проверок 1.0.0
 сохранена в [записи выпуска](releases/1.0.0.md).
 
@@ -88,6 +91,6 @@ Versions 1.0.1–1.0.2 are expected to work in desktop **Chromium 108+** and
 **Firefox 140+**, including ESR on a compatible base, provided the required
 extension APIs are available. These are source/API-based minimums; every
 version, platform and derivative has not been tested. Mobile browsers and
-WebView are outside this scope. The published Firefox 1.0.1 package requires Firefox 140+. Its signature,
-permanent installation, options loading and persistence after restart were
+WebView are outside this scope. The published Firefox 1.0.2 package requires Firefox 140+. Its signature,
+permanent update from 1.0.1, options loading and OFF/active/pending persistence after restart were
 verified in a clean Windows profile on Firefox 159.0. Linux remains untested.

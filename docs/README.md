@@ -4,16 +4,16 @@
 
 - [Скачать и установить](user/INSTALLATION.md)
 - [Руководство 1.0.2](user/USER_GUIDE_1_0_2.md): Antifilter, ресурсы сайта и обновление базы
-- [Руководство 1.0.1](user/USER_GUIDE_1_0.md) для текущих магазинных установок
+- [Руководство 1.0.1](user/USER_GUIDE_1_0.md) для Chrome 1.0.1 из магазина
 - [Помощь и сообщения об ошибках](../SUPPORT.md)
 - [Поддержать проект](../DONATE.md)
 - [Приватность 1.0](release/PRIVACY_1_0.md)
-- [Снимки интерфейса](assets/releases/1.0/README.md)
+- [Снимки интерфейса 1.0.2](assets/releases/1.0.2/README.md)
 
-**Версия 1.0.1** доступна в [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph)
-и [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
-Для ручной установки доступны **Chromium ZIP 1.0.2** и **подписанный Firefox XPI 1.0.1**.
-Обновления 1.0.2 в магазины пока не поданы.
+**Firefox 1.0.2** доступен в [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
+В [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph)
+пока **1.0.1**; 1.0.2 проходит проверку. Для ручной установки доступны
+**Chromium ZIP и подписанный Firefox XPI 1.0.2**.
 Для старого Firefox **0.0.4.0** сохранены отдельные [руководство](user/USER_GUIDE.md),
 [решение проблем](user/TROUBLESHOOTING.md) и [приватность](user/PRIVACY_AND_SECURITY.md).
 
@@ -37,6 +37,6 @@
 ## English
 
 Start with [installation](user/INSTALLATION.md#english-summary),
-[the 1.0 guide](user/USER_GUIDE_1_0.md#english-summary), or [help and bug reports](../SUPPORT.md#english).
-Version **1.0.1** is available in Chrome Web Store and Firefox Add-ons.
-Chromium ZIP **1.0.2** and signed Firefox XPI **1.0.1** are available for manual installation. The 1.0.2 store updates have not been submitted yet. For development, use the separate guides above. Older Firefox **0.0.4.0** has its own documentation.
+[the 1.0.2 guide](user/USER_GUIDE_1_0_2.md#english-summary), or [help and bug reports](../SUPPORT.md#english).
+Firefox **1.0.2** is available in Mozilla Add-ons; Chrome Web Store still offers **1.0.1**, with 1.0.2 under review.
+Chromium ZIP and signed Firefox XPI **1.0.2** are available for manual installation. For development, use the separate guides above. Older Firefox **0.0.4.0** has its own documentation.

@@ -6,8 +6,8 @@
 
 Независимый форк [Anticensority](https://github.com/anticensority/runet-censorship-bypass).
 **Chromium 1.0.2 доступен для ручной установки из ZIP.**
-В Chrome Web Store и Mozilla Add-ons доступна **1.0.1**; подписанный Firefox XPI — тоже **1.0.1**.
-Обновления 1.0.2 в магазины пока не поданы.
+**Firefox 1.0.2 опубликован в Mozilla Add-ons.**
+Chrome 1.0.2 проходит проверку; в Chrome Web Store пока доступна **1.0.1**.
 
 Выбирайте, как браузер открывает сайты: по автоматическим правилам, через
 настроенный прокси или напрямую. Расширение для Chromium и Firefox с интерфейсом
@@ -28,11 +28,11 @@
 | Браузер | Версия | Установка из магазина |
 | --- | --- | --- |
 | **Chrome, Brave и совместимые Chromium-браузеры** | **1.0.1** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
-| **Firefox 140+** | **1.0.1** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
+| **Firefox 140+** | **1.0.2** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 Магазинные установки получают одобренные обновления через браузер.
 Для ручной установки доступны **Chromium ZIP 1.0.2** и
-**подписанный Mozilla Firefox XPI 1.0.1**.
+**подписанный Mozilla Firefox XPI 1.0.2**.
 
 Расчётная совместимость **1.0.1–1.0.2** — настольные **Chromium 108+** и
 **Firefox 140+**, включая ESR, с необходимыми API.
@@ -40,12 +40,12 @@
 форка. [Требования и проверенные версии](docs/development/BROWSER_COMPATIBILITY.md).
 
 **Ручная установка:** [Chromium ZIP 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-mv3-1.0.2-f7ae775.zip) ·
-[подписанный Firefox XPI 1.0.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.1/runet-censorship-bypass-firefox-1.0.1-signed.xpi) ·
+[подписанный Firefox XPI 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-firefox-1.0.2-signed.xpi) ·
 [изменения и файлы v1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.2).
 
 В **1.0.2** добавлены список Antifilter, обновление базы из панели и ручной
 просмотр ресурсов сайта. [Как пользоваться 1.0.2](docs/user/USER_GUIDE_1_0_2.md);
-для магазинной версии 1.0.1 — [прежнее руководство](docs/user/USER_GUIDE_1_0.md).
+для Chrome 1.0.1 из магазина — [прежнее руководство](docs/user/USER_GUIDE_1_0.md).
 
 ### Быстрый старт
 
@@ -75,12 +75,12 @@
 До применения продолжают действовать прежние настройки. Обновление базы
 не включает выключенную маршрутизацию и не применяет отложенные правки.
 
-[Подключения, источники, перенос настроек и обновления](docs/user/USER_GUIDE_1_0.md)
+[Подключения, источники, перенос настроек и обновления](docs/user/USER_GUIDE_1_0_2.md)
 
 ## Интерфейс
 
 В обоих браузерах доступны светлая, тёмная и системная темы, русский и английский.
-Ниже показаны Chromium 1.0.2 и опубликованный Firefox 1.0.1.
+Ниже показан интерфейс Chromium и Firefox 1.0.2.
 
 ![Обзор Chromium 1.0.2, светлая тема](docs/assets/releases/1.0.2/chromium/ru/01-overview.png)
 
@@ -92,11 +92,11 @@
 </details>
 
 <details>
-<summary>Firefox 1.0.1: светлая и тёмная темы</summary>
+<summary>Firefox 1.0.2: светлая и тёмная темы</summary>
 
-![Настройки Firefox 1.0.1](docs/assets/releases/1.0.1/firefox-light.png)
+![Настройки Firefox 1.0.2](docs/assets/releases/1.0.2/firefox/ru/01-overview.png)
 
-![Правила сайтов Firefox 1.0.1](docs/assets/releases/1.0.1/firefox-dark.png)
+![Подключения Firefox 1.0.2](docs/assets/releases/1.0.2/firefox/ru/03-connections.png)
 
 </details>
 
@@ -120,21 +120,21 @@ SHA-256: `9c04b868cb1d739b38af0f595bc0c487f2183cd63b4ab6256d682279129e257c`
 
 [Контрольная сумма ZIP](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-mv3-1.0.2-f7ae775.zip.sha256.txt)
 
-**Firefox 1.0.1** — `runet-censorship-bypass-firefox-1.0.1-signed.xpi`
+**Firefox 1.0.2** — `runet-censorship-bypass-firefox-1.0.2-signed.xpi`
 
-SHA-256: `15e49ac406b0788bb35b002df1e81107012ede6093d411000db3565f980b75cb`
+SHA-256: `35aec76967e2b26198139766c507d828cd95572b86679d5b0e14ff4cdc0ee203`
 
-[Контрольная сумма XPI](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.1/runet-censorship-bypass-firefox-1.0.1-signed.sha256.txt) ·
-[Выпуск 1.0.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.1)
+[Контрольная сумма XPI](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-firefox-1.0.2-signed.sha256.txt) ·
+[Выпуск 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.2)
 
 </details>
 
 ## English
 
 **Runet Censorship Bypass — Revived** is an independent Anticensority fork.
-**Version 1.0.1 — Revived is available from Chrome Web Store and Mozilla Add-ons.**
-**Chromium 1.0.2** is available as a manual ZIP; the Mozilla-signed Firefox XPI remains **1.0.1**.
-The 1.0.2 store updates have not been submitted yet.
+**Firefox 1.0.2 is available from Mozilla Add-ons.**
+**Chromium ZIP and Mozilla-signed Firefox XPI 1.0.2** are available for manual installation.
+Chrome 1.0.2 is under review; the public Chrome Web Store version remains **1.0.1**.
 
 Choose **Auto**, **Proxy**, or **Direct** for websites in Chromium and Firefox.
 The extension controls browser routing and provides no VPN or proxy service.

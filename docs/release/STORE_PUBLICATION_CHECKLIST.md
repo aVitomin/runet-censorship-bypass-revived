@@ -141,3 +141,20 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
   do not promise connectivity, anonymity, encryption or security protection.
 - [ ] Monitor support/review feedback without requesting secrets, raw browser
   profiles or configuration exports in public issues.
+
+## Release follow-through
+
+- [ ] Record public versions separately for Firefox, Chrome and manual downloads,
+  with the verification date. A publisher-reported pending review is not public availability.
+- [ ] Check both listing languages, screenshot captions, current guide, support and
+  privacy links. Keep previous guide URLs useful with a link to the current edition.
+- [ ] For a signed Firefox update, compare the payload with the trusted artifact and
+  verify permanent update/restart with OFF, applied and pending settings preserved.
+  Test profiles must not overwrite browser proxy preferences during restart.
+- [ ] Update README, documentation index, installation, compatibility, release metadata
+  and existing release notes together. Preserve published tags and earlier assets.
+- [ ] When release communications are authorized, add one concise news comment with
+  verified channel status and reply to related implemented feature requests with
+  the version, instructions and remaining channel limitations. Check for duplicates.
+- [ ] Keep unresolved channels or defects in the handoff with an explicit next step;
+  do not describe partial delivery as complete.
