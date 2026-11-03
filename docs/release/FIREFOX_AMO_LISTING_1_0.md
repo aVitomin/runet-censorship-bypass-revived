@@ -83,7 +83,7 @@ cryptographic signature. Arbitrary/custom PAC sources are not supported here.
 The extension does not guarantee bypass, connectivity, anonymity or encryption
 and does not route other applications. SOCKS authentication depends on Firefox.
 
-[Guide](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/user/USER_GUIDE_1_0.md) ·
+[Guide](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/user/USER_GUIDE_1_0_2.md) ·
 [Help](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/SUPPORT.md) ·
 [Privacy](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/release/PRIVACY_1_0.md)
 
@@ -130,7 +130,7 @@ Firefox обрабатывает данные с закреплённых HTTPS-
 Расширение не гарантирует обход, доступность, анонимность или шифрование
 и не маршрутизирует другие приложения. Авторизация SOCKS зависит от Firefox.
 
-[Руководство](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/user/USER_GUIDE_1_0.md) ·
+[Руководство](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/user/USER_GUIDE_1_0_2.md) ·
 [Помощь](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/SUPPORT.md) ·
 [Приватность](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/release/PRIVACY_1_0.md)
 
