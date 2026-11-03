@@ -19,6 +19,7 @@
 [Руководство 1.0](docs/user/USER_GUIDE_1_0.md) ·
 [Помощь и сообщения об ошибках](SUPPORT.md) ·
 [Новости](https://github.com/aVitomin/runet-censorship-bypass-revived/issues/105) ·
+[Поддержать проект](DONATE.md) ·
 [English](#english)
 
 ## Скачать
@@ -138,6 +139,8 @@ Install from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdb
 Expected 1.0.1 minimums are desktop **Chromium 108+** and **Firefox 140+**, including
 ESR on a compatible base. See [installation](docs/user/INSTALLATION.md#english-summary),
 [the 1.0 guide](docs/user/USER_GUIDE_1_0.md#english-summary), and [help](SUPPORT.md#english).
+
+Support this independent fork: [donations](DONATE.md#english).
 
 <details>
 <summary>Разработчикам и пользователям старых версий</summary>

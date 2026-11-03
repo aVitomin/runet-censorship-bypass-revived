@@ -1,0 +1,209 @@
+{
+  "sourceCommit": "ebdefc685d6299b070c90865937788a08b070a44",
+  "version": "1.0.2",
+  "status": "LOCAL_CANDIDATE_NOT_PUBLISHED",
+  "screenshots": [
+    {
+      "path": "chromium/ru/01-overview.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "ru",
+      "scenario": "01-overview",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "b34d924497050cba732cb01ab603753f942d03b8a60c6b3683167e7abea34597"
+    },
+    {
+      "path": "chromium/ru/02-site-rules.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "ru",
+      "scenario": "02-site-rules",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "59706a5beb139bb202674b3a6062bef86f60ccfec5c2fe52b20e2d82d67b2124"
+    },
+    {
+      "path": "chromium/ru/03-connections.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "ru",
+      "scenario": "03-connections",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "8e4a0c237efb1a8b597bc8ee027d4816f689fdc0939da163088133a11a439419"
+    },
+    {
+      "path": "chromium/ru/04-routing-data.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "ru",
+      "scenario": "04-routing-data",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "344dd6e49f1d5cf023ce541871e2723232aa35503ba75c37f3ed47666d7b2be4"
+    },
+    {
+      "path": "chromium/ru/05-site-resources.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "ru",
+      "scenario": "05-site-resources",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "f810dd6600e7513230221ba83780ac0a1ed86388e1608e5289192bc92289f5be"
+    },
+    {
+      "path": "chromium/en/01-overview.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "en",
+      "scenario": "01-overview",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "962088db9fa645af94a7dd9cd9701577c49c960bfca6696fd6fb89fef7d188ed"
+    },
+    {
+      "path": "chromium/en/02-site-rules.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "en",
+      "scenario": "02-site-rules",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "66702762fc1f65fd91f95291b29f480b50d2eaeaad6cc7e6a56ffc17bf1f5057"
+    },
+    {
+      "path": "chromium/en/03-connections.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "en",
+      "scenario": "03-connections",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "0a61aab638d3a927d474e62426c220f16db19d3d7f54e0f4d3b7e79fdbcc5139"
+    },
+    {
+      "path": "chromium/en/04-routing-data.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "en",
+      "scenario": "04-routing-data",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "c3674b2566c8268988b5c4a4a145f09288dd50da96f8cf840539d25be74c2d03"
+    },
+    {
+      "path": "chromium/en/05-site-resources.png",
+      "browser": "Chrome 156.0.8078.79",
+      "locale": "en",
+      "scenario": "05-site-resources",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 2,
+      "sha256": "b6684dc6e03845a8b96ab5caef51ef47ec61f2ebe18e6270524f70792a517324"
+    },
+    {
+      "path": "firefox/ru/01-overview.png",
+      "browser": "Firefox 159.0",
+      "locale": "ru",
+      "scenario": "01-overview",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "d23a14d496d585fdd9cab7f0ba5bd6a2d0f2dab7455f41092e91b5556d4c651e"
+    },
+    {
+      "path": "firefox/ru/02-site-rules.png",
+      "browser": "Firefox 159.0",
+      "locale": "ru",
+      "scenario": "02-site-rules",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "ec069898ed74f9510455aa64f86925015729e8c9109691d90017c43d8d4482cc"
+    },
+    {
+      "path": "firefox/ru/03-connections.png",
+      "browser": "Firefox 159.0",
+      "locale": "ru",
+      "scenario": "03-connections",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "8790cbb8df06809067b23ba2d72ec64edca7a1b88323b725a2b9dc36f22cf515"
+    },
+    {
+      "path": "firefox/ru/04-routing-data.png",
+      "browser": "Firefox 159.0",
+      "locale": "ru",
+      "scenario": "04-routing-data",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "23ad5d5481abe5fed2930d2ee384600a181475193091b4911521cc0fbcebefb3"
+    },
+    {
+      "path": "firefox/ru/05-site-resources.png",
+      "browser": "Firefox 159.0",
+      "locale": "ru",
+      "scenario": "05-site-resources",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "e0092dcec867664611d1ab2909513400e7ab6086d1c83cfb8f6d02a6f5a2c02c"
+    },
+    {
+      "path": "firefox/en/01-overview.png",
+      "browser": "Firefox 159.0",
+      "locale": "en",
+      "scenario": "01-overview",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "cb31eaa12e3f2d56e5ac5b5887103f0e40c851393c75c83d110bf1966f7c9d9d"
+    },
+    {
+      "path": "firefox/en/02-site-rules.png",
+      "browser": "Firefox 159.0",
+      "locale": "en",
+      "scenario": "02-site-rules",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "0e837fba82914102ee3f5ea09ac7400563acddb695ea6aa5913703eabcd20adb"
+    },
+    {
+      "path": "firefox/en/03-connections.png",
+      "browser": "Firefox 159.0",
+      "locale": "en",
+      "scenario": "03-connections",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "19ac012c1f0af33ecf03bc32f3d238ce1d101fdfab0822e0e0ad8b74fb53ca63"
+    },
+    {
+      "path": "firefox/en/04-routing-data.png",
+      "browser": "Firefox 159.0",
+      "locale": "en",
+      "scenario": "04-routing-data",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "e2be1587ef302f53e6b5bf10dfb55dad29592209cab29d509992e28e4329cdc6"
+    },
+    {
+      "path": "firefox/en/05-site-resources.png",
+      "browser": "Firefox 159.0",
+      "locale": "en",
+      "scenario": "05-site-resources",
+      "width": 1280,
+      "height": 800,
+      "pngColorType": 6,
+      "sha256": "ba159a29cdddc63d6b91fe7465f8c6a0813e7396f2b189037bfe136474381d06"
+    }
+  ],
+  "method": "Actual installed candidate UI; reserved example domains and a local demonstration page; no DOM or response substitution. Resource capture is idle; no personal browsing/profile data.",
+  "limits": "Screenshot capture is not proof of connectivity, anonymity, store approval or signed-update behavior."
+}

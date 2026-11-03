@@ -1,6 +1,6 @@
-# Manifest permissions and privacy audit — 1.0
+# Manifest permissions and privacy audit — 1.0.2
 
-Permission mapping for version `1.0.0`.
+Permission mapping for version `1.0.2`; no additional permissions since 1.0.1.
 Sources: [Firefox manifest](../../extension/src/firefox/manifest.json) and
 [Chromium manifest template](../../extension/src/chromium/manifest.tmpl.json).
 Compare these declarations with the final built manifests before submission;
@@ -20,7 +20,7 @@ Proxy/destination transmission still occurs as explained in the
 | `storage` | Both | Keep settings, credentials, routing artifacts/references and restart/recovery state. | Local rules, proxy/source settings, credential records and operational metadata; Chromium also uses session request/auth bookkeeping. | No product cloud sync, website-cookie database access or developer backup upload. Not a claim of encrypted secret storage. |
 | `alarms` | Both | Restore scheduling after background restarts. Chromium refreshes PAC data and supervises relevant connection checks. Firefox checks its fixed HTTPS routing-data sources every 12 hours and can install validated changes when OFF or READY. | Schedule times, last-check/status records and an established Chromium health target. | No general activity timer or telemetry schedule. Data refresh does not enable routing or apply pending user settings. |
 | `notifications` | Both | Show localized attention/status notices and let the user open Options. | Fixed status/error categories and notification bookkeeping. | No advertising notifications, page-content collection or credential-bearing notification text. |
-| `webRequest` | Both | Bind request lifetimes to applied routing/auth settings, handle proxy challenges and clear retries/errors. | Browser request IDs, URLs/metadata, proxy challenger host/port and completion/error events. Firefox also requests response headers to recognize status 401 plus the `WWW-Authenticate` header name for bounded website-auth retries. | No request-body or request-header capture, page-content scraping or history database. The Firefox guard does not read or retain response-header values. Metadata access is still data handling. |
+| `webRequest` | Both | Bind request lifetimes to applied routing/auth settings, handle proxy challenges and clear retries/errors. After explicit Start, observe one normal tab in the optional Website resources page. | Browser request IDs, URLs/metadata, proxy challenger host/port and completion/error events. Firefox also requests response headers to recognize status 401 plus the `WWW-Authenticate` header name for bounded website-auth retries. | No request-body or request-header capture, page-content scraping or history database. The Firefox guard does not read or retain response-header values. Metadata access is still data handling. |
 | `webRequestBlocking` | Firefox only | Synchronously authorize/cancel requests and answer bounded matching proxy-auth challenges. | Request authorization, selected proxy and matching configured credentials. | Does not send stored proxy passwords to website-auth challenges or arbitrary unrelated challengers. |
 | `webRequestAuthProvider` | Chromium only | Answer supported HTTP/HTTPS proxy authentication challenges using the request's applied configuration. | Proxy challenge endpoint, configured username/password, bounded retry state. | Does not create website accounts, collect website passwords or promote newly saved credentials without Apply. |
 | `activeTab` | Chromium only | Identify the site when the user opens the action popup and selects Auto/Proxy/Direct. | Current tab URL, reduced to a normalized host for site controls. | No bookmark/history collection or injected page scripts. This is not the only host grant: broad host permissions below also exist. |
@@ -111,3 +111,20 @@ the final submission still needs maintainer review against the exact package.
 The [feature inventory](FEATURE_INVENTORY_1_0.md#implementation-evidence) lists
 the implementation paths supporting these disclosures. Verify the final package
 and user-facing consent text together before submission.
+
+## Optional data source and website resources
+
+The literal permission inventory is unchanged. Both browsers can fetch the
+optional Antifilter exact-host list from `https://antifilter.download/list/domains.lst`
+using their existing host access. The list is parsed as bounded data; importing
+it does not execute downloaded code. Applying its Proxy candidates requires
+explicit consent. Refresh keeps OFF off and uses Effective settings while active.
+
+The optional Website resources page uses existing `webRequest` access only after
+Start, filtered to one non-private source tab. It retains hostnames, coarse
+types and counts in page memory for bounded periods. No response/request bodies,
+headers, full URLs, query strings, credentials or raw errors are retained.
+Captured results are not persisted or uploaded. Selected exact-host rules may
+be Saved after review, with existing Direct rules preserved; Apply is separate.
+Those saved rules are browser-wide, including shared-domain requests from other
+sites. See the [privacy notice](PRIVACY_1_0.md) for retention details.
