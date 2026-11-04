@@ -1,13 +1,12 @@
-# Chrome Web Store — prepared next description
+# Chrome Web Store — listing copy 1.0.2
 
-**Version 1.0.2 submission copy. Store submission is not yet confirmed.**
-
-Public version `1.0.1` was verified on 2026-10-30:
+**Version 1.0.2 is public; verified on 2026-11-04:**
 [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph). The
 [reviewer notes](CHROME_REVIEWER_NOTES_1_0.md) retain the PAC disclosure and
 review requirements for future changes.
-The shorter descriptions below are repository drafts for a future listing
-edit; they have not replaced the submitted store copy or package metadata.
+The text below is the maintained listing copy, not proof that every field was
+saved in the dashboard. The live RU/EN descriptions include the 1.0.2 features,
+but still link to the previous guide; replace that link with the 1.0.2 URL below.
 
 ## Published name
 

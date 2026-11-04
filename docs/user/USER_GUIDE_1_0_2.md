@@ -1,9 +1,8 @@
 # Руководство 1.0.2
 
-**Chromium 1.0.2 доступен как ZIP для ручной установки.**
-Firefox 1.0.2 опубликован в Mozilla Add-ons и доступен как подписанный XPI.
-В Chrome Web Store пока 1.0.1; обновление 1.0.2 проходит проверку.
-Это руководство описывает 1.0.2; для опубликованной 1.0.1 есть
+**Версия 1.0.2 доступна в Chrome Web Store и Firefox Add-ons.**
+Для ручной установки есть Chromium ZIP и подписанный Firefox XPI.
+Это руководство описывает 1.0.2; для прежней версии 1.0.1 есть
 [отдельная редакция](USER_GUIDE_1_0.md).
 Сведения о доступности в магазинах:
 [Скачать доступную версию](INSTALLATION.md). Для подписанного Firefox 0.0.4.0
@@ -199,6 +198,6 @@ extension's proxy routing. The extension provides no VPN or proxy service.
 Imports save settings without activating them. Updates preserve applied settings
 and keep inactive routing inactive. Antifilter is an optional exact-host list
 for separately configured connections. The popup shows source date and last
-successful check separately. Chromium 1.0.2 is available as a manual ZIP; Firefox 1.0.2 is available in Mozilla Add-ons and as a signed XPI.
-These additions are not part of Chrome Web Store 1.0.1, whose 1.0.2 update is under review;
-use the [installation page](INSTALLATION.md) for store links and manual downloads.
+successful check separately. Version 1.0.2 is available in Chrome Web Store and
+Firefox Add-ons, and as a Chromium ZIP or signed Firefox XPI.
+Use the [installation page](INSTALLATION.md) for store links and manual downloads.

@@ -1,11 +1,26 @@
-# Public-link audit — 1.0 publication drafts
+# Public-link audit — 1.0.x
 
 Checked 2026-09-26. Scope: the public project, documentation, support, privacy,
 security and official store-guidance links used by this publication set.
 This dated record does not establish current URL availability.
 Historical/upstream attribution in `docs/legacy/` is not rewritten.
 
-## Current store check — 2026-10-30
+## Current store check — 2026-11-04
+
+Chrome Web Store and Mozilla Add-ons both publicly offer **1.0.2** under the
+Revived name. Chrome reports November 4, 2026 as its update date. The existing
+installation URLs and extension identifiers are unchanged. This confirms public
+availability, not automatic-update delivery or a new routing test.
+
+- Chrome: homepage, support form and privacy links use the renamed repository.
+  Both descriptions still link to `USER_GUIDE_1_0.md`; use the
+  [1.0.2 guide](../user/USER_GUIDE_1_0_2.md). The previous guide has a current-edition link.
+- Firefox: RU/EN descriptions already link to the 1.0.2 guide; both homepages are
+  current. The support field points to the repository root instead of the issue
+  form. Five screenshots have English captions; Russian translations remain to add.
+- These are listing-copy corrections, not a need to rebuild the published package.
+
+## Previous store check — 2026-10-30
 
 The public Chrome Web Store listing and Mozilla Add-ons API both show **1.0.1**
 with the **Revived** name. The existing store URLs below remain valid. Chrome

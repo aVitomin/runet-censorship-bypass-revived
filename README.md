@@ -5,9 +5,8 @@
 # Runet Censorship Bypass — Revived
 
 Независимый форк [Anticensority](https://github.com/anticensority/runet-censorship-bypass).
-**Chromium 1.0.2 доступен для ручной установки из ZIP.**
-**Firefox 1.0.2 опубликован в Mozilla Add-ons.**
-Chrome 1.0.2 проходит проверку; в Chrome Web Store пока доступна **1.0.1**.
+**Версия 1.0.2 доступна в Chrome Web Store и Firefox Add-ons.**
+Для ручной установки также доступны Chromium ZIP и подписанный Firefox XPI.
 
 Выбирайте, как браузер открывает сайты: по автоматическим правилам, через
 настроенный прокси или напрямую. Расширение для Chromium и Firefox с интерфейсом
@@ -27,7 +26,7 @@ Chrome 1.0.2 проходит проверку; в Chrome Web Store пока д�
 
 | Браузер | Версия | Установка из магазина |
 | --- | --- | --- |
-| **Chrome, Brave и совместимые Chromium-браузеры** | **1.0.1** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
+| **Chrome, Brave и совместимые Chromium-браузеры** | **1.0.2** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
 | **Firefox 140+** | **1.0.2** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 Магазинные установки получают одобренные обновления через браузер.
@@ -44,8 +43,7 @@ Chrome 1.0.2 проходит проверку; в Chrome Web Store пока д�
 [изменения и файлы v1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.2).
 
 В **1.0.2** добавлены список Antifilter, обновление базы из панели и ручной
-просмотр ресурсов сайта. [Как пользоваться 1.0.2](docs/user/USER_GUIDE_1_0_2.md);
-для Chrome 1.0.1 из магазина — [прежнее руководство](docs/user/USER_GUIDE_1_0.md).
+просмотр ресурсов сайта. [Как пользоваться 1.0.2](docs/user/USER_GUIDE_1_0_2.md).
 
 ### Быстрый старт
 
@@ -132,9 +130,8 @@ SHA-256: `35aec76967e2b26198139766c507d828cd95572b86679d5b0e14ff4cdc0ee203`
 ## English
 
 **Runet Censorship Bypass — Revived** is an independent Anticensority fork.
-**Firefox 1.0.2 is available from Mozilla Add-ons.**
-**Chromium ZIP and Mozilla-signed Firefox XPI 1.0.2** are available for manual installation.
-Chrome 1.0.2 is under review; the public Chrome Web Store version remains **1.0.1**.
+**Version 1.0.2 is available in Chrome Web Store and Firefox Add-ons.**
+Chromium ZIP and Mozilla-signed Firefox XPI 1.0.2 are also available for manual installation.
 
 Choose **Auto**, **Proxy**, or **Direct** for websites in Chromium and Firefox.
 The extension controls browser routing and provides no VPN or proxy service.
@@ -144,8 +141,7 @@ Install from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdb
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
 Expected 1.0.1–1.0.2 minimums are desktop **Chromium 108+** and **Firefox 140+**, including
 ESR on a compatible base. See [installation](docs/user/INSTALLATION.md#english-summary),
-[the 1.0.2 guide](docs/user/USER_GUIDE_1_0_2.md#english-summary)
-([1.0.1 guide](docs/user/USER_GUIDE_1_0.md#english-summary)), and [help](SUPPORT.md#english).
+[the 1.0.2 guide](docs/user/USER_GUIDE_1_0_2.md#english-summary), and [help](SUPPORT.md#english).
 
 Support this independent fork: [donations](DONATE.md#english).
 

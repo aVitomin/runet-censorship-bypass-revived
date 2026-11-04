@@ -1,14 +1,14 @@
 # Установка, обновление и удаление
 
-**Firefox 1.0.2 опубликован в Mozilla Add-ons.** Chromium ZIP и подписанный
-Firefox XPI 1.0.2 доступны для ручной установки. Chrome 1.0.2 проходит проверку;
-в Chrome Web Store пока доступна **1.0.1**. Проверено 3 ноября 2026.
+**Версия 1.0.2 опубликована в Chrome Web Store и Firefox Add-ons.**
+Chromium ZIP и подписанный Firefox XPI 1.0.2 доступны для ручной установки.
+Публичные версии проверены 4 ноября 2026.
 
 ## Установить из магазина
 
 | Браузер | Версия | Где установить |
 | --- | --- | --- |
-| Chrome, Brave и совместимые Chromium-браузеры | **1.0.1** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
+| Chrome, Brave и совместимые Chromium-браузеры | **1.0.2** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
 | Firefox **140+** | **1.0.2** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 1. Откройте магазин в нужном браузере, нажмите кнопку установки и подтвердите разрешения.
@@ -89,8 +89,7 @@ SHA-256 XPI:
 Для режима **Прокси** нужно подходящее настроенное подключение.
 Расширение не предоставляет VPN или прокси-сервер и не запускает локальные службы.
 
-[Руководство 1.0.2](USER_GUIDE_1_0_2.md) ·
-[Руководство 1.0.1 для Chrome из магазина](USER_GUIDE_1_0.md).
+[Руководство 1.0.2](USER_GUIDE_1_0_2.md).
 
 ## Обновить расширение
 
@@ -120,9 +119,10 @@ Chromium-версии на магазинную могут создать отд
 
 ## Обновить данные или удалить расширение
 
-Обновление данных маршрутизации в **Обслуживании** не устанавливает новую версию
-расширения. Оно сохраняет применённые настройки и не включает выключенную
-маршрутизацию: [подробнее](USER_GUIDE_1_0.md#обновить-данные-маршрутизации).
+Обновление данных маршрутизации из панели расширения или **Обслуживания**
+не устанавливает новую версию расширения. Оно сохраняет применённые настройки
+и не включает выключенную маршрутизацию:
+[подробнее](USER_GUIDE_1_0_2.md#обновить-данные-маршрутизации).
 
 Для удаления сначала выключите маршрутизацию, затем удалите расширение на
 странице расширений браузера. После удаления распакованной Chromium-установки
@@ -133,12 +133,12 @@ Chromium-версии на магазинную могут создать отд
 
 ## English summary
 
-Install **Chrome 1.0.1** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.0.2** from
+Install **Chrome 1.0.2** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.0.2** from
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/). Firefox requires **140+** and private-window
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
 
-**Chromium 1.0.2** is available as a manual ZIP; its store update is under review.
+**Chromium 1.0.2** is also available as a manual ZIP.
 **Firefox 1.0.2** is also available as a Mozilla-signed XPI. Versions **1.0.1–1.0.2** target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR releases on a compatible base. These are API-based compatibility
 estimates, not test results for every version or fork. Required MV3 and proxy
@@ -151,5 +151,4 @@ Switching it to a store installation may require settings transfer; exported
 settings omit credentials and custom-source URLs. Disable the old installation
 before applying the new one.
 
-Save records settings; Apply activates them. See the [1.0.2 guide](USER_GUIDE_1_0_2.md#english-summary), or the
-[1.0.1 guide](USER_GUIDE_1_0.md#english-summary) for Chrome 1.0.1 store installations.
+Save records settings; Apply activates them. See the [1.0.2 guide](USER_GUIDE_1_0_2.md#english-summary).

@@ -6,7 +6,7 @@ the other channels. This document grants no permission to bump
 versions, sign, tag, create releases, upload or submit store packages. Obtain
 separate maintainer authorization for those actions.
 
-The maintained source and manifests identify `1.0.1`.
+The maintained source and manifests identify `1.0.2`.
 This does not declare a published release, completed store submission or
 validation of a particular archive. Record the final approved version, exact
 main SHA, browser QA, trusted-main run, artifact names and SHA-256 in the release
@@ -15,13 +15,13 @@ version separately for each browser.
 
 ## Current channel status
 
-Last confirmed on 2026-10-30; this is not a live store-status feed.
+Last confirmed on 2026-11-04; this is not a live store-status feed.
 
-- [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph): public **1.0.1**, Revived name, updated October 30, 2026; the published manifest declares Chromium **108+**. Publication is not a general PAC-policy exception for future changes.
-- [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/): public **1.0.1**, desktop Firefox **140+**, Revived name in English and Russian. Mozilla file **5182456** is public.
-- [GitHub Release v1.0.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.1): Chromium ZIP and Mozilla-signed Firefox XPI, each with a checksum. The source tag and existing Chromium assets are unchanged.
-- The signed Firefox payload matches the canonical candidate: 77 files byte for byte, plus a semantically identical manifest with changed formatting and Mozilla signature files. Permanent installation, signature acceptance, options loading and persistence after restart passed in a clean Windows Firefox 159.0 profile. This does not assert installation through the store UI or Linux QA.
-- See the [release record](../development/releases/1.0.1.md) for hashes and full validation boundaries.
+- [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph): public **1.0.2**, Revived name, updated November 4, 2026; Chromium **108+**. Publication is not a general PAC-policy exception for future changes.
+- [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/): public **1.0.2**, desktop Firefox **140+**, Revived name in English and Russian. Mozilla file **5202515** is public.
+- [GitHub Release v1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.2): Chromium ZIP and Mozilla-signed Firefox XPI, each with a checksum. The release tag and package bytes remain unchanged.
+- The signed Firefox runtime matches the canonical candidate; only manifest formatting and Mozilla signature files differ. Signature-enforced permanent update from 1.0.1 and restart passed on Windows Firefox 159.0 with OFF, applied and pending settings preserved. This does not assert automatic store delivery or Linux QA.
+- See the [release record](../development/releases/1.0.2.md) for hashes and full validation boundaries; the [link audit](LINK_AUDIT_1_0.md) lists the remaining listing-copy corrections.
 
 The remaining checklists are procedures for a submission or future update;
 unchecked boxes are not a claim that the confirmed submissions did not occur.
@@ -52,9 +52,9 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
   listings or claiming a verified homepage domain the publisher does not own.
 - [ ] Verify [screenshots and provenance](../assets/store/README.md) against the
   final package: truthful state, readable text, correct dimensions, no private
-  data. The [current gallery](../assets/releases/1.0/README.md) includes a genuine
-  Firefox native popup. Resolve
-  the mixed-language native file-input label if required for the chosen locale.
+  data. The [current gallery](../assets/releases/1.0.2/README.md) contains five
+  Options views per browser and locale. If a popup screenshot is used, distinguish
+  a native browser popup from a standalone page; check browser-supplied labels.
 - [ ] Repeat reviewer/browser QA on the exact candidate: clean off, private
   access, modes/scope, Save/Apply, pending categories, imports, auth, recovery,
   updates and ownership loss. Old screenshot QA is not complete release QA.
@@ -152,7 +152,8 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
   verify permanent update/restart with OFF, applied and pending settings preserved.
   Test profiles must not overwrite browser proxy preferences during restart.
 - [ ] Update README, documentation index, installation, compatibility, release metadata
-  and existing release notes together. Preserve published tags and earlier assets.
+  and existing release notes together. Refresh the dated status in this checklist,
+  the link audit and both listing templates too. Preserve published tags and earlier assets.
 - [ ] When release communications are authorized, add one concise news comment with
   verified channel status and reply to related implemented feature requests with
   the version, instructions and remaining channel limitations. Check for duplicates.
