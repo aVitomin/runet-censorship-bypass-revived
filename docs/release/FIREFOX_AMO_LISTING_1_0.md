@@ -1,23 +1,17 @@
-# Firefox Add-ons — prepared next description
+# Firefox Add-ons — listing copy 1.0.2
 
-**Version 1.0.2 submission copy. Store submission is not yet confirmed.**
-
-Submission material for version `1.0.2`. Historically, the 1.0.0 package and reviewer
-source archive were submitted to Mozilla on 2026-10-24 with English and Russian
-listing descriptions, current screenshots, a privacy notice and build notes.
-Public version `1.0.1` and its signed download were verified on 2026-10-29;
-both-store availability was last checked on 2026-10-30:
-[Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/). The shorter descriptions
-below are repository drafts for a future listing edit; they have not replaced
-the descriptions already submitted to Mozilla.
+**Version 1.0.2 is public; verified on 2026-11-04:**
+[Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/),
+Mozilla file 5202515. Localized names, descriptions, release notes and current
+guide links are present. The text below is maintained listing copy, not proof
+that every field matches the live card.
 
 ## Listing fields
 
-Both localized Revived names are published with 1.0.1. The shorter description
-below remains a draft; its exact live text has not been reverified. Update the
-existing AMO entry, preserving its Gecko ID and public URL. Canonical links:
-[link audit](LINK_AUDIT_1_0.md#revived-preparation--2026-10-28). Saving the renamed
-repository URLs in the dashboard has not yet been verified; earlier URLs redirect.
+Keep the existing AMO entry, Gecko ID and public URL. Both localized homepages
+point to the renamed repository. The support field still points to its root;
+use the issue-form URL below. Five screenshot captions are present in English;
+add their Russian translations. See the [link audit](LINK_AUDIT_1_0.md).
 
 - **Title:** Runet Censorship Bypass — Revived
 - **Summary:** Choose Auto, Proxy or Direct for websites. Manage site rules and proxy connections, with separate Save and Apply controls.
