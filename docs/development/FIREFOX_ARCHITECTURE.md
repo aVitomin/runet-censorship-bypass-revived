@@ -1,9 +1,9 @@
 # Архитектура Firefox
 
 Firefox production source находится в отдельной границе
-`src/firefox`. Пакет готовится как воспроизводимый release
-candidate; Mozilla-подписанный пакет `1.0.0` опубликован и входит в
-пользовательские инструкции установки.
+`src/firefox`. Пакет готовится воспроизводимо, а подпись выпускает Mozilla.
+Актуальные публичные версии и готовые пакеты указаны в
+[инструкции установки](../user/INSTALLATION.md).
 
 Это равноправная поддерживаемая MV3-цель в общем tooling root, а не Chromium
 runtime с заменённым manifest. Общие пользовательские контракты и различия
@@ -362,9 +362,10 @@ provider artifact и default product configuration присутствуют; н�
 Production Gecko ID — неизменяемый UUIDv4
 `{adf5f697-1149-42a2-92eb-c163cb9a4146}`. Он создан для этого Firefox
 продукта и не переиспользует legacy AMO identity. Firefox следует общей версии
-репозитория: development manifests и Chromium `storeVersion` имеют `1.0.0`.
-Опубликованный release остаётся `0.0.4.0`; изменение source version не означает
-публикацию или отправку пакета в store.
+репозитория: version authority — `extension/src/templates-data.js` и
+поддерживаемые manifests. Публичные версии записаны в
+[`release-current.json`](../release-current.json); изменение source version
+само по себе не означает публикацию или отправку пакета в магазин.
 
 Детерминированные проверки запускаются из корня репозитория:
 

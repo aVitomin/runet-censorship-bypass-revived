@@ -143,11 +143,19 @@ canonical artifacts. Do not claim unrun CI or browser QA locally.
 
 ## Documentation and handoff
 
+Maintenance starts with concrete findings. Measure a suspected performance cost
+before refactoring; size, age or a missing text reference alone does not prove
+code or an asset is unused. Preserve licenses, provenance and unrelated work.
+Keep instruction changes focused on durable rules, not a growing task history.
+
 Update current documentation when installation, behavior, browser support,
 privacy/security, developer commands, architecture, or release procedure
 changes. Use current fork links; upstream links are attribution/history. README
 describes the latest published release. For new untracked Markdown, ensure docs
 validation includes it without staging the real index.
+Use `docs/release-current.json` and release records for changing publication facts;
+engineering guides should link to them instead of repeating a mutable version or
+store status. Recheck developer navigation and module/package maps after changes.
 
 Before handoff, review the complete relevant diff, run the applicable final
 gate, and confirm no generated/profile/secret material is staged or packaged.

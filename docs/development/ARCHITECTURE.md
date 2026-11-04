@@ -20,11 +20,14 @@ Gulp определяет потребителей каждого входа, а
 
 | Вход | Chromium | Firefox |
 | --- | --- | --- |
-| `src/shared` | `configuration-transfer.js` и `configuration-transfer-ui.js` | Эти модули, `routing-contract.js`, `provider-dataset.js` и `provider-dataset-state.js` |
+| Общие фоновые модули `src/shared` | Перенос настроек, declarative dataset, потоковый импорт доменов, Antifilter и хранилище кандидатов | Те же группы плюс routing contract и provider dataset state; отдельный allowlist |
+| Общий UI из `src/shared` | Темы, ресурсы сайта и состояние свежести данных | Те же модули и стили |
 | `src/chromium-compat/pages/lib` | Рекурсивное копирование всего содержимого | Не включается |
 | `src/assets/icons` | Product icons | Явно выбранные те же product icons |
 
-Общие модули копируются в `background/common`. Chromium runtime копируется без
+Общие фоновые модули копируются в `background/common`, UI — в `pages/shared`.
+Точные списки входов задаёт `extension/gulpfile.js`; таблица описывает группы,
+а не заменяет package allowlists. Chromium runtime копируется без
 тестов и scoped AGENTS; Firefox runtime имеет отдельный явный allowlist. Оба
 target также включают выбранные файлы `tldts` и его лицензию из tooling package.
 Browser-neutral routing contract используется Firefox и сравнительными тестами
