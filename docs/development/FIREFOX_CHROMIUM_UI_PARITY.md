@@ -1,6 +1,6 @@
 # Chromium / Firefox: матрица пользовательского интерфейса
 
-Матрица описывает реализованные пользовательские контракты development `1.0.0`.
+Матрица описывает реализованные пользовательские контракты версии `1.0.2`.
 `PARITY` означает одинаковый workflow, `EQUIVALENT` — сопоставимый результат
 при разной реализации, `IMPLEMENTATION_DIFFERENCE` — текущий выбор UI или
 реализации, а не ограничение browser API, `INTENTIONAL_ROUTING_DIFFERENCE` —
@@ -9,7 +9,7 @@
 Эти обозначения не заменяют browser QA выбранной release-сборки.
 
 Draft → Save → exact Apply сохраняет pending Saved отдельно от Effective.
-Firefox поддерживает Anticensority и ручной источник; сетевое обновление
+Firefox поддерживает Anticensority, Antifilter и ручной источник; сетевое обновление
 фиксированных HTTPS данных работает отдельно от ещё не настроенного signed
 канала. Текущие transaction/recovery контракты описаны в
 [Firefox architecture](FIREFOX_ARCHITECTURE.md).
@@ -32,6 +32,7 @@ Firefox поддерживает Anticensority и ручной источник;
 | Proxy candidate unavailable | Apply заблокирован, ссылка на Proxy connections | PARITY | Background также отклоняет Proxy rule без кандидата. |
 | External proxy control | Отдельное external/control-loss state | EQUIVALENT | Firefox синхронно withdraw-ит session и не перезаписывает внешний setting. |
 | PAC freshness / last download | Source-data date, check time, channel и staged-update status | EQUIVALENT | Firefox проверяет статические HTTPS данные без исполнения PAC и без author signature; источник может остаться неизменным. Signed channel отдельный и unconfigured. |
+| Обновление базы из панели | Кнопка обновления, дата данных и последней проверки | PARITY | Обновление сохраняет Effective, pending Saved и OFF; это не применение новых настроек. |
 | Proxy health summary/check | Ручная проверка текущего explicit Proxy origin | EQUIVALENT | Не меняет routing; Firefox не запускает automatic health и не использует telemetry endpoint. |
 | Toolbar A/P/D/OFF/EXT badge и state icons | A/P/D/OFF/EXT, busy/loading/error icons и title | PARITY | Строятся из authoritative activation, proxy-control и current-site state после event-page recreation. |
 
@@ -40,14 +41,15 @@ Firefox поддерживает Anticensority и ручной источник;
 | Функция Chromium | Firefox | Статус | Примечание |
 | --- | --- | --- | --- |
 | Overview | Protection/source/private-access state | PARITY | Состояние маршрутизации и доступность данных показаны отдельно. |
-| Routing sources | Anticensority или Only my rules and connections | EQUIVALENT | Ручной режим не требует provider dataset; Save source не меняет Effective до Apply. |
+| Routing sources | Anticensority, Antifilter или Only my rules and connections | EQUIVALENT | Antifilter требует собственных настроенных подключений и согласия; ручной режим не требует provider dataset. Save source не меняет Effective до Apply. |
 | Дополнительные PAC providers и custom PAC URL | Не представлены в production Firefox UI | MISSING | Firefox имеет native PAC API, но текущий runtime использует фиксированные declarative data. Это граница реализации, не утверждение невозможности browser API. |
 | Site rules | Единый список Direct / Proxy / whitelist | PARITY | Background остаётся авторитетным validator; порядок и пересечения сохраняются. |
 | Own proxy candidates и порядок | Own proxy candidates и порядок | EQUIVALENT | HTTP/HTTPS/SOCKS4/SOCKS5 и общий порядок; отдельные Firefox DNS/timeout options дают предупреждение при переносе в Chromium. |
 | Proxy credentials | KEEP / SET / NONE | PARITY | Stored password не читается обратно в page state; request auth остаётся связан с Effective. |
 | Local Tor / Tor Browser / WARP | Явные scoped controls | EQUIVALENT | Три Tor scope и два WARP scope переносятся независимо, включая использование только для замены Direct; Chromium сохраняет master enabled. Для WARP scope общие на весь список: mixed per-entry scopes остаются ограничением переноса. |
 | Safe routing defaults | Те же browser-neutral defaults | PARITY | Provider=true, own-sites-only=true, replace-Direct=false, noDirect=false. В новой configuration Tor использует только onion: localhost:9050 → localhost:9150; старые сохранённые значения не заменяются. |
-| Import / Export | Portable Saved + отдельный support export | EQUIVALENT | Anticensority/manual source переносится; неподдерживаемые custom/Antizapret source и browser-specific options показываются до импорта. Import не применяет и не включает routing. |
+| Import / Export | Portable Saved + отдельный support export | EQUIVALENT | Anticensority/Antifilter/manual source переносится; неподдерживаемые custom/Antizapret source и browser-specific options показываются до импорта. Import не применяет и не включает routing. |
+| Ресурсы сайта | Ручной сбор доменов одной обычной вкладки | PARITY | Ограниченный сбор живёт только в открытой странице инструмента. Выбранные точные Proxy-правила сохраняются для всего браузера; Apply остаётся отдельным. |
 | Maintenance section | Current/source date, HTTPS refresh, deferred install | EQUIVALENT | Проверенные данные устанавливаются при допустимом OFF/READY; Effective user settings сохраняются, pending Saved не применяются. |
 | Manual/periodic provider refresh | No-input refresh и 12-hour alarm | EQUIVALENT | Check и допустимый promotion выполняются одной serialized операцией. OFF остаётся OFF; blocked/manual Saved или Effective оставляет candidate staged. Source checks продолжаются и в manual mode. |
 | Proxy health и diagnostics | Maintenance check и redacted report/export | EQUIVALENT | URL, endpoints, authRef, hashes, floor и credentials исключены из публичной status проекции. |

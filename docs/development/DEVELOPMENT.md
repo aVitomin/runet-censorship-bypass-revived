@@ -5,7 +5,7 @@
 
 [Участие в проекте](../../CONTRIBUTING.md) · [Тестирование](TESTING.md) ·
 [Архитектура](ARCHITECTURE.md) · [Выпуск](RELEASE_PROCESS.md) ·
-[Сборка и QA версии 1.0.0](releases/1.0.0.md)
+[Сборка и QA версии 1.0.2](releases/1.0.2.md)
 
 ## Требования
 
@@ -72,12 +72,11 @@ manifest/lock из одного root и уникальную совпадающ�
 refactor); это не отменяет проверки полного lockfile, pins и возраста новых
 версий. Копии, частичные и неоднозначные переносы блокируются.
 
-Имя GitHub-репозитория пока не изменено. При отдельном будущем переименовании
-проверьте Git remote, README badges/downloads, support/security/template URLs,
-ссылки в manifests/templates и проверку current-release URLs в
-`scripts/verify-docs.mjs`. Public release filenames, frozen provenance и
-runtime/storage/RPC identifiers не меняются автоматически вместе с repository
-name. Release tooling получает корень через Git, а не имя папки или её глубину.
+Канонический репозиторий — `aVitomin/runet-censorship-bypass-revived`.
+Старые публичные ссылки GitHub перенаправляются, но новые ссылки и Git remote
+должны использовать текущее имя. Имена архивов прежних выпусков, provenance и
+runtime/storage/RPC identifiers не меняются вместе с именем репозитория.
+Release tooling получает корень через Git, а не имя папки или её глубину.
 
 ## Опциональное локальное QA-окружение
 
