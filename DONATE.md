@@ -16,9 +16,10 @@ Runet Censorship Bypass — Revived — независимый форк [Anticen
 | ETH | Ethereum, основная сеть | `0xdc794f3b6249d7676183c8dd840b3addd2ec02dc` |
 | SOL | Solana, основная сеть | `6945UWuFLCgLckJS3wu8T94MjYQUV59Fdncjb8GeRAoD` |
 | USDT | Ethereum, ERC-20 | `0xdc794f3b6249d7676183c8dd840b3addd2ec02dc` |
+| USDT | TRON, TRC-20 | `TSPzv8Z1tBxAfsQUew8SppWKG5ozHW7QyB` |
 
-USDT здесь принимается в Ethereum (ERC-20), не в TRON (TRC-20), BNB Smart Chain
-или другой сети. ETH — нативная монета Ethereum.
+USDT принимается в Ethereum (ERC-20) и TRON (TRC-20). Для каждой сети используйте
+соответствующий адрес из таблицы. ETH — нативная монета Ethereum.
 
 Адреса пополнения обслуживает Bybit. Перед переводом проверьте
 [статус приёма и минимальную сумму для выбранной монеты и сети](https://www.bybit.com/en/announcement-info/deposit-withdraw/).
@@ -38,7 +39,8 @@ Donations support development and maintenance of Revived, an independent
 Anticensority fork. They are optional; the extension remains free with no paid features.
 
 Use only the asset and network in the table above: BTC on Bitcoin mainnet,
-ETH on Ethereum mainnet, SOL on Solana mainnet, or USDT on Ethereum (ERC-20).
+ETH on Ethereum mainnet, SOL on Solana mainnet, or USDT on Ethereum (ERC-20)
+or TRON (TRC-20). Use the matching address for each network.
 The Ethereum address is shared by ETH and ERC-20 USDT; it does not authorize
 transfers over other networks.
 
