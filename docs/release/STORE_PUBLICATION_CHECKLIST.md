@@ -18,7 +18,7 @@ Last confirmed on 2026-11-07 at 18:58 UTC; this is not a live store-status feed.
 
 - [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph): public **1.0.2**, Revived name, updated November 5, 2026; Chromium **108+**. Publication is not a general PAC-policy exception for future changes.
 - [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/): public **1.0.3**, desktop Firefox **140+**, Revived name in English and Russian. Mozilla file **5221829** is public.
-- [GitHub Release v1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.3): Chromium ZIP and signed Firefox XPI/checksums are public and were downloaded again with identical bytes.
+- [GitHub Release v1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.3): Chromium ZIP and signed Firefox XPI are public and were downloaded again with identical bytes. SHA-256 values are in the release notes; separate checksum downloads were removed on November 8.
 - [GitHub Release v1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.2): Chromium ZIP and Mozilla-signed Firefox XPI, each with a checksum. The release tag and package bytes remain unchanged.
 - The signed Firefox **1.0.3** runtime matches the canonical candidate; only manifest formatting and Mozilla signature files differ. Signature-enforced permanent update from 1.0.2 and restart without reinstall passed on Windows Firefox 159.0.1 with OFF, applied and pending settings preserved. This does not assert automatic store delivery or Linux QA.
 - See the [1.0.3 record](../development/releases/1.0.3.md) and [1.0.2 record](../development/releases/1.0.2.md) for hashes and full validation boundaries; the [link audit](LINK_AUDIT_1_0.md) lists the remaining listing-copy corrections.
@@ -132,6 +132,8 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
 - [ ] Create the GitHub release using that tag and canonical approved assets
   (including the verified Mozilla-signed XPI where appropriate). Record hashes,
   browser QA, actual store availability and any unpublished optional target.
+  Upload installable packages only; keep SHA-256 values and exact filenames in a
+  collapsed notes block, with checksum files retained in local/CI evidence.
   Download published assets again and verify contents/checksums before announcing.
 - [ ] Update `docs/release-current.json`, current-release README/user docs,
   installation links and the final privacy policy coherently. This checklist

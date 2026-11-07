@@ -118,13 +118,10 @@ Chromium ZIP и подписанный Firefox XPI **1.0.3** доступны н
 
 SHA-256: `ef7ecd3f90295857aea08abe66bca9ad1a4e6d6e75a9861c15fbe0986553419e`
 
-[Контрольная сумма ZIP](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-mv3-1.0.3-34ab51b.zip.sha256.txt)
-
 **Firefox 1.0.3** — `runet-censorship-bypass-firefox-1.0.3-signed.xpi`
 
 SHA-256: `e4f2ce0420bc52898dc576727961fb9647f2a6e7bfc8a14345886d660a331e69`
 
-[Контрольная сумма XPI](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-firefox-1.0.3-signed.sha256.txt) ·
 [Выпуск 1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.3)
 
 </details>
