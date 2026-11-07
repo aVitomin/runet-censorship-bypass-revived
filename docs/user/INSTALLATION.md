@@ -1,8 +1,9 @@
 # Установка, обновление и удаление
 
-**Версия 1.0.2 опубликована в Chrome Web Store и Firefox Add-ons.**
-Chromium ZIP и подписанный Firefox XPI 1.0.2 доступны для ручной установки.
-Публичные версии проверены 4 ноября 2026.
+**Chromium ZIP 1.0.3 доступен для ручной установки.**
+Chrome Web Store, Firefox Add-ons и подписанный Firefox XPI пока предлагают
+**1.0.2**. Обновление магазинов до 1.0.3 ещё не отправлено.
+Публичные версии проверены 7 ноября 2026.
 
 ## Установить из магазина
 
@@ -23,7 +24,7 @@ Chromium ZIP и подписанный Firefox XPI 1.0.2 доступны для
 
 ## Требования
 
-В манифестах **1.0.1–1.0.2** установлены расчётные минимумы:
+В манифестах **1.0.1–1.0.3** установлены расчётные минимумы:
 **Chromium 108+** и **Firefox 140+**, включая ESR на подходящей базе.
 Ожидается работа в совместимых настольных браузерах с Manifest V3 и API прокси.
 Версия движка Chromium важнее собственного номера Brave, Opera или другого
@@ -31,13 +32,13 @@ Chromium ZIP и подписанный Firefox XPI 1.0.2 доступны для
 Каждая версия и каждый форк отдельно не проверялись;
 [основания и фактические проверки](../development/BROWSER_COMPATIBILITY.md) указаны отдельно.
 
-Проверенные браузеры и границы QA: [технические сведения о 1.0.2](../development/releases/1.0.2.md)
-и [1.0.1](../development/releases/1.0.1.md).
+Проверенные браузеры и границы QA: [технические сведения о 1.0.3](../development/releases/1.0.3.md),
+[1.0.2](../development/releases/1.0.2.md) и [1.0.1](../development/releases/1.0.1.md).
 
 ## Ручная установка Chromium: ZIP
 
-1. Скачайте [готовый ZIP 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-mv3-1.0.2-f7ae775.zip)
-   и [его контрольную сумму](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-mv3-1.0.2-f7ae775.zip.sha256.txt).
+1. Скачайте [готовый ZIP 1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-mv3-1.0.3-34ab51b.zip)
+   и [его контрольную сумму](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-mv3-1.0.3-34ab51b.zip.sha256.txt).
 2. Проверьте SHA-256 и полностью распакуйте ZIP в постоянную папку.
 3. Откройте `chrome://extensions`, `brave://extensions` или `edge://extensions`.
 4. Включите **Режим разработчика → Загрузить распакованное расширение**.
@@ -49,13 +50,13 @@ Chromium ZIP и подписанный Firefox XPI 1.0.2 доступны для
 SHA-256 ZIP:
 
 ```text
-9c04b868cb1d739b38af0f595bc0c487f2183cd63b4ab6256d682279129e257c
+ef7ecd3f90295857aea08abe66bca9ad1a4e6d6e75a9861c15fbe0986553419e
 ```
 
 Пример проверки в Windows:
 
 ```powershell
-Get-FileHash .\runet-censorship-bypass-mv3-1.0.2-f7ae775.zip -Algorithm SHA256
+Get-FileHash .\runet-censorship-bypass-mv3-1.0.3-34ab51b.zip -Algorithm SHA256
 ```
 
 Если сумма отличается, не устанавливайте файл.
@@ -138,8 +139,9 @@ Install **Chrome 1.0.2** from [Chrome Web Store](https://chromewebstore.google.c
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
 
-**Chromium 1.0.2** is also available as a manual ZIP.
-**Firefox 1.0.2** is also available as a Mozilla-signed XPI. Versions **1.0.1–1.0.2** target desktop **Chromium 108+** and **Firefox 140+**,
+**Chromium 1.0.3** is available as a manual ZIP. Store submissions for 1.0.3
+are pending; the published store versions above remain 1.0.2.
+**Firefox 1.0.2** is also available as a Mozilla-signed XPI. Versions **1.0.1–1.0.3** target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR releases on a compatible base. These are API-based compatibility
 estimates, not test results for every version or fork. Required MV3 and proxy
 extension APIs must be available; mobile browsers and WebView are outside this scope.

@@ -5,8 +5,9 @@
 # Runet Censorship Bypass — Revived
 
 Независимый форк [Anticensority](https://github.com/anticensority/runet-censorship-bypass).
-**Версия 1.0.2 доступна в Chrome Web Store и Firefox Add-ons.**
-Для ручной установки также доступны Chromium ZIP и подписанный Firefox XPI.
+**Chromium ZIP 1.0.3 доступен для ручной установки.**
+В Chrome Web Store и Firefox Add-ons пока доступна **1.0.2**; обновление
+магазинов до 1.0.3 ещё не отправлено. Подписанный Firefox XPI остаётся **1.0.2**.
 
 Выбирайте, как браузер открывает сайты: по автоматическим правилам, через
 настроенный прокси или напрямую. Расширение для Chromium и Firefox с интерфейсом
@@ -30,20 +31,21 @@
 | **Firefox 140+** | **1.0.2** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 Магазинные установки получают одобренные обновления через браузер.
-Для ручной установки доступны **Chromium ZIP 1.0.2** и
+Для ручной установки доступны **Chromium ZIP 1.0.3** и
 **подписанный Mozilla Firefox XPI 1.0.2**.
 
-Расчётная совместимость **1.0.1–1.0.2** — настольные **Chromium 108+** и
+Расчётная совместимость **1.0.1–1.0.3** — настольные **Chromium 108+** и
 **Firefox 140+**, включая ESR, с необходимыми API.
 Это оценка по используемым технологиям, а не проверка каждой версии и каждого
 форка. [Требования и проверенные версии](docs/development/BROWSER_COMPATIBILITY.md).
 
-**Ручная установка:** [Chromium ZIP 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-mv3-1.0.2-f7ae775.zip) ·
+**Ручная установка:** [Chromium ZIP 1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-mv3-1.0.3-34ab51b.zip) ·
 [подписанный Firefox XPI 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-firefox-1.0.2-signed.xpi) ·
-[изменения и файлы v1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.2).
+[изменения и файлы v1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.3).
 
-В **1.0.2** добавлены список Antifilter, обновление базы из панели и ручной
-просмотр ресурсов сайта. [Как пользоваться 1.0.2](docs/user/USER_GUIDE_1_0_2.md).
+В **1.0.3** уменьшена лишняя фоновая работа, добавлена очистка неиспользуемых
+копий баз и подсказка при блокировке авторизации прокси.
+[Что изменилось](docs/user/CHANGES_1_0_3.md) · [Основное руководство](docs/user/USER_GUIDE_1_0_2.md).
 
 ### Быстрый старт
 
@@ -112,11 +114,11 @@
 <details>
 <summary>Проверить скачанные файлы</summary>
 
-**Chromium 1.0.2** — `runet-censorship-bypass-mv3-1.0.2-f7ae775.zip`
+**Chromium 1.0.3** — `runet-censorship-bypass-mv3-1.0.3-34ab51b.zip`
 
-SHA-256: `9c04b868cb1d739b38af0f595bc0c487f2183cd63b4ab6256d682279129e257c`
+SHA-256: `ef7ecd3f90295857aea08abe66bca9ad1a4e6d6e75a9861c15fbe0986553419e`
 
-[Контрольная сумма ZIP](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-mv3-1.0.2-f7ae775.zip.sha256.txt)
+[Контрольная сумма ZIP](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-mv3-1.0.3-34ab51b.zip.sha256.txt)
 
 **Firefox 1.0.2** — `runet-censorship-bypass-firefox-1.0.2-signed.xpi`
 
@@ -131,7 +133,9 @@ SHA-256: `35aec76967e2b26198139766c507d828cd95572b86679d5b0e14ff4cdc0ee203`
 
 **Runet Censorship Bypass — Revived** is an independent Anticensority fork.
 **Version 1.0.2 is available in Chrome Web Store and Firefox Add-ons.**
-Chromium ZIP and Mozilla-signed Firefox XPI 1.0.2 are also available for manual installation.
+**Chromium ZIP 1.0.3** is available for manual installation; the signed Firefox
+XPI remains **1.0.2**. Store submissions for 1.0.3 are pending.
+[Changes in 1.0.3](docs/user/CHANGES_1_0_3.md#english).
 
 Choose **Auto**, **Proxy**, or **Direct** for websites in Chromium and Firefox.
 The extension controls browser routing and provides no VPN or proxy service.
@@ -139,7 +143,7 @@ Save records settings; Apply activates them.
 
 Install from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
-Expected 1.0.1–1.0.2 minimums are desktop **Chromium 108+** and **Firefox 140+**, including
+Expected 1.0.1–1.0.3 minimums are desktop **Chromium 108+** and **Firefox 140+**, including
 ESR on a compatible base. See [installation](docs/user/INSTALLATION.md#english-summary),
 [the 1.0.2 guide](docs/user/USER_GUIDE_1_0_2.md#english-summary), and [help](SUPPORT.md#english).
 

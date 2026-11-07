@@ -53,12 +53,15 @@ require Firefox 154 or Chromium 156 specifically:
 | 1.0.2 source | Chrome 156.0.8078.79, Firefox 159.0 | Local update scenarios |
 | 1.0.2 source | Windows Firefox 153.5.1 ESR | Bounded active/pending settings scenario |
 | Signed Firefox 1.0.1 → 1.0.2 | Windows Firefox 159.0 | Permanent signature-enforced update/restart preserving OFF, Effective and pending Saved |
+| 1.0.3 Chromium ZIP | Windows Chrome 156.0.8078.80 | Routing/auth/restart/ownership smoke; unpacked 1.0.2 → 1.0.3 update with OFF, Effective and pending Saved preserved |
+| Signed Firefox 1.0.2 → temporary unsigned 1.0.3 | Windows Firefox 159.0 | OFF, Effective and pending Saved preserved; candidate reinstalled after restart, not a permanent signed update |
 
 These records do not prove store automatic delivery or comprehensive routing/UI
 coverage. Chromium 108 and Firefox 140 were not individually launched; Linux
 remains untested. The [ESR/Linux procedure](qa/FIREFOX_ESR_153.md) is a reproducible
 scenario, not evidence that it ran. Versioned details remain in
-[1.0.0](releases/1.0.0.md), [1.0.1](releases/1.0.1.md) and [1.0.2](releases/1.0.2.md).
+[1.0.0](releases/1.0.0.md), [1.0.1](releases/1.0.1.md), [1.0.2](releases/1.0.2.md)
+and [1.0.3](releases/1.0.3.md).
 
 ## Published packages
 
