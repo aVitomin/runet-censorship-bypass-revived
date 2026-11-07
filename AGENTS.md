@@ -40,6 +40,13 @@ because a generic skill mentions it. Keep task history out of durable rules.
 
 ## Repository map and working boundary
 
+Write code comments, agent/skill instructions, contributor guides, PR templates
+and maintained developer documentation in English. Keep user-facing content in
+its intended language and update both supported UI locales when behavior changes.
+Preserve licenses, quoted evidence, historical release/audit records, Unicode test
+fixtures and persistent identifiers. Language cleanup must not rename stored keys
+or stable APIs, alter behavior, or rewrite published history.
+
 - The only npm root is `extension`
   (`$Project`). Run commands from the repository root in PowerShell and never
   run root npm install/scripts. If dependencies are missing, use

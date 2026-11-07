@@ -410,6 +410,38 @@
 
   }
 
+  async function collectUnreferenced(retainedRefs, canCollect) {
+
+    const retained = new Set(retainedRefs);
+    const db = await openDb();
+    if (!canCollect()) return {status: 'busy', deleted: 0};
+    const transaction = db.transaction([RAW_STORE, COOKED_STORE], 'readwrite');
+    const complete = transactionToPromise(transaction,
+        'PAC_ARTIFACT_DELETE_FAILED', 'Failed to collect unused PAC artifacts.');
+    let deleted = 0;
+    const sweep = Promise.all([RAW_STORE, COOKED_STORE].map(async (name) => {
+      const store = transaction.objectStore(name);
+      // Keys avoid copying every large PAC body into the worker during cleanup.
+      const keys = await requestToPromise(store.getAllKeys(),
+          'PAC_ARTIFACT_READ_FAILED', 'Failed to list PAC artifact keys.');
+      await Promise.all(keys.filter((key) => !retained.has(key)).map((key) =>
+        requestToPromise(store.delete(key),
+            'PAC_ARTIFACT_DELETE_FAILED', 'Failed to delete unused PAC artifact.')
+            .then(() => ++deleted)));
+    }));
+    try {
+      await Promise.all([complete, sweep]);
+    } catch (error) {
+      try {
+        transaction.abort();
+      } catch (_abortError) {/* Already aborted. */}
+      await complete.catch(() => undefined);
+      throw error;
+    }
+    return {status: 'collected', deleted};
+
+  }
+
   function getStatus() {
 
     return {
@@ -462,6 +494,7 @@
     getLatestCookedPacArtifact,
     deleteCookedPacArtifact,
     clearPacArtifacts,
+    collectUnreferenced,
     selfTest,
   });
 

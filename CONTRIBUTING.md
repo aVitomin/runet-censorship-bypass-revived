@@ -1,49 +1,47 @@
-# Участие в проекте
+# Contributing
 
-Перед изменением поведения найдите похожую задачу или опишите желаемый
-результат в новой. Для ошибки или предложения используйте [раздел помощи](SUPPORT.md).
-Подготовка среды и команды сборки находятся в [руководстве разработчика](docs/development/DEVELOPMENT.md).
+Find an existing issue or describe the intended behavior before changing it.
+Use [Support](SUPPORT.md) for bug reports and feature requests, and the
+[development guide](docs/development/DEVELOPMENT.md) for setup and commands.
 
-## С чего начать
+## Start with the affected scope
 
-Для правок только в тексте и GitHub-шаблонах устанавливать зависимости и
-запускать runtime/browser-проверки не нужно. Проверьте документацию и пробелы:
+For documentation or GitHub-template changes, no dependency install or runtime
+suite is needed:
 
 ```powershell
 node .\scripts\verify-docs.mjs
 git diff --check
 ```
 
-Для изменения кода используйте Node.js 22 и прочитайте действующие
-[правила репозитория](AGENTS.md). Они выбирают проверки по затронутой области;
-подробности и состав команд описаны в
-[руководстве по тестированию](docs/development/TESTING.md). Зависимости, если
-они нужны, устанавливаются только в `extension`, а не в корне репозитория.
-Применимые локальные gates, тестовое покрытие и обязательные проверки CI для
-изменения кода нельзя пропускать.
+For code, use Node.js 22 and follow [AGENTS.md](AGENTS.md). Its scope table selects
+the required local gate; [Testing](docs/development/TESTING.md) explains commands
+and browser coverage. Install dependencies only under `extension`. Applicable
+local gates, regression coverage and required CI are mandatory.
 
-## Границы изменений
+## Change boundaries
 
-- Создавайте тематическую ветку от актуального `main`.
-- Не смешивайте runtime, зависимости, разрешения и документацию без причины.
-- Считайте скачанный PAC недоверенными данными и не выполняйте его текст в коде расширения.
-- Не переносите учётные данные прокси в PAC, интерфейс, логи, диагностику или тесты.
-- Добавляйте пользовательские строки одновременно в `en` и `ru`.
-- Не коммитьте сборки, профили браузера, логи, `.tmp`, `.local`, секреты или локальные отчёты.
-- Обновляйте текущую документацию в том же PR, если меняются установка, пользовательское поведение, поддерживаемые браузеры, privacy/security, команды, архитектура или выпуск.
+- Use a focused branch from current `main`; avoid unrelated runtime, permission,
+  dependency and documentation changes.
+- Write developer instructions, comments and documentation in English. Keep
+  user-facing text in its intended language; update both `en` and `ru` UI catalogs.
+- Treat downloaded PAC as untrusted data, never executable extension code.
+- Keep real proxy credentials out of PAC, UI, logs, diagnostics and test fixtures.
+- Do not commit builds, browser profiles, logs, `.tmp`, `.local`, secrets or private
+  reports. Preserve licenses and historical records.
+- Update current docs alongside changes to installation, behavior, browser support,
+  privacy/security, commands, architecture or release procedure.
 
-MV2 не поддерживается в текущем `main`; исторические материалы доступны в Git
-history и frozen development branch. Chromium MV3 и Firefox MV3 используют
-разные разрешённые наборы общих файлов, поэтому общие модули и packaged assets
-требуют проверок обоих пакетов по правилам репозитория.
+MV2 is historical, not a supported `main` target. Chromium MV3 and Firefox MV3 have
+different shared-file allowlists; changes to common inputs/assets require both
+package checks as defined in the repository rules.
 
-## Pull request
+## Pull requests
 
-Опишите цель, пользовательский эффект, влияние на безопасность/маршрутизацию,
-фактически выполненные проверки и оставшуюся браузерную QA. При сбое не скрывайте
-exit status и дайте доступ к полному очищенному логу. Для UI используйте только
-скриншоты без персональных данных и секретов.
+Describe the purpose, user-visible result, security/routing impact, checks actually
+run and remaining browser QA. Record failed exit status and link a complete
+sanitized log. Screenshots must contain no personal data or secrets.
 
-Никогда не публикуйте пароль, приватный адрес прокси или PAC, токен, cookie, URL
-с учётными данными или историю посещений. О потенциальной уязвимости сообщайте
-по [SECURITY.md](SECURITY.md), а не в публичном PR или issue.
+Never publish passwords, private proxy/PAC URLs, tokens, cookies, URLs containing
+credentials or browsing history. Report potential vulnerabilities through
+[SECURITY.md](SECURITY.md), not a public issue or PR.

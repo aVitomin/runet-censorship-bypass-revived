@@ -6,7 +6,7 @@ the other channels. This document grants no permission to bump
 versions, sign, tag, create releases, upload or submit store packages. Obtain
 separate maintainer authorization for those actions.
 
-The maintained source and manifests identify `1.0.2`.
+The maintained source and manifests identify the unreleased `1.0.3` candidate.
 This does not declare a published release, completed store submission or
 validation of a particular archive. Record the final approved version, exact
 main SHA, browser QA, trusted-main run, artifact names and SHA-256 in the release

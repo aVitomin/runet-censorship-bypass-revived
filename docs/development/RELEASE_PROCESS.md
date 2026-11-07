@@ -1,34 +1,32 @@
-# Процесс выпуска Chromium и Firefox
+# Chromium and Firefox release process
 
-Chromium публикуется как ZIP готовой MV3-сборки. Firefox release candidate
-состоит из детерминированного unsigned XPI, checksum и reviewer source archive;
-нормальная пользовательская установка Firefox требует отдельной Mozilla
-signature. Выпуск любого target допустим только из точного validated commit
-актуального чистого `main`, после успешного trusted-main CI и проверки того же
-артефакта, который будет опубликован.
+Release only from the exact validated commit on current clean `main`, successful
+trusted-main CI and the identical artifact to be published. Chromium uses a built
+MV3 ZIP. Firefox candidates include deterministic unsigned XPI, checksum and
+reviewer source; normal installation needs a separate Mozilla signature.
 
-> Release останавливается, если в обязательном CI отсутствует любой release
-> gate, даже когда отдельные тесты зелёные. Нельзя заменять отсутствующий
-> итоговый `Verify MV3`, docs/supply-chain или target package-integrity gate
-> набором похожих локальных результатов.
+> Missing required CI blocks release. Local tests cannot replace **Verify MV3**,
+> documentation/supply-chain or target package-integrity gates.
 
-## 1. Подготовить чистый main
+This procedure grants no commit, tag, upload, store or announcement authority.
+Follow [AGENTS.md](../../AGENTS.md) and the current maintainer-approved scope.
 
-1. Обновите `main` через fast-forward и убедитесь, что рабочее дерево чистое.
-2. Запишите полный SHA кандидата и проверьте, что version согласована между
-   `src/templates-data.js`, manifest template и собранным `manifest.json`.
-3. Установите pinned зависимости только в extension tooling package на Node 22.
-4. Убедитесь, что reports, profiles, build/dist, archives, `.local`, `.tmp` и
-   секреты не tracked и не staged.
+## 1. Prepare clean main
 
-Если менялись shared templates или Gulp, побайтово сравните Chromium и Firefox
-MV3 package trees с trusted baseline. Исторический MV2 не является build/release
-целью текущего `main`. Chromium и Firefox build очищают только собственные
-output-каталоги и не имеют требования к взаимному порядку.
+1. Fast-forward `main`; confirm a clean tree and record the full candidate SHA.
+2. Confirm version agreement in `src/templates-data.js`, manifest templates and
+   built manifests.
+3. Install reviewed pinned dependencies using Node 22 in `extension` only.
+4. Exclude reports, profiles, build/dist, archives, `.local`, `.tmp` and secrets
+   from tracking/staging.
 
-## 2. Выполнить локальные gates
+Shared templates/Gulp changes require byte comparison of both target trees with
+trusted baselines. MV2 is not a maintained release target. Each build cleans only
+its own output; build order is independent.
 
-Из корня репозитория:
+## 2. Local gates
+
+From repository root:
 
 ```powershell
 $Project = '.\extension'
@@ -44,92 +42,67 @@ npm --prefix $Project run release:firefox
 git diff --check
 ```
 
-Aggregate `verify` выполняет все deterministic tests, tooling и оба browser
-lint/build без повторного запуска suites/builds. Обе build-команды внутри него
-включают package-integrity; Chromium также проверяет runtime icons. Release-команды
-отдельно доказывают byte-identical rebuild и создают архивы. После всех команд
-tracked tree должен остаться чистым.
+Aggregate verify runs lint, deterministic suites and both checked builds once.
+Release commands separately prove reproducible rebuilds and create archives.
+The tracked tree must remain clean. Record SHA, commands, exit status and logs.
+Reuse passing evidence only with unchanged inputs/environment and cite its original
+run; prose-only edits do not invalidate runtime checks. Dependency changes also
+require `dependency-review` and final merged-state checks. Final artifacts, sources
+and trusted-main CI must match the release commit.
 
-Для каждого результата запишите SHA, команду, код возврата и путь к журналу.
-Уже успешные проверки можно использовать повторно, если их входные файлы и
-среда не изменились; укажите исходный запуск. Правки только документации не
-требуют нового прогона runtime-тестов. Изменение зависимостей требует проверок
-из `dependency-review` и итогового gate на объединённом состоянии. Архивы,
-исходники и trusted-main CI всегда должны соответствовать финальному SHA.
+## 3. Trusted-main CI
 
-## 3. Подтвердить trusted-main CI
+Require **Verify extension** for the exact `main` SHA as a trusted push. If that
+push run is missing, do not rewrite/amend main to trigger it. An explicit dispatch
+of the same workflow is acceptable only with `event = workflow_dispatch`,
+`ref = refs/heads/main`, `head_sha = origin/main`, successful ordinary jobs and
+that run's canonical artifact. Another branch is not trusted.
 
-Для exact main SHA workflow **Verify extension** должен завершиться успешно как
-trusted push в `main`. Если GitHub не создал ожидаемый push run, не переписывайте
-и не дополняйте `main`: вручную запустите тот же workflow на `main`. Такой run
-допустим только при `event = workflow_dispatch`, `ref = refs/heads/main`,
-`head_sha = origin/main`, полном успехе обычного job и наличии canonical
-artifact этого run. Dispatch другой ветки не является trusted source и не
-загружает canonical artifact. Проверьте не только общий зелёный статус, но
-наличие и успех обязательных gates:
+Check actual required jobs/steps, not only a green overall badge:
 
-- documentation integrity;
-- static supply-chain policy, focused verifier tests и registry signatures;
-- tooling, PAC, Chromium и Firefox deterministic tests без повторов;
-- focused Chromium/Firefox lint, builds и package integrity;
-- runtime icons и package integrity внутри build;
-- tracked-worktree checks;
-- trusted-main-only Chromium и Firefox artifact uploads, включая
-  детерминированные Chromium ZIP/checksum и Firefox XPI/source/checksums.
+- Documentation, static supply-chain, verifier tests and registry signatures.
+- Tooling/PAC/Chromium/Firefox deterministic coverage without duplicate runs.
+- Target lint/build/package integrity, runtime icons and tracked-tree checks.
+- Required Chromium browser smoke and stable final **Verify MV3**.
+- Trusted-main Chromium ZIP/checksum and Firefox XPI/source/checksum uploads.
 
-Если обязательного шага нет, release блокирован до исправления workflow и
-нового успешного trusted-main run. Артефакт PR не является trusted release
-source: upload на pull request намеренно пропускается. Итоговый check сохраняет
-имя **Verify MV3**, требуемое действующим ruleset; его переименование требует
-отдельного согласованного изменения branch protection. Имена существующих
-release artifacts также сохранены независимо от имени исходных каталогов.
+A missing required step blocks release until fixed and rerun on trusted main.
+PRs intentionally upload no canonical release artifacts. Preserve **Verify MV3**
+and existing release artifact names; check-name changes need a separate reviewed
+branch-protection change.
 
-## 4. Скачать и проверить trusted artifact
+## 4. Inspect the trusted artifact
 
-Скачайте нужный Chromium или Firefox artifact именно из успешного trusted-main
-run exact SHA. Не пересобирайте release независимо от CI. Проверьте:
+Download the successful run's required target artifact for the exact SHA, rather
+than independently rebuilding release bytes. Verify run/name/SHA, MV3/version,
+manifest at package root, exact runtime list/hashes, icons and package integrity.
+Exclude docs/screenshots/tests/maps/nested archives/profiles/logs, `.env`, `.local`,
+`.tmp`, credentials and private URLs.
 
-- имя run/artifact и полный commit SHA;
-- `manifest_version: 3`, version и `manifest.json` в корне;
-- точный список и SHA-256 всех runtime-файлов;
-- runtime icons и package-integrity;
-- отсутствие docs, screenshots, tests, source maps, archives, profiles, logs,
-  `.env`, `.local`, `.tmp`, credentials и приватных URL.
+For Firefox, verify unsigned XPI checksum, Gecko ID, data-collection declaration,
+reviewer source and exact extracted-byte match with the locally reproduced tree.
+See [Firefox release build](FIREFOX_RELEASE_BUILD.md) and
+[AMO reviewer notes](FIREFOX_AMO_REVIEW.md). Mozilla signs the submitted XPI;
+signing credentials do not belong in Git or CI.
 
-Firefox artifact содержит unsigned XPI, checksum и reviewer source archive.
-Проверьте XPI checksum, manifest Gecko ID, data-collection declaration и
-побайтовое совпадение XPI contents с локально воспроизведённым проверенным
-package tree. Инструкции и AMO notes находятся в
-[`FIREFOX_RELEASE_BUILD.md`](FIREFOX_RELEASE_BUILD.md) и
-[`FIREFOX_AMO_REVIEW.md`](FIREFOX_AMO_REVIEW.md). Подписание выполняется AMO
-после проверки exact unsigned XPI; signing credentials в репозитории и CI нет.
+Required browser QA loads the unpacked trusted artifact in a clean profile.
+Chromium checks Chrome/Brave with exact version recorded; one derivative is not
+proof of all others. Use [Browser QA](TESTING.md#browser-qa) and only authorized
+test proxy credentials, never logging passwords.
 
-Если выпуск требует browser QA, загрузите именно распакованный trusted artifact
-в чистый профиль. Для Chromium проверьте Chrome или Brave и запишите точную
-версию; результаты одного браузера не выдавайте за проверку всех форков.
-Сценарии перечислены в
-[TESTING.md](TESTING.md#браузерная-qa). Для authenticated proxy используйте
-только разрешённый тестовый аккаунт и не записывайте пароль.
+Firefox temporary XPI QA checks popup/options, Apply/recovery/Clear, EN/RU, auth,
+private-access revocation and external control on an exact recorded browser.
+Temporary unsigned installation is not the normal user path. The
+[compatibility matrix](BROWSER_COMPATIBILITY.md) separates expected minimums from
+actual QA; no need to test every derivative, but untested support is not confirmed.
 
-Для Firefox установите exact unsigned XPI как temporary add-on в поддерживаемом
-Firefox и запишите точную версию; проверьте popup/options, Apply/recovery/Clear, EN/RU, authenticated
-proxy, private-access revoke и external control loss. Обычная установка
-unsigned XPI не считается пользовательским release path.
-Расчётные минимумы и фактические проверки указаны в
-[матрице совместимости](BROWSER_COMPATIBILITY.md). Полная проверка каждой версии
-или каждого производного браузера не требуется; непроверенные среды не выдаются
-за подтверждённые.
+## 5. ZIP and checksums
 
-## 5. Создать ZIP из проверенного artifact
-
-Пакуется содержимое trusted artifact directory, а не сам каталог. После
-распаковки `manifest.json` должен находиться в корне ZIP. Не допускается ни
-одного runtime-byte отличия от проверенного artifact. Локальный release
-candidate создаётся детерминированно командой `npm --prefix $Project run
-release:chromium`: два независимых build сравниваются побайтово, а ZIP и
-checksum записываются в `dist/chromium-release`.
-
-Пример упаковки:
+Use the canonical ZIP when present. If packaging the verified trusted directory,
+archive its contents, not the directory itself; root manifest and extracted
+runtime must match exactly. `release:chromium` is the local reproducibility command
+and creates candidates under `dist/chromium-release` after two byte-equal builds;
+it does not replace the trusted-main release artifact. Manual packaging example:
 
 ```powershell
 $Package = '.\trusted-artifact'
@@ -139,63 +112,48 @@ Compress-Archive -Path "$Package\*" -DestinationPath $Archive
 Get-FileHash $Archive -Algorithm SHA256
 ```
 
-Создайте отдельный checksum asset с точным именем ZIP. Не перезаписывайте уже
-опубликованный asset тем же именем.
+Create a checksum asset naming the exact ZIP. Never overwrite a published asset
+with different bytes under the same name.
 
-## 6. Проверить tag и prerelease scope
+## 6. Tag and release scope
 
-- Tag имеет форму `v<version-name>` и должен указывать на exact validated main
-  SHA, а не просто на текущее имя ветки.
-- **Prerelease** обязателен для ограниченной beta, незакрытых проверок
-  согласованного support scope или значимых известных ограничений. Отсутствие
-  исчерпывающей проверки всех версий и форков само по себе не блокирует stable.
-- **Stable** допустим только после согласованного support scope, закрытых release
-  blockers и достаточной real-browser QA; unit tests сами по себе недостаточны.
+- `v<version-name>` must point to the exact validated main SHA, not just a branch.
+- Limited beta, incomplete agreed QA or significant known limits require prerelease.
+  Not testing every version/derivative alone does not block stable.
+- Stable requires agreed support scope, resolved blockers and sufficient native
+  browser QA; unit tests alone are insufficient.
 
-Перед публикацией проверьте target tag, prerelease flag, release-page path,
-имена и размеры assets и SHA-256.
+Before publication verify tag, prerelease flag, release path, asset names/sizes
+and SHA-256. Commit, tag, upload and release are separate authorized actions.
 
-## 7. Опубликовать и повторно скачать assets
+## 7. Publish and read back
 
-Release notes должны указывать статус, целевую аудиторию, подтверждённые
-highlights, browser QA, CI, manual installation, отсутствие store auto-update,
-имена assets, SHA-256, security/routing impact, известные ограничения и
-безопасный канал обратной связи.
+Release notes state status/audience, confirmed changes, browser QA/CI, manual
+installation and its lack of store auto-update, asset names/hashes, security/routing
+impact, limits and safe feedback channel. After authorized upload and before news:
 
-После upload, но до объявления выпуска окончательно:
+1. Download public ZIP/checksum again; verify size, hash, checksum filename and root.
+2. Compare extracted runtime with the trusted artifact.
+3. Verify tag target/prerelease metadata and exclusion of secrets/repository files.
 
-1. скачайте опубликованные ZIP и checksum asset заново;
-2. проверьте размер, SHA-256, checksum content и корень ZIP;
-3. сравните распакованные runtime-файлы с trusted artifact;
-4. подтвердите tag target и prerelease status через GitHub metadata;
-5. убедитесь, что публичные assets не содержат секретов или repository-only
-   файлов.
+Any mismatch blocks release; never silently substitute different published bytes.
 
-Любое несовпадение блокирует выпуск; опубликованный архив нельзя молча заменить
-другим содержимым под тем же именем.
+## 8. Documentation and store follow-through
 
-## 8. Обновить current-release документацию
+README describes latest published, installable versions per target, not arbitrary
+main. Chromium and signed Firefox can ship independently. After authorized release:
 
-README описывает последние **опубликованные и доступные для установки** версии
-для каждого браузера, а не произвольную версию на `main`. Chromium ZIP и
-подписанный Firefox XPI могут выходить независимо. После публикации:
+1. Update `docs/release-current.json` with exact public metadata.
+2. Update README/status/QA/install text and check release, ZIP, checksum URLs/hashes.
+3. Keep targets separate: pending AMO review/signature does not replace latest
+   installable signed Firefox; unsigned XPI is not a normal-user link.
+4. Run docs integrity and require successful CI for the changed documentation.
+5. Follow the [store checklist](../release/STORE_PUBLICATION_CHECKLIST.md) for
+   channel checks, signed artifacts, listing links and authorized announcements.
 
-1. обновите `docs/release-current.json` точными публичными metadata;
-2. обновите README current-release block, status, browser QA и installation;
-3. проверьте release, ZIP и checksum links и опубликованный SHA-256;
-4. укажите доступную версию каждого target отдельно: Firefox, ожидающий AMO
-   review или подписи, не заменяет последний подписанный пользовательский XPI;
-5. выполните `node .\scripts\verify-docs.mjs` и дождитесь нового успешного CI.
-
-Обычный unreleased tooling commit не требует изменения публичной версии README.
-В `docs/release-current.json` основные поля описывают опубликованный Chromium
-release. Если подписанный Firefox относится к другому выпуску, укажите вместе
-`firefoxVersionName`, `firefoxTag` и `firefoxReleaseUrl`; существующие Firefox
-asset/hash/size поля должны описывать именно этот подписанный файл. Без трёх
-дополнительных полей verifier использует общий release для обоих targets.
-Старый Firefox asset остаётся по исходной ссылке, не переименовывается под новый
-release. Статус ожидающей проверки версии показывается отдельно и не создаёт
-ссылку на unsigned XPI как на обычную установку. Заполните `publishedAt` и
-публичные asset metadata только после подтверждённой публикации.
-Commit, tag, upload и GitHub Release — отдельные внешние действия и выполняются
-только с явным разрешением сопровождающего.
+Unreleased tooling changes do not change README's public version. Main metadata
+fields describe Chromium; if Firefox is a different release, set
+`firefoxVersionName`, `firefoxTag`, `firefoxReleaseUrl` together and bind its
+asset/hash/size to that signed file. Without them the verifier uses one release
+for both. Old Firefox assets keep their original URL. Set `publishedAt` and public
+asset facts only after confirmed publication; pending status stays explicit.

@@ -148,6 +148,31 @@ describe('Firefox HTTPS source dataset staging', function() {
 
   });
 
+  it('collects orphaned bodies while retaining replay hashes and Saved references', async function() {
+
+    const test = await fixture();
+    const orphan = candidate('orphan.example', '2026-09-02T00:00:00.000Z');
+    await test.store.stageHttpsCandidate(orphan);
+    const active = candidate('active.example', '2026-09-03T00:00:00.000Z');
+    await test.store.stageHttpsCandidate(active);
+    await test.store.promoteStaged('anticensority');
+
+    Assert.equal(await test.store.collectGarbage([
+      orphan.envelope.artifactSha256,
+    ]), 0);
+    Assert.equal(test.backend.artifacts.has(orphan.envelope.artifactSha256), true,
+        'Saved/Effective references supplied by the coordinator protect bodies');
+    Assert.equal(await test.store.collectGarbage(), 1);
+    Assert.equal(test.backend.artifacts.has(orphan.envelope.artifactSha256), false);
+    Assert.equal(await test.backend.hasArtifactHash(orphan.envelope.artifactSha256), true);
+    Assert.equal((await test.store.stageHttpsCandidate(candidate(
+        'orphan.example', '2026-09-04T00:00:00.000Z',
+    ))).code, 'HTTPS_KNOWN_ARTIFACT_REPLAY');
+    Assert.equal((await test.store.loadVerifications('anticensority')).active
+        .dataset.identity.artifactSha256, active.envelope.artifactSha256);
+
+  });
+
   it('serializes racing source updates against the durable timestamp floor', async function() {
 
     const test = await fixture();

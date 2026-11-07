@@ -803,6 +803,24 @@ async function createRuntimeHarness(options = {}) {
       cookedArtifacts.delete(cookedKey(input));
 
     },
+    async collectUnreferenced(refs, canCollect) {
+
+      if (!canCollect()) return {status: 'busy', deleted: 0};
+      if (options.artifactCollectionError) throw new Error('Synthetic collection failure');
+      if (options.onArtifactCollection) await options.onArtifactCollection();
+      const retained = new Set(refs);
+      let deleted = 0;
+      for (const artifacts of [rawArtifacts, cookedArtifacts]) {
+        for (const key of artifacts.keys()) {
+          if (!retained.has(key)) {
+            artifacts.delete(key);
+            ++deleted;
+          }
+        }
+      }
+      return {status: 'collected', deleted};
+
+    },
   });
   context.mv3PacDownload = Object.freeze(Object.assign({}, context.mv3PacDownload, {
     async downloadPac() {
@@ -1033,6 +1051,11 @@ async function createRuntimeHarness(options = {}) {
     getSessionStorage() {
 
       return clone(sessionStorageData);
+
+    },
+    getArtifactRefs() {
+
+      return [...rawArtifacts.keys(), ...cookedArtifacts.keys()].sort();
 
     },
     getLocalStorage() {

@@ -384,6 +384,7 @@
     let toolbarRequest = 0;
     let toolbarFingerprint = null;
     let toolbarSiteRead = null;
+    let toolbarSiteReadGeneration = 0;
     let activeOperation = null;
     let operationSequence = 0;
 
@@ -596,25 +597,49 @@
 
     }
 
-    async function readToolbarSite(tabUrl, requestId) {
+    async function readToolbarSite(
+        tabId, tabUrl, requestId, generation, shareable,
+    ) {
 
-      // Wait for the one in-flight read, then only the latest request may
-      // start a fresh read. Never reuse the previous tab's verified snapshot.
-      if (toolbarSiteRead) await toolbarSiteRead;
+      // Same-tab URL/completion events may share one in-flight read. Other
+      // tabs, URLs and explicit refreshes start a fresh read.
+      const previous = toolbarSiteRead;
+      if (previous) {
+        await previous.promise;
+        if (requestId !== toolbarRequest || !toolbarNeedsSite()) return null;
+        if (shareable && previous.shareable && previous.tabId === tabId &&
+            previous.tabUrl === tabUrl &&
+            previous.generation === generation && !previous.failed) {
+          return previous.value;
+        }
+      }
       if (requestId !== toolbarRequest || !toolbarNeedsSite()) return null;
-      const pending = Promise.resolve().then(() => siteController.get(tabUrl))
-          .catch(() => null);
-      toolbarSiteRead = pending;
+      const current = {
+        tabId, tabUrl, generation, shareable, value: null, failed: false,
+      };
+      current.promise = Promise.resolve().then(() => siteController.get(tabUrl))
+          .then((value) => {
+            current.value = value;
+            return value;
+          }, () => {
+            current.failed = true;
+            return null;
+          });
+      toolbarSiteRead = current;
       try {
-        return await pending;
+        return await current.promise;
       } finally {
-        if (toolbarSiteRead === pending) toolbarSiteRead = null;
+        if (toolbarSiteRead === current) toolbarSiteRead = null;
       }
 
     }
 
     async function refreshToolbar(params = {}) {
 
+      const tabUpdate = params.tab && params.tab.active === true &&
+        Number.isInteger(params.tabId) && params.tab.id === params.tabId;
+      if (!tabUpdate) toolbarSiteReadGeneration += 1;
+      const siteReadGeneration = toolbarSiteReadGeneration;
       const requestId = ++toolbarRequest;
       try {
         await initialize();
@@ -644,7 +669,8 @@
       // discard it. Live control is still read below before publishing.
       let site = null;
       if (toolbarNeedsSite() && tab && typeof tab.url === 'string') {
-        site = await readToolbarSite(tab.url, requestId);
+        site = await readToolbarSite(tab.id, tab.url, requestId,
+            siteReadGeneration, tabUpdate);
       }
       if (requestId !== toolbarRequest) {
         return {ok: false, status: 'SUPERSEDED'};
@@ -667,6 +693,7 @@
 
     async function refreshGlobalToolbar() {
 
+      toolbarSiteReadGeneration += 1;
       const requestId = ++toolbarRequest;
       try {
         await initialize();
@@ -693,6 +720,7 @@
 
     function showLoading() {
 
+      toolbarSiteReadGeneration += 1;
       const requestId = ++toolbarRequest;
       return applyToolbar(deriveToolbarPresentation({
         activation: {runtimeState: 'INITIALIZING'},

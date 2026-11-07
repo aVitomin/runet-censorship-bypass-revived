@@ -270,6 +270,13 @@
     root.setAttribute('aria-busy', isOperationBusy(state) ? 'true' : 'false');
     document.title = t('popupTitle');
     const presentation = getGlobalPresentation(state, lastOperation);
+    if (state.configuration && state.configuration.active === true &&
+        state.proxyAuthBinding && state.proxyAuthBinding.status === 'unavailable') {
+      presentation.description = t('popupAuthBindingUnavailableHelp');
+      presentation.tone = 'warning';
+      presentation.pillText = t('popupAuthBindingUnavailablePill');
+      presentation.pillClass = 'warning';
+    }
     renderHeader(root, presentation);
     renderGlobalCard(root, state, presentation, lastOperation);
     if (presentation.kind !== 'setup') {

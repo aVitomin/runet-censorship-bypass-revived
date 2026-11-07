@@ -212,6 +212,18 @@ older dates are rejected, and equal dates with different routing content conflic
 A later observation of identical selected routing content is `UNCHANGED`; it
 may advance the date floor but does not overwrite or relabel packaged bytes.
 An old artifact that is no longer selected cannot be replayed as a fresh update.
+
+IndexedDB version 2 retains compact SHA-256 history independently of large
+artifact bodies. After serialized provider changes, collection preserves every
+active, previous-LKG, packaged-baseline and staged pointer, plus Saved, retained
+Effective and durable ON identities. Unresolved promotion/settings journals or
+unproven references defer collection. History insertion and body deletion share
+one transaction, so removing an orphan cannot make a known HTTPS artifact new
+again. History grows by one hash per distinct artifact; this bounds body storage,
+not the number of historical hashes. Collection does not run on the toolbar
+startup path or require dataset storage for manual Apply/Clear. A collection
+failure leaves the committed provider operation successful.
+
 Changed comments/source hashes alone do not force a new routing generation.
 There is no age-based expiry: a valid unchanged source may still be old.
 The UI therefore separates source-data time from the time of the latest check.

@@ -1,30 +1,27 @@
-# Что изменено
+# Change
 
-Кратко опишите цель, пользовательский результат и связанную задачу.
+Describe the problem, resulting user behavior and related issue.
 
-## Область и риск
+## Scope and risk
 
-- Затронуто: Chromium / Firefox / общее поведение / документация / зависимости / выпуск.
-- Влияние на маршрутизацию, PAC, состояние, разрешения и учётные данные: укажите или напишите «нет».
-- Пользовательская и разработческая документация обновлена либо пояснено, почему это не требуется.
+- Affected: Chromium / Firefox / shared behavior / docs / dependencies / release.
+- Routing, PAC, state, permission and credential impact: describe it or state none.
+- User/developer documentation updated, or explain why no update is needed.
 
-## Проверки
+## Validation
 
-- [ ] Выполнены `node .\scripts\verify-docs.mjs` и `git diff --check`.
-- [ ] По [правилам репозитория](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/AGENTS.md) и [описанию проверок](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/development/TESTING.md) выбран и успешно выполнен подходящий финальный gate.
-- [ ] Изменённое поведение покрыто тестами или ниже объяснено, почему новый тест не нужен.
-- [ ] Нужная браузерная QA выполнена либо явно перечислена как оставшаяся.
-- [ ] Обязательные проверки CI прошли или их сбой и полный статус указаны ниже.
+- [ ] `node .\scripts\verify-docs.mjs` and `git diff --check` passed.
+- [ ] The affected final gate from [AGENTS](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/AGENTS.md) and [Testing](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/development/TESTING.md) passed.
+- [ ] Changed behavior has regression coverage, or explain why a new test is unnecessary.
+- [ ] Required browser QA is complete or explicitly listed as remaining.
+- [ ] Required CI passed, or its failure and full status are stated below.
 
-Для изменений только в тексте и шаблонах не нужно устанавливать зависимости или
-запускать runtime/browser-проверки. Для кода, зависимостей и выпуска применимые
-проверки из правил репозитория и CI остаются обязательными.
+Prose/template-only changes need no dependency install or runtime/browser suites.
+Applicable code, dependency and release gates remain mandatory. Record commands,
+exit status and limits; link the full sanitized log for failures.
 
-## Безопасность и материалы
+## Safety and attachments
 
-- [ ] В diff нет сборок, профилей браузера, логов, `.tmp`, `.local`, секретов или release-артефактов.
-- [ ] Приложения и примеры очищены от паролей, токенов, cookies, приватных адресов прокси/PAC и истории посещений.
-- [ ] Пользовательские строки обновлены в `en` и `ru`, если применимо.
-
-Укажите команды, exit status и оставшиеся ограничения рядом с проверками выше.
-При сбое добавьте ссылку на полный очищенный лог.
+- [ ] No builds, profiles, logs, `.tmp`, `.local`, secrets or release artifacts in the diff.
+- [ ] Examples/attachments omit real passwords, tokens, cookies, private proxy/PAC addresses and browsing history.
+- [ ] Both `en` and `ru` user-facing catalogs updated where applicable.

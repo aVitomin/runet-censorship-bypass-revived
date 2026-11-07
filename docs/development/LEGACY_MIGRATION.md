@@ -1,13 +1,11 @@
-# Перенос конфигурации в maintained MV3
+# Configuration transfer to maintained MV3
 
-Встроенный workflow **«Миграция из MV2»** удалён из поддерживаемого продукта.
-Текущие сборки не читают `localStorage` исторического расширения и не запрашивают
-разрешение `offscreen` для такого переноса.
+The built-in MV2 migration workflow has been removed. Current packages do not
+read historical extension `localStorage` or request `offscreen` for migration.
 
-Для ручного переноса настроек между поддерживаемыми установками используйте
-**Импорт / Экспорт**, описанный в [руководстве пользователя](../user/USER_GUIDE.md).
-Импорт создаёт новую сохранённую конфигурацию, но не применяет её и не включает
-защиту автоматически.
+Use the manual Import / Export workflow in the
+[user guide](../user/USER_GUIDE.md) to transfer supported settings. Import creates
+Saved configuration only; it neither applies settings nor enables protection.
 
-Исторические заметки реализации сохранены в
-[`docs/legacy/audits/MV3_LEGACY_MIGRATION_PHASE_NOTES.md`](../legacy/audits/MV3_LEGACY_MIGRATION_PHASE_NOTES.md).
+Historical implementation notes remain in
+[MV3_LEGACY_MIGRATION_PHASE_NOTES.md](../legacy/audits/MV3_LEGACY_MIGRATION_PHASE_NOTES.md).

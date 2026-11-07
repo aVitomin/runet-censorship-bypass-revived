@@ -1,26 +1,21 @@
-# Материалы для магазинов и проверяющих — 1.0
+# Store and reviewer materials
 
-Этот раздел предназначен сопровождающим. Пользователям:
-[скачивание и установка](../user/INSTALLATION.md), [помощь](../../SUPPORT.md).
+This directory is for maintainers. Users should start with
+[Installation](../user/INSTALLATION.md) or [Support](../../SUPPORT.md).
+Current public versions/assets are recorded in
+[release-current.json](../release-current.json); dated channel verification and
+remaining listing work belong in the [store checklist](STORE_PUBLICATION_CHECKLIST.md).
 
-**Версия 1.0.2** опубликована в Chrome Web Store и Mozilla Add-ons.
-Chromium ZIP и подписанный Firefox XPI 1.0.2 доступны на GitHub.
-Публичные версии проверены 2026-11-04.
-Материалы 1.0.2: [руководство](../user/USER_GUIDE_1_0_2.md),
-[снимки](../assets/releases/1.0.2/README.md) и обновлённая политика приватности.
-Ссылки и границы проверки:
-[чек-лист публикации](STORE_PUBLICATION_CHECKLIST.md).
-
-| Материал | Назначение |
+| Material | Purpose |
 | --- | --- |
-| [Описание Chrome](CHROME_WEB_STORE_LISTING_1_0.md), [Firefox](FIREFOX_AMO_LISTING_1_0.md) | Название, краткое и полное описание на русском и английском |
-| [Проверяющим Chrome](CHROME_REVIEWER_NOTES_1_0.md), [Firefox](../development/FIREFOX_AMO_REVIEW.md) | Сценарии проверки, сборка и ограничения |
-| [Функции и подтверждения](FEATURE_INVENTORY_1_0.md) | Сопоставление заявлений с реализацией |
-| [Разрешения и обработка данных](PERMISSIONS_AND_PRIVACY_1_0.md) | Обоснования для форм магазинов |
-| [Приватность](PRIVACY_1_0.md) | Политика 1.0.2 и ссылка на предыдущую редакцию |
-| [Снимки интерфейса 1.0.2](../assets/releases/1.0.2/README.md) | Изображения и их происхождение |
-| [Проверка ссылок](LINK_AUDIT_1_0.md) | Датированная проверка адресов |
+| [Chrome listing](CHROME_WEB_STORE_LISTING_1_0.md), [Firefox listing](FIREFOX_AMO_LISTING_1_0.md) | User-facing titles and descriptions in Russian and English |
+| [Chrome reviewer notes](CHROME_REVIEWER_NOTES_1_0.md), [Firefox reviewer notes](../development/FIREFOX_AMO_REVIEW.md) | Review scenarios, build and limitations |
+| [Feature inventory](FEATURE_INVENTORY_1_0.md) | Claims mapped to implementation/evidence |
+| [Permissions and privacy](PERMISSIONS_AND_PRIVACY_1_0.md) | Store-form justifications |
+| [Privacy policy](PRIVACY_1_0.md) | Current policy and previous edition |
+| [1.0.2 screenshots](../assets/releases/1.0.2/README.md) | Versioned images and provenance |
+| [Link audit](LINK_AUDIT_1_0.md) | Dated URL checks |
 
-Сокращённые описания в репозитории подготовлены для будущего обновления карточек.
-Они не заменяют тексты уже отправленных заявок. Изменения кода, пакетов,
-подписей и выпусков выполняются по [процессу выпуска](../development/RELEASE_PROCESS.md).
+Repository listing drafts do not prove that store text was submitted or published.
+Preserve submitted text and historical release evidence. Code, packages, signing
+and publication follow the [release process](../development/RELEASE_PROCESS.md).

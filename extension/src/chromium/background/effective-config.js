@@ -358,7 +358,10 @@
       } else {
         const store = await read();
         const record = recordFor(store);
-        const valid = store && !store.blocked && (!store.transaction || store.transaction.phase !== 'switching') &&
+        const canAuthenticate = record &&
+          mv3ProxyAuth.buildProxyAuthConfig(record.config).credentialCount > 0;
+        const valid = canAuthenticate && store && !store.blocked &&
+          (!store.transaction || store.transaction.phase !== 'switching') &&
           await matchesBrowser(record, await mv3ProxySettings.getProxySettings());
         bindings.entries.push({requestId, generationId: valid ? record.id : null});
       }
@@ -398,15 +401,31 @@
 
   }
 
+  async function getBindingStatus() {
+
+    if (bindingFailure) return {status: 'unavailable', reason: 'storage_unavailable'};
+    try {
+      const bindings = await readBindings();
+      return bindings.saturated ?
+        {status: 'unavailable', reason: 'session_blocked'} :
+        {status: 'available', reason: 'none'};
+    } catch (_error) {
+      return {status: 'unavailable', reason: 'storage_unavailable'};
+    }
+
+  }
+
   function releaseRequest(details) {
 
     return enqueue(async () => {
       const bindings = await readBindings();
       const requestId = String(details.requestId);
+      const removed = bindings.entries.filter((entry) => entry.requestId === requestId);
       const entries = bindings.entries.filter((entry) => entry.requestId !== requestId);
       if (entries.length === bindings.entries.length) return;
       bindings.entries = entries;
       await session('set', {[SESSION_KEY]: bindings});
+      if (!removed.some((entry) => entry.generationId !== null)) return;
       const store = await read();
       if (store) {
         const count = store.records.length;
@@ -429,9 +448,25 @@
 
   }
 
+  function collectArtifacts(canCollect) {
+
+    return enqueue(async () => {
+      if (!canCollect()) return {status: 'busy', deleted: 0};
+      const store = await read();
+      if (store && (store.blocked || store.transaction)) return {status: 'pending', deleted: 0};
+      const caches = (store && store.records || [])
+          .flatMap((record) => [record.pacCache, record.cookedPacCache]);
+      // Lock order matches promotion: Effective first, then Saved. Retained
+      // generations include requests that may still need their old credentials.
+      return mv3State.collectPacArtifacts(caches, canCollect);
+    });
+
+  }
+
   exports.mv3Effective = Object.freeze({
     STORAGE_KEY, SESSION_KEY, MAX_REQUESTS, MAX_GENERATIONS,
-    abortPrepared, authState, beginSwitch, bindRequest, commit, current,
+    abortPrepared, authState, beginSwitch, bindRequest, collectArtifacts, commit,
+    current, getBindingStatus,
     hasHistory, overlay, prepare, protectsArtifact, recover, releaseRequest, retained, sameSaved,
   });
 

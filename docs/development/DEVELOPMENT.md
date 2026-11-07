@@ -1,212 +1,143 @@
-# Разработка Chromium и Firefox
+# Chromium and Firefox development
 
-Поддерживаемые цели — `extension/src/chromium` и `extension/src/firefox`.
-Единственный npm-пакет находится в `extension`; корневого npm-пакета нет.
+Supported sources are `extension/src/chromium` and `extension/src/firefox`.
+The only npm root is `extension`; there is no root npm package.
 
-[Участие в проекте](../../CONTRIBUTING.md) · [Тестирование](TESTING.md) ·
-[Архитектура](ARCHITECTURE.md) · [Выпуск](RELEASE_PROCESS.md) ·
-[Сборка и QA версии 1.0.2](releases/1.0.2.md)
+[Contributing](../../CONTRIBUTING.md) · [Testing](TESTING.md) ·
+[Architecture](ARCHITECTURE.md) · [Release process](RELEASE_PROCESS.md)
 
-## Требования
+## Setup
 
-- Git.
-- Node.js 22 и совместимый npm. Node 22 используется в GitHub Actions.
-- Brave или другой Chromium-браузер с поддержкой требуемых MV3 API.
-- Windows PowerShell для команд в этом руководстве; сами npm-скрипты также
-  выполняются в CI на Ubuntu.
-
-## Клонирование и установка
+Use Git, Node.js 22 with compatible npm, and a browser with the required MV3 APIs.
+Examples use PowerShell from the repository root; npm scripts also run on Ubuntu
+in CI. Browser requirements and actual QA are separate in
+[Compatibility](BROWSER_COMPATIBILITY.md).
 
 ```powershell
 git clone https://github.com/aVitomin/runet-censorship-bypass-revived.git
 Set-Location .\runet-censorship-bypass-revived
-npm ci --prefix .\extension
-```
-
-Не запускайте `npm install`, `npm ci` или npm-скрипты в корне репозитория.
-Используйте только extension-scoped команды: канонический пакет и его lockfile
-находятся в `extension`.
-
-## Основные команды
-
-```powershell
 $Project = '.\extension'
+npm ci --prefix $Project
 ```
 
-| Этап | Команда | Когда нужна |
-| --- | --- | --- |
-| Документация | `node .\scripts\verify-docs.mjs` | Любое изменение документации или инструкций |
-| Фокусная обратная связь | `npm --prefix $Project run test:pac` | Во время изменения PAC-семантики |
-| Финальная Chromium-проверка | `npm --prefix $Project run verify:chromium` | Только Chromium runtime/UI |
-| Финальная Firefox-проверка | `npm --prefix $Project run verify:firefox` | Только Firefox runtime/UI |
-| Финальная общая проверка | `npm --prefix $Project run verify` | Shared runtime, templates, Gulp или общий packaged input |
+Never install dependencies or run npm scripts at repository root. Follow
+[AGENTS.md](../../AGENTS.md) for task boundaries, dependency review and the final
+affected-scope gate. Developer instructions/comments are English; user copy keeps
+its intended locale. Preserve historical records, licenses and persistent IDs.
 
-`verify:chromium` и `verify:firefox` запускают target lint, deterministic tests и
-проверенную сборку. `test:pac` входит в `test:chromium`, а тот — в `verify:chromium`.
-`verify` выполняет все maintained deterministic suites и обе сборки один раз.
-Фокусную команду можно использовать во время разработки, но после неизменённого
-финального gate повторять её не нужно.
-`scripts/required-checks.mjs` выдаёт advisory-план по
-изменённым путям; CI и правила `AGENTS.md` остаются авторитетными.
-Dependency-free docs verifier запускается из корня и не требует корневого
-`package.json` или `npm install`.
+## Commands
 
-## Совместимость структуры 1.0
+| Purpose | Command |
+| --- | --- |
+| Documentation/instructions | `node .\scripts\verify-docs.mjs` and `git diff --check` |
+| Focused PAC feedback | `npm --prefix $Project run test:pac` |
+| Chromium final gate | `npm --prefix $Project run verify:chromium` |
+| Firefox final gate | `npm --prefix $Project run verify:firefox` |
+| Shared/templates/Gulp final gate | `npm --prefix $Project run verify` |
 
-Единственный npm-root — `extension/`: `src/chromium`, `src/firefox`,
-`src/shared`, общие product assets в `src/assets`, `src/tooling` и Chromium-only
-`src/chromium-compat`.
-Сборки находятся в `extension/build/chromium` и `extension/build/firefox`;
-пути внутри пакетов не меняются. Старых aliases npm-команд нет: используются
-`lint:chromium`, `test:chromium`, `build:chromium`, `verify:chromium` и
-`test:browser:chromium`. Firefox, tooling и aggregate gates сохраняют смысл.
+Target gates include lint, deterministic tests and verified builds. PAC tests are
+already included in Chromium tests. Aggregate `verify` runs all maintained suites
+and both builds once. Do not rerun unchanged included suites. The dependency-free
+docs verifier needs no npm install. `scripts/required-checks.mjs` is advisory;
+AGENTS and CI remain authoritative. See [Testing](TESTING.md) for details.
 
-Workflow — `.github/workflows/extension.yml` (**Verify extension**). Итоговый
-check **Verify MV3** и browser job labels оставлены как compatibility names:
-ruleset требует первый, а classic branch protection не удалось прочитать.
-Не переименовывайте check names без согласованной проверки remote protection.
+## Source and package map
 
-При перемещении package root supply-chain verifier требует парные Git renames
-manifest/lock из одного root и уникальную совпадающую package identity.
-Порог similarity 40% позволяет перенос script-heavy manifest (49% в этом
-refactor); это не отменяет проверки полного lockfile, pins и возраста новых
-версий. Копии, частичные и неоднозначные переносы блокируются.
-
-Канонический репозиторий — `aVitomin/runet-censorship-bypass-revived`.
-Старые публичные ссылки GitHub перенаправляются, но новые ссылки и Git remote
-должны использовать текущее имя. Имена архивов прежних выпусков, provenance и
-runtime/storage/RPC identifiers не меняются вместе с именем репозитория.
-Release tooling получает корень через Git, а не имя папки или её глубину.
-
-## Опциональное локальное QA-окружение
-
-Необязательные machine-specific пути и наблюдения хранятся только в
-игнорируемом `.local/qa/environment.json`. Агент может свериться с ним перед
-явно запрошенной проверкой реального сервиса, но должен заново проверить время,
-process и listener: эти данные быстро устаревают, а `null` означает неизвестное.
-Ни один существующий test script не загружает файл автоматически. Синтетические
-тесты от этих приложений не зависят; real-service проверки всегда включаются
-явно. Tor Browser не является обычным Firefox executable для browser QA.
-
-## Пути исходников и сборки
-
-| Назначение | Путь |
+| Purpose | Path |
 | --- | --- |
 | Chromium runtime | `extension/src/chromium` |
-| Service worker | `…/background/service-worker.js` |
-| Popup и settings | `…/pages/popup` и `…/pages/options` |
-| Manifest template | `…/manifest.tmpl.json` |
+| Chromium entrypoint | `extension/src/chromium/background/service-worker.js` |
+| Chromium UI | `extension/src/chromium/pages/popup`, `pages/options` |
+| Chromium manifest | `extension/src/chromium/manifest.tmpl.json` |
 | Firefox runtime | `extension/src/firefox` |
-| Shared contracts | `extension/src/shared` |
-| Версия Chromium и template values | `extension/src/templates-data.js` |
-| Gulp orchestration | `extension/gulpfile.js` |
-| Chromium unpacked-сборка | `extension/build/chromium` |
-| Firefox unpacked-сборка | `extension/build/firefox` |
+| Shared modules/assets | `extension/src/shared`, `extension/src/assets` |
+| Repository-only helpers/tests | `extension/src/tooling` |
+| Version/template values | `extension/src/templates-data.js` |
+| Packaging authority | `extension/gulpfile.js` |
+| Unpacked outputs | `extension/build/chromium`, `extension/build/firefox` |
 
-MV2 удалён из maintained `main`; его исходники и сборочные инструкции доступны
-через Git history и frozen development branch. Chromium рекурсивно включает в
-пакет всё содержимое `chromium-compat/pages/lib`, поэтому новый файл там меняет
-packaged bytes. Nested legacy Options package отсутствует. Chromium и Firefox
-build очищают только собственные output-каталоги и не зависят от порядка запуска.
+Both builds clean only their own output and do not depend on build order. Inspect
+actual consumers and package trees when shared input changes. Chromium recursively
+copies `src/chromium-compat/pages/lib`; adding a file changes packaged bytes.
+Firefox uses explicit allowlists. The nested legacy Options package is removed.
+MV2 is historical and is not built from maintained `main`.
 
-## Загрузка локальной сборки
+Use the current fork name in new links/remotes. Old release asset names,
+provenance, RPC and storage identifiers do not change with repository naming.
+Release tooling resolves the root through Git, not directory name or depth.
+Moving the npm root requires reviewed paired manifest/lock renames and unchanged
+package identity; see the supply-chain gate in [Testing](TESTING.md).
 
-1. Выполните `build:chromium`.
-2. Откройте `brave://extensions` или `chrome://extensions`.
-3. Включите Developer mode.
-4. Нажмите Load unpacked и выберите каталог
-   `build/chromium` внутри tooling root.
-5. После изменений исходников снова соберите пакет и нажмите Reload.
+## Load an unpacked build
 
-Используйте отдельный тестовый профиль без личной истории, bookmarks и других
-proxy-расширений. Не добавляйте профиль, NetLog, `build/`, `dist/` или `.tmp/` в
-Git.
+1. Run `npm --prefix $Project run build:chromium`.
+2. Open `chrome://extensions` or `brave://extensions` and enable Developer mode.
+3. Use Load unpacked and select `extension/build/chromium`.
+4. Rebuild and Reload after source changes.
 
-## Локализация
+Use a disposable profile without personal history, bookmarks or unrelated proxy
+extensions. Do not commit profiles, NetLog, `build`, `dist` or `.tmp`.
+See [Firefox release build](FIREFOX_RELEASE_BUILD.md) for Firefox packaging and
+the distinction between temporary and signed installation.
 
-Пользовательская строка должна появиться в `en` и `ru` затронутой цели:
+Optional local service hints belong in ignored `.local/qa/environment.json`.
+They are not automatically consumed by tests. Recheck timestamps, process and
+listener before authorized real-service QA; `null` means unknown. Synthetic tests
+must not depend on these applications. Tor Browser is not a normal Firefox QA
+executable.
 
-- `src/chromium/_locales/en/messages.json`;
-- `src/chromium/_locales/ru/messages.json`;
-- `src/firefox/_locales/en/messages.json`;
-- `src/firefox/_locales/ru/messages.json`.
+## Localization and UI
 
-Сохраняйте одинаковые ключи и формы placeholders. После изменения проверьте обе
-локали в затронутом интерфейсе и выполните `verify:chromium` для Chromium либо
-`verify:firefox` для Firefox; если затронуты оба, нужны оба соответствующих gate.
-Интерфейс создаёт DOM через безопасные текстовые API; не добавляйте HTML injection
-sinks для сохранённых значений.
+Update both `en/messages.json` and `ru/messages.json` under each affected target's
+`_locales`. Keep keys/placeholders aligned; inspect both locales and run the
+affected final gate. Use text-safe DOM APIs for stored values.
 
-## Значки
+Popup refresh uses the selected source updater. With protection active, it updates
+Effective source data without applying pending Saved or Draft; while OFF it may
+prepare data but must remain OFF. Concurrent popup requests coalesce. The popup's
+manual-mode action does not fetch a provider list; background source checks may
+still run. Results distinguish unchanged, applied, prepared,
+deferred and failed updates.
 
-Единственный авторитетный источник рисунка — процедурный генератор
-[`generate-action-icons.js`](../../extension/src/chromium/test/generate-action-icons.js).
-Он задаёт shield/routing geometry, палитру, 4× supersampling и PNG encoding;
-PNG — производные, отдельного SVG/master нет. Несмотря на расположение
-генератора, artwork общий для Chromium и Firefox. Из корня репозитория:
+Source-data date and last successful check are separate. Chromium uses the source
+file modification date; Firefox uses the validated dataset date. Neither proves
+every entry is current. Unknown dates or age over 30 days produce an informational
+warning without changing routes. Shared `routing-data-status` validates public
+format/presentation; browser controllers retain trust, download, ownership and
+promotion logic.
+
+## Icons
+
+The authoritative artwork is the procedural
+[generator](../../extension/src/chromium/test/generate-action-icons.js), despite
+its Chromium source location. It defines geometry, palette, 4× supersampling and
+PNG encoding; there is no separate SVG/master. From repository root:
 
 ```powershell
 node .\extension\src\chromium\test\generate-action-icons.js
 npm --prefix .\extension run verify
 ```
 
-`extension/src/assets/icons` содержит состояния `active`, `off`, `loading`,
-`busy`, `warning`, `external`: все имеют 16/19/20/32/38 px, а `active` дополнительно
-48/64/128 px для общего значка расширения. Оба пакета сохраняют пути `icons/...`;
-Gulp копирует общие ресурсы отдельно от browser runtime. General icons Firefox
-объявляют 32/48/64/128 px, Chromium — 16/32/48/64/128 px. Runtime action maps
-не меняются при добавлении general sizes.
+`src/assets/icons` contains active/off/loading/busy/warning/external icons at
+16/19/20/32/38 px; active additionally has 48/64/128 px. Packages retain `icons/...`.
+Firefox general icons declare 32/48/64/128 px; Chromium declares 16/32/48/64/128 px.
+Adding general sizes does not change action maps. The same generator creates
+[brand/icon-512.png](../../extension/src/assets/brand/icon-512.png), a transparent
+active-icon derivative for store artwork. `brand` is not packaged; it is neither
+a second master nor a finished promotional tile. Do not hand-edit derived PNGs.
+Tests check dimensions, RGBA, transparency, metadata absence and exact generation;
+package checks verify runtime/manifest references and shared bytes.
 
-Тот же запуск создаёт прозрачный
-[`src/assets/brand/icon-512.png`](../../extension/src/assets/brand/icon-512.png) —
-детерминированную high-resolution производную `active` для будущего store artwork,
-не второй master и не готовый promotional tile. `brand/` не входит в browser
-packages. Не редактируйте PNG вручную. Tests проверяют точные размеры,
-декодирование RGBA, прозрачность, отсутствие metadata и равенство генератору;
-package verification проверяет ссылки manifest/runtime и shared source bytes.
+## CI and pull requests
 
-## GitHub Actions
+[Verify extension](../../.github/workflows/extension.yml) runs on Node 22 for PRs
+and `main` pushes. Separate policy/supply-chain, tooling, Chromium and Firefox
+checks preserve the required **Verify MV3** name; do not rename remote-protection
+contracts without agreement. Chromium smoke is an additional gate. Reproducible
+release archives/uploads run only for trusted `main` push or explicitly dispatched
+exact `main`, never PRs.
 
-Workflow [`.github/workflows/extension.yml`](../../.github/workflows/extension.yml) работает
-на Node 22 для push и pull request в `main`. Независимые policy/supply-chain,
-Chromium и Firefox jobs исполняют каждую deterministic suite и build один раз;
-итоговый `Verify MV3` сохраняет стабильный required-check contract. Chrome smoke
-остаётся Chromium gate. Двойная воспроизводимая упаковка и загрузка artifacts
-выполняются только для trusted push или explicit dispatch exact `main`; pull
-request artifacts не создаются.
-
-## Ветки и pull request
-
-- Создавайте узкую тематическую ветку от актуального `main`.
-- Не смешивайте документацию, поведение маршрутизации и обновление зависимостей
-  без необходимости.
-- Не коммитьте generated output, браузерные профили, секреты или локальные
-  отчёты.
-- Выполните docs integrity, `git diff --check` и один финальный gate для
-  затронутой области; не повторяйте уже включённые фокусные тесты. Если
-  изменение затрагивает
-  установку, поведение, browser support, privacy/security, команды, архитектуру
-  или выпуск, обновите соответствующий текущий документ.
-- Опишите влияние на безопасность, маршрутизацию и требуемую браузерную QA.
-- Дождитесь успешного workflow и ответьте на review до слияния.
-
-Подробнее: [тестирование](TESTING.md), [архитектура](ARCHITECTURE.md) и
-[CONTRIBUTING.md](../../CONTRIBUTING.md).
-
-## В разработке: обновление базы из popup
-
-В неопубликованных сборках Chromium и Firefox кнопка «Проверить обновления»
-использует существующий механизм обновления источника. При активной защите
-обновляется источник действующей конфигурации; ожидающие Saved и локальные
-Draft не применяются. При выключенной защите данные можно подготовить, но
-защита остаётся выключенной. Одновременные запросы из popup объединяются.
-Ручной режим не запускает загрузку списка. Результат различает отсутствие
-новых данных, применение, подготовку, отложенное применение и ошибку.
-
-Дата данных показывается отдельно от последней успешной проверки. Chromium
-использует дату изменения файла источника, Firefox — дату проверенного набора
-данных. Эти даты не доказывают полноту или актуальность каждой записи.
-Неизвестная дата и возраст больше 30 дней вызывают информационное предупреждение,
-которое не меняет маршрутизацию. Общий модуль `routing-data-status` отвечает
-только за проверку публичного формата и отображение; правила доверия, загрузка,
-проверка владения прокси и применение остаются в браузерных контроллерах.
+Keep changes scoped and update the appropriate current docs when behavior,
+installation, support, privacy/security, commands, architecture or release process
+changes. Record actual checks and remaining browser QA; await required CI/review
+before an authorized merge. See [Contributing](../../CONTRIBUTING.md).

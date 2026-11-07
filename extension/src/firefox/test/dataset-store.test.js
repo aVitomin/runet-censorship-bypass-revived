@@ -438,6 +438,34 @@ describe('Firefox immutable provider dataset store', function() {
 
       });
 
+  it('collects bodies outside the pointer roles but preserves Saved and LKG references', async function() {
+
+    const {backend, store} = makeStore();
+    const withHost = (version, host, trust) => artifact({datasetVersion: version, trust,
+      payload: payload([{width: host.length, routeRef: 'PROVIDER_PROXY', hosts: host}])});
+    const baseline = withHost('2026.09.01-test.1', 'base.example');
+    const first = withHost('2026.09.02-test.1', 'one.example', Dataset.TRUST.REMOTE_AUTHENTICATED);
+    const second = withHost('2026.09.03-test.1', 'two.example', Dataset.TRUST.REMOTE_AUTHENTICATED);
+    const third = withHost('2026.09.04-test.1', 'tri.example', Dataset.TRUST.REMOTE_AUTHENTICATED);
+    await store.commitPackagedBaseline(baseline);
+    await store.activateCandidate(first);
+    await store.activateCandidate(second);
+    await store.activateCandidate(third);
+
+    Assert.equal(await store.collectGarbage([first.envelope.artifactSha256]), 0);
+    Assert.equal(await store.collectGarbage(), 1);
+    Assert.equal(backend.artifacts.has(first.envelope.artifactSha256), false);
+    Assert.equal(backend.artifacts.has(second.envelope.artifactSha256), true);
+    Assert.equal(backend.artifacts.has(third.envelope.artifactSha256), true);
+    Assert.equal(backend.artifacts.has(baseline.envelope.artifactSha256), true);
+    const loaded = await store.loadVerifications(PROVIDER_KEY);
+    Assert.equal(loaded.active.dataset.identity.artifactSha256,
+        third.envelope.artifactSha256);
+    Assert.equal(loaded.previousLkg.dataset.identity.artifactSha256,
+        second.envelope.artifactSha256);
+
+  });
+
   it('never activates an unauthenticated remote candidate', async function() {
 
     const {backend, store} = makeStore();

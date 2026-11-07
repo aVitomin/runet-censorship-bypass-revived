@@ -3952,6 +3952,14 @@
     );
     appendDefinition(
         list,
+        t('optionsAuthBindingStatus'),
+        localizeAuthBindingStatus(snapshot.proxyAuthBinding),
+    );
+    if (snapshot.proxyAuthBinding && snapshot.proxyAuthBinding.status === 'unavailable') {
+      appendText(parent, 'p', t('optionsAuthBindingUnavailableHelp'), 'status-banner warning');
+    }
+    appendDefinition(
+        list,
         t('optionsDownloadStatus'),
         localizeStatusValue(stored.pacDownload && stored.pacDownload.status),
     );
@@ -3999,6 +4007,15 @@
       not_controllable: 'optionsControlLevelPolicy',
     };
     return keys[level] ? t(keys[level]) : t('optionsNone');
+
+  }
+
+  function localizeAuthBindingStatus(status) {
+
+    if (!status) return t('optionsAuthBindingUnknown');
+    if (status.status === 'available') return t('optionsAuthBindingAvailable');
+    if (status.reason === 'session_blocked') return t('optionsAuthBindingSessionBlocked');
+    return t('optionsAuthBindingStorageUnavailable');
 
   }
 

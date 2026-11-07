@@ -558,6 +558,69 @@ describe('Firefox operational status', function() {
     Assert.ok(test.actionCalls.every((call) => call.params.tabId === 2));
   });
 
+  it('shares only an in-flight site read for the same active tab and URL', async function() {
+    const entered = deferred();
+    const release = deferred();
+    const test = harness({siteGet: async () => {
+      entered.resolve();
+      await release.promise;
+      return {target: {controllable: true}, route: {mode: 'DIRECT'}};
+    }});
+    const tab = {id: 1, active: true, url: 'https://proxy.example/current'};
+    const first = test.controller.refreshToolbar({tabId: tab.id, tab});
+    await entered.promise;
+    const latest = test.controller.refreshToolbar({tabId: tab.id, tab});
+    await new Promise((resolve) => setImmediate(resolve));
+    release.resolve();
+
+    Assert.strictEqual((await first).status, 'SUPERSEDED');
+    Assert.strictEqual((await latest).status, 'UPDATED');
+    Assert.strictEqual(test.siteReads(), 1);
+    Assert.strictEqual(test.controlReads(), 1);
+
+    await test.controller.refreshToolbar({tabId: tab.id, tab});
+    Assert.strictEqual(test.siteReads(), 2);
+  });
+
+  it('does not reuse a site read across an explicit refresh', async function() {
+    const firstEntered = deferred();
+    const firstRelease = deferred();
+    const currentEntered = deferred();
+    const currentRelease = deferred();
+    const latestEntered = deferred();
+    const latestRelease = deferred();
+    const test = harness({siteGet: async () => {
+      if (test.siteReads() === 1) {
+        firstEntered.resolve();
+        await firstRelease.promise;
+      } else if (test.siteReads() === 2) {
+        currentEntered.resolve();
+        await currentRelease.promise;
+      } else if (test.siteReads() === 3) {
+        latestEntered.resolve();
+        await latestRelease.promise;
+      }
+      return {target: {controllable: true}, route: {mode: 'DIRECT'}};
+    }});
+    const tab = {id: 7, active: true, url: 'https://proxy.example/private'};
+    const oldRead = test.controller.refreshToolbar({tabId: tab.id, tab});
+    await firstEntered.promise;
+    const explicitRefresh = test.controller.refreshToolbar();
+    firstRelease.resolve();
+    await currentEntered.promise;
+    const latestTabEvent = test.controller.refreshToolbar({tabId: tab.id, tab});
+    await new Promise((resolve) => setImmediate(resolve));
+    currentRelease.resolve();
+    await latestEntered.promise;
+    latestRelease.resolve();
+
+    Assert.strictEqual((await oldRead).status, 'SUPERSEDED');
+    Assert.strictEqual((await explicitRefresh).status, 'SUPERSEDED');
+    Assert.strictEqual((await latestTabEvent).status, 'UPDATED');
+    Assert.strictEqual(test.siteReads(), 3);
+    Assert.strictEqual(test.controlReads(), 1);
+  });
+
   it('discards an in-flight site result after a newer tab refresh', async function() {
     const entered = deferred();
     const release = deferred();

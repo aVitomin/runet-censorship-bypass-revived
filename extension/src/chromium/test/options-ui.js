@@ -2570,6 +2570,7 @@ describe('Chromium options UI', function() {
       async function() {
 
         const snapshot = createSnapshot();
+        snapshot.proxyAuthBinding = {status: 'unavailable', reason: 'storage_unavailable'};
         snapshot.providers.push({
           key: 'custom:hostile',
           label: '<img src=x onerror=alert(1)>',
@@ -2620,6 +2621,9 @@ describe('Chromium options UI', function() {
         expect(diagnostics.textContent).not.to.include('hidden');
         expect(diagnostics.textContent).not.to.match(/artifact(?:Ref|:)/i);
         expect(diagnostics.textContent).not.to.match(/sha-?256/i);
+        expect(diagnostics.textContent).to.include('Proxy sign-in');
+        expect(diagnostics.textContent).to.include('could not be verified');
+        expect(diagnostics.textContent).to.include('Restart the browser');
         await findButton(harness.root, 'Check connection').onclick();
         expect(harness.root.textContent).not.to.include('synthetic-secret');
         expect(harness.document.title).not.to.include('synthetic-secret');
