@@ -18,23 +18,24 @@
 Для старого Firefox **0.0.4.0** сохранены отдельные [руководство](user/USER_GUIDE.md),
 [решение проблем](user/TROUBLESHOOTING.md) и [приватность](user/PRIVACY_AND_SECURITY.md).
 
-## Разработчикам
+## For developers
 
-- [Участие в проекте](../CONTRIBUTING.md) и [подготовка среды](development/DEVELOPMENT.md)
-- [Архитектура Chromium и общих компонентов](development/ARCHITECTURE.md), [Firefox](development/FIREFOX_ARCHITECTURE.md)
-- [Тестирование](development/TESTING.md)
-- [Локальная проверка новых доменных баз](development/DOMAIN_SOURCE_PREFLIGHT.md)
+One product has two equal Manifest V3 targets: Chromium and Firefox.
+They share a release version; store availability is tracked separately.
+
+- [Contributing](../CONTRIBUTING.md) and [development setup](development/DEVELOPMENT.md)
+- [Chromium/shared architecture](development/ARCHITECTURE.md), [Firefox architecture](development/FIREFOX_ARCHITECTURE.md)
+- [Testing](development/TESTING.md) and [local dataset preflight](development/DOMAIN_SOURCE_PREFLIGHT.md)
 - [Release 1.0.3: artifacts, validation and channel status](development/releases/1.0.3.md)
-- [Изменения и статус выпуска 1.0.2](development/releases/1.0.2.md)
-- [Изменения и статус выпуска 1.0.1](development/releases/1.0.1.md)
-- [Совместимость браузеров: расчётные минимумы и реальные проверки](development/BROWSER_COMPATIBILITY.md)
-- [Процесс выпуска](development/RELEASE_PROCESS.md) и [технические сведения о 1.0.0](development/releases/1.0.0.md)
-- [Материалы для магазинов и проверяющих](release/README.md)
-- [Карта документации и происхождение материалов](maintainers/DOCUMENTATION_MAP.md)
-- [Политика безопасности](../SECURITY.md)
+- Earlier release records: [1.0.2](development/releases/1.0.2.md), [1.0.1](development/releases/1.0.1.md), [1.0.0](development/releases/1.0.0.md)
+- [Browser compatibility: expected minimums and actual checks](development/BROWSER_COMPATIBILITY.md)
+- [Release process and target naming](development/RELEASE_PROCESS.md)
+- [Store and reviewer materials](release/README.md)
+- [Repository/documentation map](maintainers/DOCUMENTATION_MAP.md)
+- [Security policy](../SECURITY.md)
 
-Исторические материалы находятся в [архиве upstream](legacy/UPSTREAM_README.md)
-и истории Git. Они не заменяют инструкции для текущей версии.
+The [upstream archive](legacy/UPSTREAM_README.md) and Git history retain historical
+material. They do not replace the current installation and development guides.
 
 ## English
 

@@ -13,7 +13,7 @@ const NOTICE_SOURCES = distributionNoticeSources('firefox');
 
 const FIREFOX_GECKO_ID = '{adf5f697-1149-42a2-92eb-c163cb9a4146}';
 const EXPECTED_FIREFOX_VERSION =
-  Templates.contexts.chromium.storeVersion;
+  Templates.contexts.firefox.storeVersion;
 const EXPECTED_ICON_FILES = Object.freeze([
   'active',
   'busy',

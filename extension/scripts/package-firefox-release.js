@@ -247,7 +247,7 @@ function releaseVersion() {
 
   const manifestPath = Path.join(FIREFOX_BUILD_ROOT, 'manifest.json');
   const manifest = JSON.parse(Fs.readFileSync(manifestPath, 'utf8'));
-  const expected = Templates.contexts.chromium.storeVersion;
+  const expected = Templates.contexts.firefox.storeVersion;
   Assert.strictEqual(manifest.version, expected,
       'Firefox version must follow the repository release version.');
   return manifest.version;
@@ -262,7 +262,7 @@ function createReleaseBuffers() {
   const sourceName = `${base}-source.zip`;
   const xpi = createDeterministicZip(listDirectoryEntries(FIREFOX_BUILD_ROOT));
   const source = createDeterministicZip(listTrackedSourceEntries(
-      `runet-censorship-bypass-mv3-${version}-source`,
+      `${base}-source`,
   ));
   const xpiSha256 = sha256(xpi);
   const sourceSha256 = sha256(source);

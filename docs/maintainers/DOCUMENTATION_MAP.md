@@ -1,139 +1,84 @@
-# Карта документации и репозитория
+# Repository and documentation map
 
-Этот файл — навигатор, а не снимок числа файлов или полный каталог дерева.
-Текущий состав определяет Git; при изменении структуры проверяйте реальные
-пути и их потребителей, а не старые количественные оценки.
+This is a navigation guide, not a snapshot of file counts. Inspect tracked files
+and their consumers before changing ownership, packaging or cleanup rules.
 
-## Куда идти
+## Two browser targets
 
-| Задача | Основной документ |
-| --- | --- |
-| Понять продукт и скачать выпуск | [`README.md`](../../README.md) |
-| Установить, обновить или удалить | [установка](../user/INSTALLATION.md) |
-| Настроить Авто / Прокси / Напрямую | [руководство 1.0.2](../user/USER_GUIDE_1_0_2.md) |
-| Устранить обычную проблему | [помощь и сообщения об ошибках](../../SUPPORT.md) |
-| Проверить границы приватности | [текущая политика](../release/PRIVACY_1_0.md) |
-| Подготовить среду разработки | [разработка](../development/DEVELOPMENT.md) |
-| Понять устройство поддерживаемого кода | [архитектура](../development/ARCHITECTURE.md) и [Firefox](../development/FIREFOX_ARCHITECTURE.md) |
-| Выбрать проверки | [тестирование](../development/TESTING.md) |
-| Подготовить выпуск | [процесс выпуска](../development/RELEASE_PROCESS.md) |
-| Сообщить об уязвимости | [`SECURITY.md`](../../SECURITY.md) |
+One product has two supported Manifest V3 targets: **Chromium** and **Firefox**.
+Chromium covers Chrome and compatible browsers such as Brave and Edge; Firefox
+uses its own browser APIs. See [compatibility](../development/BROWSER_COMPATIBILITY.md)
+for expected minimums and actual checks.
 
-[`docs/README.md`](../README.md) связывает пользовательские, инженерные и
-исторические разделы. Обычному пользователю не нужно читать материалы для
-разработчиков или архив.
-
-## Поддерживаемое дерево
-
-| Область | Где находится | Граница |
+| Target | Source and entry point | Build / release output |
 | --- | --- | --- |
-| Chromium | `extension/src/chromium/` | Фоновая часть начинается в `background/service-worker.js`; локальные требования находятся в scoped `AGENTS.md`. |
-| Firefox | `extension/src/firefox/` | Фоновая часть начинается в `background/event-page.js`; target-scoped `AGENTS.md` задаёт локальные границы, архитектура — в документации Firefox. |
-| Browser-neutral модули | `extension/src/shared/` | Состав копируемых модулей различается по target; shared routing проверяется также тестами под Chromium. |
-| Статические ресурсы Chromium | `extension/src/chromium-compat/pages/lib/` | Рекурсивный Gulp glob включает всё содержимое только в Chromium. Новый файл меняет packaged bytes. |
-| Общие product assets | `extension/src/assets/` | Содержит только ресурсы с реальными потребителями в нескольких browser targets; текущие icons используются обоими браузерами. |
-| Сборка и версии | tooling package, `gulpfile.js`, `src/templates-data.js`, manifest templates | Корневого npm-пакета нет; команды npm запускаются только с `--prefix` для tooling package. |
-| Проверки документации | `scripts/verify-docs.mjs`, `docs/release-current.json` | Проверяются навигация, локальные цели и метаданные опубликованного выпуска. |
-| Локальные инструкции | корневой и scoped `AGENTS.md`, `.agents/skills/` | Применимые правила и четыре repository skills покрывают security, PAC, зависимости и выпуск. |
+| Chromium | extension/src/chromium/background/service-worker.js | extension/build/chromium, extension/dist/chromium-release |
+| Firefox | extension/src/firefox/background/event-page.js | extension/build/firefox, extension/dist/firefox-release |
 
-Chromium и Firefox равноправны; исторические имена родительских каталогов не
-определяют ownership. Поддерживаемая ветка не собирает MV2. MV2-дерево доступно через
-Git history, frozen development branch и явно помеченные архивные документы.
+Both contexts share the version in extension/src/templates-data.js. Store
+publication may happen on different dates. Manifest V3 is a shared technology;
+historical filenames, installed IDs, storage/RPC keys and AMO slugs may retain mv3.
+New package/CI names use the browser target; public labels clarify old downloads
+without changing their URLs. See [release naming](../development/RELEASE_PROCESS.md#5-zip-and-checksums).
 
-## Текущая документация
+## Where to start
 
-- `docs/user/` — актуальные установка и руководство 1.0.2, а также явно
-  помеченные материалы прежних версий. `USER_GUIDE.md`, `TROUBLESHOOTING.md`
-  и `PRIVACY_AND_SECURITY.md` относятся к старому Firefox 0.0.4.0.
-- `docs/development/` — среда, архитектура, тестирование, миграция, выпуск и
-  узкие QA-материалы. Point-in-time документы должны быть помечены как такие и
-  не заменяют текущий процесс.
-- `docs/release-current.json` — машинно-читаемые данные последних доступных
-  для установки версий каждого браузера; README разделяет эти версии и статусы.
-- Инженерные документы ссылаются на эти данные и записи выпусков, а не хранят
-  собственную копию меняющегося статуса магазина или текущей версии.
-- `docs/release/` — проекты текстов каталогов, приватности и чек-лист публикации;
-  это не объявление выпуска и не разрешение на загрузку или подписание.
-- `SUPPORT.md` — быстрые проверки и сообщения об обычных ошибках;
-  `CONTRIBUTING.md` и `SECURITY.md` — участие и приватное сообщение об уязвимостях.
-- `docs/development/releases/` — технические записи выпущенных версий:
-  происхождение пакетов, выполненные проверки и их ограничения.
-- `extension/assets/README.md` — происхождение
-  и лицензии графических и шрифтовых материалов.
+| Task | Guide |
+| --- | --- |
+| Understand the product and download it | [README](../../README.md) |
+| Install, update or remove it | [Installation](../user/INSTALLATION.md) |
+| Configure routing and connections | [User guide](../user/USER_GUIDE_1_0_2.md) |
+| Troubleshoot or report a bug | [Support](../../SUPPORT.md) |
+| Review privacy or report a vulnerability | [Privacy](../release/PRIVACY_1_0.md), [Security](../../SECURITY.md) |
+| Prepare a development environment | [Development](../development/DEVELOPMENT.md) |
+| Understand runtime boundaries | [Chromium/shared architecture](../development/ARCHITECTURE.md), [Firefox architecture](../development/FIREFOX_ARCHITECTURE.md) |
+| Select checks or prepare a release | [Testing](../development/TESTING.md), [Release process](../development/RELEASE_PROCESS.md) |
 
-## История и происхождение
+[Documentation index](../README.md) separates user, developer and historical material.
 
-- `docs/legacy/**` сохраняет старые upstream/MV2/store/reviewer материалы,
-  прежние снимки аудитов и исходники авторских SVG. Это история и атрибуция, а
-  не инструкция для текущего продукта.
-- `docs/development/release-drafts/` хранит опубликованные заметки выпуска как
-  evidence его границ; пользовательский статус берётся из GitHub Release и
-  `docs/release-current.json`.
-- Корневой `LICENSE`, архивный upstream README и asset attribution сохраняют
-  лицензионную и авторскую цепочку независимо от текущего runtime.
-- Upstream PAC-адреса в Chromium runtime являются действующими источниками
-  маршрутизации, а не случайными устаревшими ссылками. Их изменение требует
-  продуктовой и security-проверки.
+## Shared ownership and packaging
 
-Архив не нужно включать в обычное чтение или текущую QA-матрицу, но отсутствие
-текстовых ссылок само по себе не делает provenance-файл кандидатом на удаление.
+- extension is the only npm root. Gulp, templates and maintained manifests
+  determine version/build output; root npm commands are unsupported.
+- extension/src/shared contains browser-neutral modules with target-specific
+  copy rules. Inspect both consumers; a source path alone does not prove ownership.
+- extension/src/assets contains shared product assets. Icons serve both targets;
+  branding exports are not automatically packaged.
+- extension/src/chromium-compat/pages/lib is recursively copied into Chromium
+  only. Firefox uses explicit allowlists; do not broaden either package boundary.
+- extension/src/tooling contains repository-only helpers/tests. MV2 is historical
+  and is not built by maintained main.
+- Root/scoped AGENTS.md and .agents/skills define applicable working rules.
+  [Asset attribution](../../extension/assets/README.md) records licenses/provenance.
 
-## Generated и локальные материалы
+## Current facts and historical records
 
-Корневой [`.gitignore`](../../.gitignore) и tooling `.gitignore` исключают
-`node_modules`, `build`, `dist`, coverage, кэши, логи, временные каталоги,
-browser profiles и локальные отчёты. [Настройки VS Code](../../.vscode/settings.json)
-отдельно исключают из дерева, поиска и наблюдения `node_modules`, `build`,
-`dist`, coverage, `.local`, `.omp`, `.codex`, `.tmp`, `.cache` и browser-profile
-patterns. Git также игнорирует локальные настройки агента, package-manager
-caches, логи и environment-файлы.
+- docs/release-current.json records actual installable packages and store versions
+  per target. README and installation guidance must agree with it.
+- docs/development/releases records source/artifact hashes, checks and limits.
+  Engineering guides link to these records instead of duplicating changing status.
+- docs/release contains store/reviewer drafts and publication procedures;
+  prepared text does not prove that a store field was saved.
+- docs/user/USER_GUIDE.md, TROUBLESHOOTING.md and PRIVACY_AND_SECURITY.md describe
+  Firefox 0.0.4.0. Their historical behavior must not be presented as current guidance.
+- docs/legacy, release drafts and Git history preserve upstream/MV2 materials,
+  completed audits, screenshots, original release scope and attribution. The
+  [upstream archive](../legacy/UPSTREAM_README.md) is historical documentation.
+- Release-page cleanup may improve navigation and labels, but must preserve
+  original package URLs/bytes, source tags, QA limitations and release-time facts.
+  Runtime provider URLs are active data sources, not obsolete repository links.
 
-Отдельный `.rgignore` не нужен: поддерживаемые исходники, тесты, fixtures,
-skills, lockfiles и security evidence должны оставаться доступными обычному
-поиску. Узкие исключения допустимы только для реально существующего шума,
-который не покрыт общими generated-правилами.
+## Generated and private files
 
-Локальные `.local/`, `.tmp/`, tooling `node_modules/`, `build/` и `dist/` могут
-существовать в рабочем дереве. Они не tracked и не являются основанием для
-репозиторной очистки; содержимое отчётов, профилей и кэшей не следует
-просматривать или удалять без отдельной задачи.
+[Git ignores](../../.gitignore) and [editor settings](../../.vscode/settings.json)
+exclude dependencies, build/dist, coverage, caches, profiles, logs and private
+configuration. Keep source, tests, fixtures, skills, lockfiles and security evidence
+searchable; a separate broad search-ignore file is unnecessary.
 
-## Завершённая историческая очистка
+Generated files may exist locally. Their existence or lack of text references is
+not permission to delete them. Verify actual consumers and preserve source,
+licenses, profiles and release evidence before any authorized cleanup.
 
-- Аудит от 2026-07-17 сохранён в
-  `docs/legacy/audits/ARCHITECTURE_AUDIT_2026-07-17.md`; исправленные находки не
-  являются текущим списком задач.
-- Refresh документации от 2026-08-20 был выполнен относительно
-  `275ba91d32adfe593a266b42a150f8cd689432ad`. Эта ревизия сохраняется как
-  датированное свидетельство, но не называется текущей базой и не задаёт
-  ожидаемое число файлов.
-- В том цикле старые upstream/store/reviewer/Options материалы и RC/audit
-  snapshots были перенесены в `docs/legacy/`; актуальные performance и browser
-  QA-материалы остались в `docs/development/`.
-- Последующая maintenance-работа удалила неиспользуемые корневой donation
-  package и `grep.sh`, вынесла авторские SVG в архив и убрала неподдерживаемую
-  MV2/placeholder поверхность. История и атрибуция сохранены в Git и архиве.
-- Hygiene-pass от 2026-09-19 удалил исключение отсутствующего Ace debug/vendor
-  дерева и избыточное исключение legacy Options `dist`; общие правила `dist/`
-  продолжают скрывать локальный generated output.
-
-## Открытые границы и будущие решения
-
-Подтверждённых кандидатов на удаление поддерживаемого кода, тестов, assets,
-datasets, migration-материалов или provenance-документов у этой карты нет.
-
-- При публикации следующего выпуска обновляйте GitHub Release,
-  `docs/release-current.json`, README и release notes согласованно.
-- При изменении package layout заново проверяйте Gulp/manifest allowlists и
-  editor exclusions; не переносите старые пути автоматически.
-- Для нового кандидата сначала проверяйте manifest/build references,
-  динамическую загрузку, тесты и fixtures, документацию, упаковку и атрибуцию.
-  Отсутствие результата текстового поиска — только один сигнал, не доказательство
-  неиспользования.
-- Удаление локальных generated-каталогов, отчётов, профилей или кэшей не входит
-  в документационную очистку и требует отдельного явного решения.
-
-Для независимой от editor/search exclusions проверки используйте Git (`git
-ls-files`, `git grep`) и `git check-ignore -v` для конкретного generated-пути.
-После изменения навигации запускайте `node .\scripts\verify-docs.mjs` и
-`git diff --check`.
+After navigation changes, run node scripts/verify-docs.mjs and git diff --check.
+Packaging changes also require the applicable build checks and exact package-tree
+comparison.

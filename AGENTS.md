@@ -58,6 +58,10 @@ or stable APIs, alter behavior, or rewrite published history.
   consumers rather than inferring ownership from a browser source location.
   MV2 is historical; use Git history or the frozen development branch rather
   than rebuilding it on `main`.
+- Use `chromium` and `firefox` for browser targets and new artifact names.
+  Manifest V3 is shared technology, not a third target or a synonym for Chromium.
+  Both targets share a release version; store publication dates may differ.
+  Preserve installed IDs, protocol/storage keys and published download URLs.
 - Chromium background starts at `background/service-worker.js`; Chromium UI is
   under `pages/`; Firefox starts at `background/event-page.js`.
 - Version/build authority is `src/templates-data.js`, `gulpfile.js`, and the
