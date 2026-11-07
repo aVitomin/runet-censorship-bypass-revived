@@ -1,7 +1,7 @@
 # Изменения в 1.0.3
 
-**Chromium ZIP 1.0.3 опубликован.** В магазинах и подписанном Firefox XPI
-пока доступна 1.0.2; отправка обновлений ещё не завершена. Способы установки указаны
+**1.0.3 доступна в Firefox Add-ons и на GitHub:** Chromium ZIP и подписанный
+Firefox XPI. Chrome Web Store пока предлагает 1.0.2; обновление отправлено. Способы установки указаны
 в [инструкции](INSTALLATION.md). Основные настройки описаны в
 [руководстве](USER_GUIDE_1_0_2.md).
 
@@ -32,8 +32,9 @@
 
 ## English
 
-**Chromium ZIP 1.0.3 is available.** Both stores and the signed Firefox XPI
-remain at 1.0.2; store submissions are pending. See [Installation](INSTALLATION.md).
+**1.0.3 is available in Firefox Add-ons and on GitHub** as Chromium ZIP and
+signed Firefox XPI. Chrome Web Store still offers 1.0.2; its update was submitted.
+See [Installation](INSTALLATION.md).
 
 - Less unnecessary background work in Chromium and fewer duplicate site-status
   checks in Firefox. Website speed also depends on the network and proxy.

@@ -55,6 +55,7 @@ require Firefox 154 or Chromium 156 specifically:
 | Signed Firefox 1.0.1 → 1.0.2 | Windows Firefox 159.0 | Permanent signature-enforced update/restart preserving OFF, Effective and pending Saved |
 | 1.0.3 Chromium ZIP | Windows Chrome 156.0.8078.80 | Routing/auth/restart/ownership smoke; unpacked 1.0.2 → 1.0.3 update with OFF, Effective and pending Saved preserved |
 | Signed Firefox 1.0.2 → temporary unsigned 1.0.3 | Windows Firefox 159.0 | OFF, Effective and pending Saved preserved; candidate reinstalled after restart, not a permanent signed update |
+| Signed Firefox 1.0.2 → 1.0.3 | Windows Firefox 159.0.1 | Signature-enforced permanent update/restart without reinstall; OFF, Effective and pending Saved preserved |
 
 These records do not prove store automatic delivery or comprehensive routing/UI
 coverage. Chromium 108 and Firefox 140 were not individually launched; Linux

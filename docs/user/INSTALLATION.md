@@ -1,8 +1,8 @@
 # Установка, обновление и удаление
 
-**Chromium ZIP 1.0.3 доступен для ручной установки.**
-Chrome Web Store, Firefox Add-ons и подписанный Firefox XPI пока предлагают
-**1.0.2**. Обновление магазинов до 1.0.3 ещё не отправлено.
+**Firefox 1.0.3 доступен в Firefox Add-ons.**
+Для ручной установки доступны Chromium ZIP и подписанный Firefox XPI **1.0.3**.
+В Chrome Web Store пока **1.0.2**; обновление отправлено, публикация 1.0.3 ещё не подтверждена.
 Публичные версии проверены 7 ноября 2026.
 
 ## Установить из магазина
@@ -10,7 +10,7 @@ Chrome Web Store, Firefox Add-ons и подписанный Firefox XPI пока
 | Браузер | Версия | Где установить |
 | --- | --- | --- |
 | Chrome, Brave и совместимые Chromium-браузеры | **1.0.2** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
-| Firefox **140+** | **1.0.2** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
+| Firefox **140+** | **1.0.3** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 1. Откройте магазин в нужном браузере, нажмите кнопку установки и подтвердите разрешения.
 2. Закрепите значок расширения на панели.
@@ -63,8 +63,8 @@ Get-FileHash .\runet-censorship-bypass-mv3-1.0.3-34ab51b.zip -Algorithm SHA256
 
 ## Ручная установка Firefox: подписанный XPI
 
-1. Скачайте [подписанный Firefox XPI 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-firefox-1.0.2-signed.xpi)
-   и [его контрольную сумму](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-firefox-1.0.2-signed.sha256.txt).
+1. Скачайте [подписанный Firefox XPI 1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-firefox-1.0.3-signed.xpi)
+   и [его контрольную сумму](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-firefox-1.0.3-signed.sha256.txt).
 2. Проверьте SHA-256. В Firefox откройте **Дополнения и темы → шестерёнка →
    Установить дополнение из файла**, выберите XPI и подтвердите установку.
 3. Разрешите расширению работу в приватных окнах и закрепите значок.
@@ -74,7 +74,7 @@ Get-FileHash .\runet-censorship-bypass-mv3-1.0.3-34ab51b.zip -Algorithm SHA256
 SHA-256 XPI:
 
 ```text
-35aec76967e2b26198139766c507d828cd95572b86679d5b0e14ff4cdc0ee203
+e4f2ce0420bc52898dc576727961fb9647f2a6e7bfc8a14345886d660a331e69
 ```
 
 Для проверки используйте `Get-FileHash` с именем XPI. Unsigned-кандидаты и временная
@@ -134,14 +134,13 @@ Chromium-версии на магазинную могут создать отд
 
 ## English summary
 
-Install **Chrome 1.0.2** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.0.2** from
+Install **Chrome 1.0.2** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.0.3** from
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/). Firefox requires **140+** and private-window
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
 
-**Chromium 1.0.3** is available as a manual ZIP. Store submissions for 1.0.3
-are pending; the published store versions above remain 1.0.2.
-**Firefox 1.0.2** is also available as a Mozilla-signed XPI. Versions **1.0.1–1.0.3** target desktop **Chromium 108+** and **Firefox 140+**,
+**Chromium 1.0.3** is available as a manual ZIP. The Chrome update was submitted;
+its store still offers 1.0.2. **Firefox 1.0.3** is also available as a Mozilla-signed XPI. Versions **1.0.1–1.0.3** target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR releases on a compatible base. These are API-based compatibility
 estimates, not test results for every version or fork. Required MV3 and proxy
 extension APIs must be available; mobile browsers and WebView are outside this scope.

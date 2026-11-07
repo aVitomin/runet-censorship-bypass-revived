@@ -6,7 +6,7 @@
 review requirements for future changes.
 The text below is the maintained listing copy, not proof that every field was
 saved in the dashboard. The public description now links to the 1.0.2 guide.
-The 1.0.3 package is ready; submission is pending. Its [changes](../user/CHANGES_1_0_3.md)
+The publisher reports submitting 1.0.3; its public availability is not yet confirmed. Its [changes](../user/CHANGES_1_0_3.md)
 supplement the existing guide and do not require replacing unchanged screenshots.
 
 ## Published name
