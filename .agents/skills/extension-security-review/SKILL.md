@@ -1,55 +1,48 @@
 ---
 name: extension-security-review
-description: Review changes to permissions, background lifecycle, PAC/provider downloads or application, routing precedence or Direct/fail-open behavior, auth/credentials, migration, IndexedDB/persistent state, external requests, proxy ownership/errors, or browser error handling; exclude prose, styling, and tests with no boundary effect.
+description: Review extension boundaries affected by permissions, lifecycle, routing, provider downloads, credentials, persistent state, external requests, ownership or browser errors; exclude prose and visual-only edits.
 ---
 
 # Extension security review
 
-Read root instructions and only scoped instructions for changed paths. Review
-the complete relevant diff and enough callers to prove each affected boundary.
-Never print credentials, browsing data, full custom URLs, or profile contents.
-Choose affected targets by runtime/build consumers, not parent directory names;
-shared modules and icons can enter different per-browser package rules.
+Scope the changed boundary or named audit question. Read the root/scoped rules,
+relevant diff and callers. Trace actual per-browser consumers and package inputs.
+Review is read-only unless fixing is in the current task. Never expose passwords,
+browsing data, full custom URLs or profile contents.
 
-If dependencies, Actions, or vendored code changed, also use
-`$dependency-review` for that delta rather than repeating it here.
-
-## Scope and final gate
-
-- Chromium-only: review Chromium semantics; final gate `verify:chromium`.
-- Firefox-only: review Firefox semantics; final gate `verify:firefox`.
-- Shared runtime, manifest/template, Gulp, or common packaged input: review both
-  targets; final gate `verify` plus both package-tree comparisons.
-- Prose/tests without executable or boundary effect: stop; this skill does not
-  apply.
-
-Use focused `test:pac` only while developing changed Chromium PAC semantics;
-the final gates already include deterministic PAC coverage.
-
-## Boundaries
-
-Check only those affected:
+## Review affected boundaries
 
 1. Permission/host/CSP expansion and executable-code provenance.
-2. Untrusted PAC/dataset validation, hashing/signature, schema/size bounds, and
-   trust assignment before use.
-3. Input/final URLs, credentials, redirects, streaming bounds, deadlines,
-   referrer policy, fallback, and disabled-by-default network paths.
-4. Credential routing and redaction across PAC/datasets, UI/DOM, storage, RPC,
-   events, errors, notifications, and diagnostics; Effective/request-generation
-   binding must not follow newer Saved credentials.
-5. IndexedDB/storage atomicity, journals/pointers, concurrent writers, restart
-   reconstruction, alarms, and destructive cleanup. Save/import affects Saved
-   only; exact Apply and provider refresh must preserve pending-settings isolation.
-6. Direct/fail-open paths, callback authorization, live proxy ownership,
-   control loss, private access, and proxy/listener errors.
-   Keep Chromium live PAC/control reconciliation separate from Firefox's
-   private-access prerequisite, owned floor and blocked recovery.
-7. Package allowlists, source/runtime correspondence, inactive production
-   paths, and unreferenced executable code.
+2. Untrusted PAC/dataset parsing, schema/size bounds, hashes/signatures and trust
+   assignment. Distinguish fixed HTTPS validation from author authentication.
+3. Input/final redirect URLs, URL credentials, streaming bounds, deadlines,
+   referrer policy, fallback and opt-in network paths.
+4. Credential routing/redaction across PAC, DOM, storage, RPC, errors, events,
+   notifications and diagnostics. Use Effective/request-bound credentials,
+   never a newer Saved revision; preserve bounded retries and safe ambiguity.
+5. Storage/IndexedDB transactions, journals, pointers, concurrent mutations,
+   restart reconstruction, alarms and cleanup. Save/import changes Saved only;
+   exact Apply and active provider refresh preserve pending-settings isolation.
+6. Direct/fail-open paths, callback authorization, proxy ownership/control loss,
+   private access and listener errors. Chromium live-PAC reconciliation and
+   Firefox's owned floor/private-access prerequisite are different contracts.
+7. Package allowlists, source/runtime correspondence and unintended executable
+   input. Do not assume both browser packages copy the same files.
 
-Add real-browser QA only where platform behavior matters: permissions,
-proxy/auth, ownership, lifecycle/recovery, IndexedDB, alarms, or browser-level
-fallback. Report findings first, then verified invariants, final-gate evidence,
-package impact, and unresolved QA. Never describe Chromium PAC as browser-level
-fail-closed while it uses `mandatory:false`.
+For a dependency/Action/vendor delta use `dependency-review` for that part.
+For routing semantics add `pac-regression`; integrate their evidence in this
+review rather than repeating it as a second full review.
+
+## Verification and handoff
+
+For implementation, use the root's affected final gate once. Add targeted real
+browser QA when the claim depends on permissions, proxy/auth, ownership,
+lifecycle/recovery, storage/alarms or browser fallback. A read-only audit chooses
+bounded probes from its questions; it does not trigger a rebuild/release gate.
+Prose/visual-only work does not activate this skill without a boundary change.
+
+Findings need a concrete trigger, path/line, affected invariant, actual versus
+expected behavior and a bounded remedy/check. Separate confirmed defects,
+intentional safety behavior, hypotheses and coverage gaps. Lead with findings,
+then verified boundaries, commands/outcomes and package/browser limitations.
+Never call Chromium PAC browser-level fail-closed while `mandatory:false` is used.

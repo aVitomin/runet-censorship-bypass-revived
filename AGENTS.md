@@ -1,15 +1,42 @@
 # Repository instructions
 
-## Priority and scope
+## Scope and task mode
 
-Apply instructions in this order: the current user request, the hard
-invariants here, the most specific applicable `AGENTS.md`, an applicable
-repository skill, then defaults. A request defines scope but does not silently
-waive a safety invariant. Report any forced stop or material scope expansion.
+Follow the current task, the hard invariants below, the applicable scoped
+`AGENTS.md`, then the matching repository skill. A task defines scope; it does
+not silently waive a safety invariant. Preserve unrelated work.
 
-Read this file once. Before editing, read the applicable browser/scoped
-`AGENTS.md` for the changed paths; do not load unrelated scopes. Load a skill
-only when its description matches the task.
+Classify the task before acting:
+
+- Audit/review: findings and evidence; do not start fixes or install packages.
+- Planning: ordered tasks, acceptance criteria and dependencies; no implementation.
+- Implementation: the smallest complete authorized change and its affected gate.
+- Release: use the release skill and exact artifacts; preparation is not publication.
+
+Read this file once per task, then only the scoped instructions, source consumers
+and evidence needed for the changed paths. Inspect current Git status and the
+actual base before editing. State material assumptions; resolve routine choices
+from project evidence. Ask only for a consequential missing decision or authority.
+Existing approval applies to its task continuation, not unrelated future actions.
+Report consequential blockers or scope expansion before dependent work.
+
+## Select a workflow
+
+Use one primary workflow; add a repository safety skill only for its boundary.
+Do not chain every installed skill, duplicate reviews, or inherit generic
+requirements for model calls, whole-suite reruns, commits or publishing.
+
+| Boundary | Repository skill |
+| --- | --- |
+| Package/lock, dependency manager, Action or vendored code | `dependency-review` |
+| Extension security, storage, lifecycle, permissions or external requests | `extension-security-review` |
+| Chromium PAC or Firefox declarative routing semantics | `pac-regression` |
+| Release candidate, provenance, packaging, signing or release QA | `release-candidate` |
+
+The skills in `.agents/skills` define additional checks; the table below defines
+the final gate. A read-only audit does not become a release/rebuild workflow.
+Use available tools; do not install a framework or add infrastructure merely
+because a generic skill mentions it. Keep task history out of durable rules.
 
 ## Repository map and working boundary
 
