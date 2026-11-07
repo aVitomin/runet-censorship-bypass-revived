@@ -1,38 +1,39 @@
 ---
 name: pac-regression
-description: Review PAC generation/cooking, rule matching or precedence, provider fallback, candidate order, Direct/noDirect behavior, or own-proxy scope; exclude copy, styling, unrelated state, and build-only work.
+description: Review Chromium PAC and Firefox declarative routing changes affecting matching, precedence, fallback, candidate order, Direct/noDirect or own-proxy scope; exclude copy, styling and unrelated state/build changes.
 ---
 
-# PAC regression
+# Routing regression
 
-PAC execution is Chromium-specific. Read the applicable browser/scoped
-instructions for changed files. Inspect the complete relevant diff, including
-relevant untracked files, and needed callers without printing credentials or
-private provider URLs.
+PAC execution is Chromium-specific. Firefox consumes declarative rules; evaluated
+PAC output cannot establish Firefox behavior. Read root/scoped rules and inspect
+the relevant diff/callers, including relevant untracked files. Keep credentials
+and private provider URLs out of output. A review does not automatically fix code.
 
-1. Identify the changed routing branch and its observable result. Trace only
-   needed Chromium PAC/site-scope/apply callers or Firefox declarative adapter
-   callers. Shared contract changes require both; evaluated PAC results alone
-   do not prove Firefox behavior.
-2. For Chromium, cover affected and adjacent cases with evaluated
-   `FindProxyForURL` results, not string fragments: exact host and `*.domain`,
-   Auto/Proxy/Direct, candidate order, provider fallback, `noDirect`, safe defaults,
-   and rule precedence. Add Chromium cases to
-   `src/chromium/test/pac-regression.js` when semantics change;
-   cover corresponding Firefox declarative decisions when that target is affected,
-   rather than copying PAC assumptions.
-3. Preserve explicit Proxy semantics: a usable ordered candidate list, no
-   provider fallback, and no unintended `DIRECT`. Auto removes its override;
-   Direct remains explicit.
+## Contract and cases
 
-During Chromium PAC development, `test:pac` is the focused check. For an
-unchanged final tree, do not also run `test:chromium`: Chromium-only completion uses
-`verify:chromium`, which includes both. Firefox-only declarative changes use
-`verify:firefox`, not Chromium PAC checks; shared routing uses full `verify`,
-including Firefox/shared suites. Describe Firefox declarative behavior
-separately and never imply this target executes PAC.
+Identify the changed branch and observable routing result. Cover affected and
+adjacent combinations: exact host versus `*.domain`, Auto/Proxy/Direct, whitelist,
+`.onion`, provider selection/fallback, candidate order, own-proxy scope, `noDirect`
+and safe defaults. Preserve usable explicit-Proxy candidates with no Chromium
+provider fallback or unintended DIRECT; Auto removes the override, Direct is explicit.
 
-For Chromium, add browser QA only for parsing/fallback, `mandatory:false`, real
-failover, DNS/leaks, or UI-derived scope. Report failures as
-`scope | mode | candidates | expected | actual` and separate deterministic
-evidence from browser observations.
+For Chromium assert evaluated `FindProxyForURL` results, not string fragments;
+maintained cases live in `extension/src/chromium/test/pac-regression.js`.
+For Firefox assert the corresponding declarative decision/adapter behavior.
+Shared routing changes need both views, without pretending they have identical
+browser fallback semantics. Pure reviews may reuse applicable evidence and add
+only bounded probes needed to establish a concrete finding.
+
+## Check selection
+
+During implementation `test:pac` is optional focused feedback. Final gates come
+from root AGENTS: `verify:chromium` already contains Chromium/PAC tests;
+`verify:firefox` covers Firefox-only changes; shared routing uses `verify`.
+Do not run the contained suites again on unchanged inputs.
+
+Use targeted browser QA for claims about PAC parsing, `mandatory:false`, real
+failover, DNS/leaks or UI-derived scope. Report a failure as
+`scope | mode | candidates | expected | actual`, with source references and
+separate deterministic/browser evidence. Do not expand a prose-only change into
+routing work or treat an untested hypothesis as a defect.
