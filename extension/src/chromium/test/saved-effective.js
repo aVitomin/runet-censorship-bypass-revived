@@ -599,6 +599,7 @@ describe('Chromium Saved and Effective generations', function() {
   it('never rebinds a redirect after its original binding could not be persisted', async function() {
 
     const h = await active();
+    Assert.equal((await h.context.mv3Effective.getBindingStatus()).status, 'available');
     const area = h.context.chrome.storage.session;
     const original = area.set;
     area.set = (_value, callback) => {
@@ -611,9 +612,63 @@ describe('Chromium Saved and Effective generations', function() {
     await effective(h);
     await save(h);
     await h.audit.applyCookedPacAndPersist({});
+    Assert.equal((await h.context.mv3Effective.getBindingStatus()).reason, 'storage_unavailable');
     start(h, 'unpersisted');
     Assert.equal((await challenge(h, 'unpersisted')).cancel, true);
     Assert.equal(h.getSessionStorage()[h.context.mv3Effective.SESSION_KEY].saturated, true);
+    const resumed = await createRuntimeHarness({initialLocalStorage: h.getLocalStorage(),
+      initialProxyDetails: h.getProxyDetails(), pacMods: h.getState().pacMods,
+      initialSessionStorage: h.getSessionStorage()});
+    Assert.equal((await resumed.context.mv3Effective.getBindingStatus()).reason, 'session_blocked');
+    const newSession = await createRuntimeHarness({initialLocalStorage: h.getLocalStorage(),
+      initialProxyDetails: h.getProxyDetails(), pacMods: h.getState().pacMods});
+    Assert.equal((await newSession.context.mv3Effective.getBindingStatus()).status, 'available');
+
+  });
+
+  it('never reports proxy sign-in as available when session storage status cannot be read', async function() {
+
+    const h = await active();
+    const area = h.context.chrome.storage.session;
+    const original = area.get;
+    area.get = (_value, callback) => {
+      area.get = original;
+      h.context.chrome.runtime.lastError = {message: 'Synthetic storage failure'};
+      callback();
+      h.context.chrome.runtime.lastError = null;
+    };
+    const status = await h.context.mv3Effective.getBindingStatus();
+    Assert.equal(status.status, 'unavailable');
+    Assert.equal(status.reason, 'storage_unavailable');
+
+  });
+
+  it('keeps a no-credential request unbound across Apply and skips its generation cleanup', async function() {
+
+    const h = await createRuntimeHarness({pacMods: {ownProxies: []}});
+    Assert.equal((await h.audit.applyCookedPacAndPersist({})).ok, true);
+    const api = h.context.mv3Effective;
+    const initialProxyReads = h.counts.proxySettingsReads;
+    start(h, 'no-credential-request');
+    Assert.equal((await challenge(h, 'no-credential-request')).cancel, true);
+    Assert.equal(h.counts.proxySettingsReads, initialProxyReads);
+    Assert.equal(h.getSessionStorage()[api.SESSION_KEY].entries[0].generationId, null);
+
+    await save(h);
+    const status = await h.callRpc('getConfigurationStatus');
+    const applied = await h.callRpc('applySavedConfiguration', {
+      expectedRevision: status.savedRevision, expectedEffectiveId: status.effectiveId,
+    });
+    Assert.equal(applied.ok, true);
+    start(h, 'no-credential-request');
+    Assert.equal((await challenge(h, 'no-credential-request')).cancel, true);
+    Assert.equal(h.getSessionStorage()[api.SESSION_KEY].entries[0].generationId, null);
+
+    Assert.equal(h.getSessionStorage()[api.SESSION_KEY].entries.find((entry) =>
+      entry.requestId === 'no-credential-request').generationId, null);
+    await api.releaseRequest({requestId: 'no-credential-request'});
+    Assert.equal(h.getSessionStorage()[api.SESSION_KEY].entries.some((entry) =>
+      entry.requestId === 'no-credential-request'), false);
 
   });
 
@@ -648,10 +703,16 @@ describe('Chromium Saved and Effective generations', function() {
     const resumed = await createRuntimeHarness({initialLocalStorage: h.getLocalStorage(),
       initialProxyDetails: h.getProxyDetails(), pacMods: h.getState().pacMods,
       initialSessionStorage: {[api.SESSION_KEY]: {entries, saturated: false}}});
+    Assert.equal((await resumed.context.mv3Effective.getBindingStatus()).status, 'available');
     start(resumed, 'overflow');
     Assert.equal((await challenge(resumed, 'overflow')).cancel, true);
+    Assert.equal((await resumed.context.mv3Effective.getBindingStatus()).reason, 'session_blocked');
     Assert.equal(resumed.getSessionStorage()[api.SESSION_KEY].entries.length, api.MAX_REQUESTS);
     Assert.equal(resumed.getSessionStorage()[api.SESSION_KEY].saturated, true);
+    const popup = await resumed.callRpc('getPopupState', {tabUrl: 'https://synthetic.example/'});
+    Assert.equal(popup.proxyAuthBinding.status, 'unavailable');
+    Assert.equal(popup.configuration.active, true);
+    Assert.doesNotMatch(JSON.stringify(popup.proxyAuthBinding), /synthetic|requestId|password/);
 
   });
 });

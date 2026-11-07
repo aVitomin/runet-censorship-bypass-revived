@@ -72,7 +72,8 @@
       // Construct the data backend only for an actual dataset operation. Manual
       // routing must remain available when IndexedDB itself cannot be opened.
       let indexedBackend;
-      const backend = Object.fromEntries(['readArtifact', 'readPointers', 'commit'].map((method) =>
+      const backend = Object.fromEntries(['readArtifact', 'readPointers', 'commit',
+        'hasArtifactHash', 'collectGarbage'].map((method) =>
         [method, async (...args) => {
           if (!indexedBackend) {
             indexedBackend = datasetStoreApi.createIndexedDbBackend(root.indexedDB);
@@ -363,6 +364,7 @@
     // data replacements use the normal crash-safe promotion controller.
     const prepared = await root.rucbFirefoxAntifilterUpdater.publishFirstCandidate(store);
     if (!prepared.ok) return errorResponse(prepared.code);
+    await collectUnusedProviderDatasets();
     invalidateOptionsStatus();
     return {ok: true, result: {status: 'PREPARED'}};
   }
@@ -725,6 +727,54 @@
 
   }
 
+  async function collectUnusedProviderDatasets() {
+
+    try {
+      const keys = [productConfigApi.CONFIG_STORAGE_KEY,
+        productConfigApi.GENERATIONS_STORAGE_KEY,
+        productConfigApi.DATASET_PROMOTION_STORAGE_KEY,
+        productConfigApi.SETTINGS_TRANSACTION_STORAGE_KEY,
+        offState.STORAGE_KEY];
+      const stored = await browser.storage.local.get(keys);
+      if (stored[productConfigApi.DATASET_PROMOTION_STORAGE_KEY] ||
+          stored[productConfigApi.SETTINGS_TRANSACTION_STORAGE_KEY]) return;
+      const protectedHashes = new Set();
+      const protectIdentity = (identity) => {
+        const canonical = offState.canonicalizeDatasetIdentity(identity);
+        if (!canonical) return false;
+        protectedHashes.add(canonical.artifactSha256);
+        return true;
+      };
+      const config = stored[productConfigApi.CONFIG_STORAGE_KEY];
+      if (config !== undefined) {
+        const canonical = productConfigApi.canonicalProductConfig(config).config;
+        if (!protectIdentity(canonical.datasetIdentity)) return;
+      }
+      const durable = stored[offState.STORAGE_KEY];
+      if (durable !== undefined) {
+        if (!offState.isCanonicalState(durable)) return;
+        if (durable.intent === offState.ON && !protectIdentity(durable.datasetIdentity)) return;
+      }
+      const generations = stored[productConfigApi.GENERATIONS_STORAGE_KEY];
+      if (generations !== undefined) {
+        if (!generations || generations.schemaVersion !== 1 ||
+            !Array.isArray(generations.records) || generations.records.length > 2) return;
+        for (const record of generations.records) {
+          const retainedConfig = record && record[productConfigApi.CONFIG_STORAGE_KEY];
+          if (!retainedConfig) return;
+          const canonical = productConfigApi.canonicalProductConfig(retainedConfig).config;
+          if (!protectIdentity(canonical.datasetIdentity)) return;
+        }
+      }
+      // The live routing runtime holds the verified parsed dataset in memory;
+      // durable ON/generation identities cover recovery after event-page restart.
+      await createProductionDatasetStore().collectGarbage([...protectedHashes]);
+    } catch (_error) {
+      // Collection is best effort after the authoritative state transition.
+    }
+
+  }
+
   async function applyPersistedProductConfiguration(message) {
 
     const current = activationController.snapshot();
@@ -838,6 +888,9 @@
     invalidateOptionsStatus();
     try {
       const installed = await datasetPromotionController.install();
+      if (installed.status === 'INSTALLED' || installed.status === 'UNCHANGED') {
+        await collectUnusedProviderDatasets();
+      }
       try {
         if (installed.status === 'INSTALLED') await providerUpdateController.markInstalled();
       } catch (_error) {
@@ -881,6 +934,7 @@
     if (!checked || checked.ok !== true) {
       return errorResponse(safeProviderUpdateErrorCode(checked));
     }
+    await collectUnusedProviderDatasets();
     let update;
     try {
       update = await providerUpdateController.publicStatus();

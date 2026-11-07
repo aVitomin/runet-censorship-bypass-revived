@@ -2259,6 +2259,71 @@ describe('Firefox production control package', function() {
 
   });
 
+  it('collects only after provider checks and protects Saved, Effective, and journal state', async function() {
+
+    const sha256 = async (bytes) => Helpers.sha256(Buffer.from(bytes));
+    const artifact = Helpers.artifact({providerKey: ProductionProvider.PROVIDER_KEY});
+    const store = DatasetStore.createStore({backend: Helpers.memoryBackend(), sha256});
+    await store.commitPackagedBaseline(artifact);
+    const collections = [];
+    const countedStore = Object.assign({}, store, {async collectGarbage(hashes) {
+
+      collections.push([...hashes]);
+      return 0;
+
+    }});
+    const config = JSON.parse(JSON.stringify(
+        await ProductionProvider.createProductionProductConfig(sha256),
+    ));
+    config.datasetIdentity = {providerKey: artifact.envelope.providerKey,
+      datasetVersion: artifact.envelope.datasetVersion,
+      artifactSha256: artifact.envelope.artifactSha256};
+    const storage = makeStorage();
+    storage.values[ProductConfig.CONFIG_STORAGE_KEY] = JSON.parse(JSON.stringify(config));
+    const page = startEventPage({storage, datasetStore: countedStore,
+      privateWindowAccess: true,
+      providerSourceUpdateConfigured: true,
+      providerUpdateCheck: async () => ({ok: true, status: 'NO_UPDATE'})});
+    await page.ready();
+    Assert.equal(collections.length, 0, 'startup does not open IndexedDB for GC');
+
+    Assert.equal((await page.send({type: 'firefox.activation.apply'})).ok, true);
+    Assert.equal(collections.length, 0, 'manual Apply does not require IndexedDB');
+    const settings = (await page.send({type: 'firefox.settings.get'})).result;
+    Assert.equal((await page.send({type: 'firefox.settings.replace',
+      expectedRevision: settings.revision, settings: settings.settings})).ok, true);
+    Assert.equal(collections.length, 0, 'manual Saved changes do not run GC');
+    Assert.equal((await page.send({type: 'firefox.activation.clear'})).ok, true);
+    Assert.equal(collections.length, 0, 'manual Clear does not require IndexedDB');
+    Assert.equal((await page.send({type: 'firefox.activation.apply'})).ok, true);
+
+    const saved = JSON.parse(JSON.stringify(storage.values[ProductConfig.CONFIG_STORAGE_KEY]));
+    saved.datasetIdentity = Object.assign({}, saved.datasetIdentity, {
+      datasetVersion: '2026.09.02-test.1', artifactSha256: 'b'.repeat(64),
+    });
+    storage.values[ProductConfig.CONFIG_STORAGE_KEY] = saved;
+    const effectiveHash = storage.values[OffState.STORAGE_KEY].datasetIdentity.artifactSha256;
+    Assert.equal((await page.send({type: 'firefox.provider.update.check'})).ok, true);
+    Assert.equal(collections.length, 1);
+    Assert.ok(collections[0].includes(artifact.envelope.artifactSha256));
+    Assert.ok(collections[0].includes(effectiveHash));
+    Assert.ok(collections[0].includes('b'.repeat(64)));
+
+    storage.values[ProductConfig.DATASET_PROMOTION_STORAGE_KEY] = {status: 'PREPARED'};
+    await page.send({type: 'firefox.provider.update.check'});
+    Assert.equal(collections.length, 1, 'pending promotion journal blocks sweep');
+    delete storage.values[ProductConfig.DATASET_PROMOTION_STORAGE_KEY];
+    const generations = JSON.parse(JSON.stringify(
+        storage.values[ProductConfig.GENERATIONS_STORAGE_KEY],
+    ));
+    generations.records[0][ProductConfig.CONFIG_STORAGE_KEY]
+        .datasetIdentity.artifactSha256 = 'malformed';
+    storage.values[ProductConfig.GENERATIONS_STORAGE_KEY] = generations;
+    await page.send({type: 'firefox.provider.update.check'});
+    Assert.equal(collections.length, 1, 'malformed Effective identity blocks sweep');
+
+  });
+
   it('diagnoses the selected Saved dataset after OFF instead of historical Effective', async function() {
 
     const page = await unifiedFixture();

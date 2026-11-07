@@ -281,6 +281,12 @@
   "popupControlActiveHelp": {
     "message": "This extension controls the browser's proxy settings. Choose what happens to this site below."
   },
+  "popupAuthBindingUnavailablePill": {
+    "message": "Proxy sign-in unavailable"
+  },
+  "popupAuthBindingUnavailableHelp": {
+    "message": "Routing is still active, but new requests may be unable to sign in to a proxy. Restart the browser completely. Your settings are saved; applying them again will not clear this safety lock."
+  },
   "popupControlOff": {
     "message": "Routing is turned off"
   },
@@ -984,6 +990,24 @@
   },
   "optionsApplyStatus": {
     "message": "Apply status"
+  },
+  "optionsAuthBindingStatus": {
+    "message": "Proxy sign-in"
+  },
+  "optionsAuthBindingAvailable": {
+    "message": "Available"
+  },
+  "optionsAuthBindingUnknown": {
+    "message": "Could not be verified"
+  },
+  "optionsAuthBindingSessionBlocked": {
+    "message": "Unavailable for this browser session"
+  },
+  "optionsAuthBindingStorageUnavailable": {
+    "message": "Unavailable: session storage could not be verified"
+  },
+  "optionsAuthBindingUnavailableHelp": {
+    "message": "Routing may remain active while proxy sign-in for new requests is blocked for safety. Restart the browser completely. Your settings are saved; applying them again or restarting only the extension will not clear this lock."
   },
   "optionsSaveNotifications": {
     "message": "Save notifications"

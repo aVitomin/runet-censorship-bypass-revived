@@ -33,10 +33,10 @@ package allowlist/integrity verifier after each build, and compares both
 release sets byte for byte. It refuses a dirty tracked tree and refuses to
 overwrite an existing release output. It then writes:
 
-- `extension/dist/firefox-release/runet-censorship-bypass-firefox-1.0.2.xpi` — unsigned
+- `extension/dist/firefox-release/runet-censorship-bypass-firefox-1.0.3.xpi` — unsigned
   release candidate with `manifest.json` at archive root;
 - the matching `.xpi.sha256` file;
-- `runet-censorship-bypass-firefox-1.0.2-source.zip` — all tracked source
+- `runet-censorship-bypass-firefox-1.0.3-source.zip` — all tracked source
   files needed for review and reproduction, under one versioned root;
 - the matching source-archive `.sha256` file.
 
@@ -65,7 +65,7 @@ reference invocation is not evidence of completed validation:
 
 ```powershell
 npx --yes --ignore-scripts addons-linter@10.10.0 `
-  "$Project\dist\firefox-release\runet-censorship-bypass-firefox-1.0.2.xpi"
+  "$Project\dist\firefox-release\runet-censorship-bypass-firefox-1.0.3.xpi"
 ```
 
 This command is an explicit release audit tool invocation; it is not a project

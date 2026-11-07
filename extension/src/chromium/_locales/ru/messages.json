@@ -281,6 +281,12 @@
   "popupControlActiveHelp": {
     "message": "Расширение управляет настройками прокси браузера. Ниже можно выбрать маршрут для этого сайта."
   },
+  "popupAuthBindingUnavailablePill": {
+    "message": "Авторизация прокси недоступна"
+  },
+  "popupAuthBindingUnavailableHelp": {
+    "message": "Маршрутизация включена, но авторизация прокси для новых запросов может быть недоступна. Полностью закройте браузер и запустите снова. Настройки сохранены; повторное применение не снимет защитную блокировку."
+  },
   "popupControlOff": {
     "message": "Маршрутизация выключена"
   },
@@ -984,6 +990,24 @@
   },
   "optionsApplyStatus": {
     "message": "Статус применения"
+  },
+  "optionsAuthBindingStatus": {
+    "message": "Авторизация прокси"
+  },
+  "optionsAuthBindingAvailable": {
+    "message": "Доступна"
+  },
+  "optionsAuthBindingUnknown": {
+    "message": "Не удалось проверить"
+  },
+  "optionsAuthBindingSessionBlocked": {
+    "message": "Недоступна в этом сеансе браузера"
+  },
+  "optionsAuthBindingStorageUnavailable": {
+    "message": "Недоступна: состояние хранилища сеанса не проверено"
+  },
+  "optionsAuthBindingUnavailableHelp": {
+    "message": "Маршрутизация может работать, пока авторизация прокси для новых запросов заблокирована в целях безопасности. Полностью закройте браузер и запустите снова. Настройки сохранены; повторное применение или перезапуск только расширения не снимут блокировку."
   },
   "optionsSaveNotifications": {
     "message": "Сохранить уведомления"

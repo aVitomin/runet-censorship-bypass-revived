@@ -88,6 +88,7 @@ function memoryBackend() {
 
   const artifacts = new Map();
   const pointers = new Map();
+  const history = new Set();
   const commits = [];
   return {
     artifacts,
@@ -107,12 +108,37 @@ function memoryBackend() {
 
       if (nextArtifact) {
         artifacts.set(nextArtifact.artifactSha256, copy(nextArtifact));
+        history.add(nextArtifact.artifactSha256);
       }
       pointers.set(nextPointers.providerKey, copy(nextPointers));
       commits.push({
         artifactSha256: nextArtifact ? nextArtifact.artifactSha256 : null,
         pointers: copy(nextPointers),
       });
+
+    },
+    async hasArtifactHash(artifactSha256) {
+
+      return artifacts.has(artifactSha256) || history.has(artifactSha256);
+
+    },
+    async collectGarbage(protectedArtifactShas = []) {
+
+      const protectedHashes = new Set(protectedArtifactShas);
+      for (const pointer of pointers.values()) {
+        for (const field of ['activeArtifactSha256', 'previousLkgArtifactSha256',
+          'packagedBaselineArtifactSha256', 'stagedArtifactSha256']) {
+          if (pointer[field]) protectedHashes.add(pointer[field]);
+        }
+      }
+      let deleted = 0;
+      for (const artifactSha256 of artifacts.keys()) {
+        if (protectedHashes.has(artifactSha256)) continue;
+        history.add(artifactSha256);
+        artifacts.delete(artifactSha256);
+        deleted++;
+      }
+      return deleted;
 
     },
   };

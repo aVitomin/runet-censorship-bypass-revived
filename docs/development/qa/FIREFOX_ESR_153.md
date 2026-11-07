@@ -1,25 +1,24 @@
-# Проверка Firefox 153 ESR на Linux
+# Firefox 153 ESR on Linux: optional QA procedure
 
-Цель — дополнить расчётную совместимость **Firefox 140+** реальной проверкой
-ESR 153 на Debian/Linux. Проверять каждую промежуточную версию не требуется;
-расчёт по API и результат запуска учитываются отдельно. Используйте отдельный профиль и синтетические
-настройки. Личный профиль и его пароли не нужны.
+This procedure can supplement the calculated Firefox 140+ minimum with an actual
+Debian/Linux ESR 153 run. It is not a result, scheduled task or release blocker by
+itself. Testing every intermediate browser version is unnecessary. Use a disposable
+profile and synthetic settings, never personal credentials or browsing history.
 
-## Среда и тестовый пакет
+## Environment and test package
 
-Нужны Node.js 22.17 или новее, зависимости Firefox для выбранного дистрибутива
-и официальный Firefox **153.5.1 ESR** для нужной архитектуры. Возьмите бинарный
-архив и `SHA256SUMS` из [официального каталога Mozilla](https://archive.mozilla.org/pub/firefox/releases/153.5.1esr/),
-проверьте SHA-256 и распакуйте браузер отдельно от установленного. Для
-`linux-x86_64/en-US/firefox-153.5.1esr.tar.xz` ожидается:
+Use Node.js 22.17+, the distribution's Firefox runtime dependencies, and official
+Firefox **153.5.1 ESR** for the required architecture. Download the archive and
+`SHA256SUMS` from [Mozilla](https://archive.mozilla.org/pub/firefox/releases/153.5.1esr/),
+verify SHA-256 and extract separately from installed Firefox. The recorded hash for
+`linux-x86_64/en-US/firefox-153.5.1esr.tar.xz` is:
 
 ```text
 e289bdc532decf2b54dea9b5ac64cf6f84a62eeec4d4a9ec2f69590f61b0ff1c
 ```
 
-Следующие команды Bash выполняются из корня репозитория. Укажите свой путь
-к распакованному Firefox. Manifest изменять не нужно: минимум 140 уже допускает
-установку в ESR 153.
+Run Bash from repository root and supply the extracted executable path. The manifest
+minimum of 140 already permits ESR 153; do not change it for this test.
 
 ```bash
 set -euo pipefail
@@ -35,9 +34,9 @@ cp -R extension/build/firefox "$FIREFOX_PACKAGE_ROOT"
 diff -qr extension/build/firefox "$FIREFOX_PACKAGE_ROOT"
 ```
 
-Не загружайте эту копию в магазины и не выдавайте её за релизный пакет.
+This copied test package is not a release and must not be submitted to stores.
 
-## Автоматические браузерные сценарии
+## Automated browser scenarios
 
 ```bash
 node extension/src/firefox/test/firefox-lifecycle-smoke.js | tee "$qaRoot/lifecycle.log"
@@ -46,32 +45,28 @@ node extension/src/firefox/test/firefox-auth-control-smoke.js | tee "$qaRoot/aut
 node extension/src/firefox/test/firefox-auth-control-smoke.js --manual | tee "$qaRoot/auth-manual.log"
 ```
 
-Все команды должны завершиться с кодом 0. Полные auth/lifecycle сценарии
-содержат ожидание настоящего уничтожения фоновой страницы; не заменяйте их
-`--quick` для подтверждения совместимости. Проверяются OFF, сохранение
-прежнего proxy, private-access denial/revocation, ownership, Save B при
-Effective A, восстановление A и применение B, предел повторов 407 и отсутствие
-proxy-пароля у origin 401. Описание границ: [тестирование](../TESTING.md).
+Every command must exit 0. Full auth/lifecycle scenarios wait for real background
+destruction; `--quick` cannot establish that coverage. They check OFF, preservation
+of prior proxy settings, private-access denial/revocation, ownership, Save B with
+Effective A, recovery of A and Apply B, 407 retry bounds and withholding proxy
+credentials from origin 401. See [Testing](../TESTING.md) for exact limits.
 
-## Ручная проверка
+## Manual checks and evidence
 
-В новом временном профиле загрузите тестовый manifest через
-`about:debugging#/runtime/this-firefox`, разрешите работу в приватных окнах
-и проверьте:
+In a new temporary profile, load the test manifest through
+`about:debugging#/runtime/this-firefox`, grant private-window access and check:
 
-1. Popup и все разделы Options на русском и английском; светлая, тёмная и
-   системная темы, клавиатура и узкое окно. Поиск и навигация сохраняют Draft.
-2. Save не включает управление. Apply использует сохранённую версию.
-   Ошибка в скрытом поле открывает соответствующий раздел.
-3. Ручное и alarm-обновление базы при OFF не включает управление; при активном
-   Effective обновление не применяет ожидающие Saved-правки. Отсутствие новой
-   базы (`UNCHANGED`) само по себе не ошибка.
-4. Auto/Proxy/Direct с точным хостом и поддоменами через собственный тестовый
-   proxy; выключение возвращает прежнюю настройку браузера.
+1. Popup/all Options sections in EN/RU, light/dark/system themes, keyboard and
+   narrow-window behavior. Search/navigation preserve Draft.
+2. Save does not enable control; Apply uses the saved revision. An invalid hidden
+   field opens its section before focus.
+3. Manual/alarm data refresh while OFF stays OFF; active refresh preserves pending
+   Saved settings. `UNCHANGED` alone is not an error.
+4. Auto/Proxy/Direct with exact/subdomain rules through an owned test proxy;
+   disabling restores the previous browser setting.
 
-Сохраните версию ОС/Firefox, commit, хеш исходного пакета, коды завершения и
-краткие результаты ручных пунктов. В отчёте отдельно укажите непроверенные
-сценарии. Полный перезапуск с подписанным постоянно установленным пакетом
-выполняется позднее при выпуске: временная установка его не заменяет.
-После проверки закройте тестовый браузер и удалите только созданные для QA
-каталоги. Не публикуйте личные URL, профили, credentials или необработанные логи.
+Record OS/browser, commit, source-package hash, exit codes, manual outcomes and
+untested cases. Temporary installation does not replace later full restart QA
+with a signed permanent package. Close the owned test browser afterward and remove
+only directories created for this QA. Do not publish profiles, private URLs,
+credentials or unredacted logs.

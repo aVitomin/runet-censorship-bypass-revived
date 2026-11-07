@@ -1,435 +1,255 @@
-# Тестирование
+# Testing
 
-Все команды выполняются из корня репозитория. Зависимости устанавливаются в
-extension tooling root:
+Run commands from repository root. The only npm root is `extension`:
 
 ```powershell
 $Project = '.\extension'
 npm ci --prefix $Project
 ```
 
-## Выбор уровня проверки
+## Select one final gate
 
-| Уровень | Назначение | Примеры |
-| --- | --- | --- |
-| Фокусный | Быстрая обратная связь во время изменения; не доказывает готовность всего target | `test:pac`, `test:chromium`, `test:firefox`, `test:tooling` |
-| Финальный локальный | Один канонический gate для итогового дерева | `verify:chromium`, `verify:firefox` или общий `verify` |
-| CI | Независимые policy, supply-chain, tooling, browser и Chrome smoke jobs | GitHub Actions после push/PR |
-| Release | Воспроизводимые архивы, addons-linter, trusted-main provenance и browser QA | Только процесс выпуска |
+[AGENTS.md](../../AGENTS.md) defines the affected-scope gate and authority;
+this guide explains coverage. Focused suites are development feedback, not a
+replacement for the final gate. `test:pac` is included in `test:chromium`, which is
+included in `verify:chromium`. Aggregate `verify` runs all maintained suites once.
+Do not repeat unchanged included suites after a passing gate.
 
-Не запускайте фокусный тест повторно после неизменённого финального gate,
-который уже его включает. `test:pac` входит в `test:chromium`; `verify:chromium` включает
-`test:chromium`; общий `verify` запускает все maintained deterministic suites один
-раз. `scripts/required-checks.mjs` — advisory mapper, а не замена правилам
-`AGENTS.md` или CI.
+Record source SHA, relevant inputs, command, exit status and evidence. Reuse checks
+only while inputs/environment still apply and name the original run. Diagnose a
+timeout and host load before retrying; retain failed and successful evidence.
+Documentation-only changes do not invalidate runtime checks. Local results do not
+establish CI, browser QA, release provenance or signing.
 
-Без аргументов mapper учитывает staged/unstaged изменения относительно `HEAD`,
-удаления, обе стороны переименований и неигнорируемые untracked-файлы. Он выдаёт
-финальные gates без включённых в них фокусных suites; shared icons выбирают оба
-browser packages независимо от названия родительского каталога. Неизвестные
-пути требуют проверки ownership и консервативно выбирают aggregate gate.
-Tooling-пути собраны в `scripts/repository-paths.mjs`; это не замена Gulp/CI
-и не автоматическая поддержка перемещения файлов. Проверки mapper/ownership:
+`scripts/required-checks.mjs` is advisory. It considers staged/unstaged changes
+against HEAD, deletions, both rename paths and non-ignored untracked files; it
+omits suites included in a selected final gate. Shared icons affect both targets.
+Unknown paths conservatively select aggregate checks pending ownership review.
+`scripts/repository-paths.mjs` lists tooling paths, not Gulp inputs or automatic
+approval for file moves. Mapper tests:
 
 ```powershell
 node --test .\scripts\required-checks.test.mjs
 ```
 
-## Автоматические проверки
+## Documentation and supply chain
 
-### Documentation integrity
+The docs/agent/skill-only gate is docs integrity, relevant metadata validation and
+whitespace checking. It requires no npm install:
 
 ```powershell
 node .\scripts\verify-docs.mjs
+git diff --check
 ```
 
-Dependency-free проверка сканирует tracked Markdown, relative links, images и
-anchors, запрещает developer-machine paths и stale current-release/default-
-branch/install metadata. Она не делает CI зависимым от доступности внешних
-сайтов; отдельный bounded аудит можно запустить с `--audit-external`.
+The verifier scans tracked Markdown, relative links, images and anchors, rejecting
+machine paths and stale current-release/default-branch/install metadata. It does
+not require external sites to respond. Use `--audit-external` only for an intended
+bounded live-link audit. New untracked Markdown must be included without staging
+the real index. Docs integrity and whitespace checks are required before every PR.
 
-### Supply-chain gates
+Dependency/Action/vendor changes additionally require the repository
+`dependency-review` workflow. Relevant supply-chain commands are:
 
 ```powershell
 node .\scripts\verify-supply-chain.mjs
 node --test .\scripts\verify-supply-chain.test.mjs
 npm audit signatures --prefix $Project
-```
-
-Статический verifier разрешает единственный npm-root: основной tooling package.
-Для его lockfile он проверяет exact direct pins, официальный npm registry source,
-integrity и минимальный lifecycle baseline (`fsevents@2.3.3`, optional).
-MV2 и его nested Options compiler удалены из maintained `main`; повторное
-добавление nested package root блокируется как непроверенная dependency
-boundary. На PR registry
-publication time запрашивается только для новых выбранных direct versions.
-По умолчанию требуется 168 часов. Проверенное обновление известного пакета
-можно использовать раньше: запись в `scripts/reviewed-dependencies.json`
-должна содержать точные name/version/integrity из lockfile, ссылку на source
-commit, дату, основание и выполненные проверки. Поля `checks`: `source`,
-`maintainers`, `license`, `contents`, `code-diff`, `registry-signature`,
-`provenance`, `advisories`, `lock-delta`; формат файла — `schemaVersion: 1`
-и массив `reviews`. Запись составляет сопровождающий после проверки;
-CI проверяет её полноту и привязку к байтам, а не достоверность выводов.
-Другая версия или integrity требуют нового review. Ошибка registry/metadata
-блокирует change даже при наличии записи. Популярность и истечение недели
-не заменяют проверку безопасности; нерешённые риски блокируют установку.
-
-Перенос npm-root требует отдельного review и явного обновления tooling/CI/build
-путей. Verifier не принимает обнаруженный root автоматически. Для сравнения
-зависимостей с PR base допускается парное Git-переименование `package.json` и
-`package-lock.json` из одного прежнего root с неизменной package identity;
-частичный, неоднозначный или нераспознанный Git перенос блокирует age review,
-а не пропускает его.
-
-Pull request дополнительно использует официальный
-`actions/dependency-review-action` v5.0.0, pinned на signed commit
-`a1d282b36b6f3519aa1f3fc636f609c47dddb294`. Release опубликован
-2026-05-08T20:23:50Z и на review 2026-08-26 был старше 2619 часов; repository
-принадлежит GitHub `actions`, license — MIT, consumer запускает committed Node
-24 bundle и не устанавливает source dependencies. Проверенный source lock имел
-753 package entries, без non-registry sources или missing integrity; его
-build-time install metadata (`esbuild` и optional `fsevents`) не исполняется в
-этом workflow. Action получает только `contents: read`; custom license/severity
-policy не включена, Scorecard display отключён как необязательный сигнал.
-
-### Production npm audit
-
-```powershell
 npm --prefix $Project run audit:prod
 ```
 
-CI запускает этот gate сразу после `npm ci`. Команда использует
-`npm audit --omit=dev` и блокирует любую advisory в production dependency tree.
-В `dependencies` находится `tldts`, выбранные файлы которого включаются в оба
-браузерных пакета. Gulp используется только для сборки и находится в
-`devDependencies` вместе с тестовыми инструментами; его код и зависимости
-не копируются в расширения. Для сборки нужен обычный `npm ci`, без `--omit=dev`.
+Static policy allows one npm root, exact direct pins, official registry URLs,
+integrity and only the reviewed install-script baseline (`fsevents@2.3.3`, optional).
+MV2/nested Options compiler are excluded; a new nested package is an unreviewed
+dependency boundary. Registry age is checked for newly selected direct PR versions.
+The default is 168 hours. Earlier updates require a maintainer-authored exact
+name/version/integrity review in `scripts/reviewed-dependencies.json`, schemaVersion
+1 with `reviews`, source commit/date/rationale and checks for source, maintainers,
+license, contents, code-diff, registry-signature, provenance, advisories and lock-delta.
+CI checks completeness/byte binding, not the truth of conclusions. Different bytes
+need a new review; registry/metadata failures remain blocking. Popularity and age
+alone never establish safety.
 
-Полный `npm audit --prefix $Project` остаётся диагностическим: findings в
-инструментах сборки, линтере и тестовых браузерных клиентах не входят в
-production gate. Проверяйте текущие advisories и достижимость уязвимого кода
-отдельно: результаты реестра меняются даже при неизменном lockfile. Сборка
-использует заданные в репозитории glob-шаблоны; пользовательские правила и
-скачанные PAC через Gulp не проходят. Обновление тестового клиента не меняет
-браузерные пакеты, но требует проверки его API и browser smoke. Не применяйте
-непроверенные major overrides или `npm audit fix --force` ради нулевого отчёта.
+A package-root move requires reviewed tooling/CI/build updates. Base comparison
+recognizes only paired Git manifest/lock renames from one root with unchanged
+package identity; partial/ambiguous moves block age review. Root discovery is not
+approval. Existing rename matching uses 40% similarity for script-heavy manifests.
 
-### PAC semantics
+The recorded review of `actions/dependency-review-action` v5.0.0 pins signed commit
+`a1d282b36b6f3519aa1f3fc636f609c47dddb294`: GitHub `actions` ownership, MIT license,
+release 2026-05-08T20:23:50Z, reviewed 2026-08-26 (>2619 hours old). Its committed
+Node 24 bundle runs without installing source dependencies. The reviewed lock had
+753 entries, no non-registry sources or missing integrity; source build metadata
+for esbuild/optional fsevents is not run. Workflow permission is `contents: read`,
+custom license/severity policy is disabled, and Scorecard is advisory. This is
+historical exact-release evidence, not approval of future Action versions.
 
-```powershell
-npm --prefix $Project run test:pac
-```
+CI runs `audit:prod` (`npm audit --omit=dev`) after installation and blocks any
+production advisory. Selected `tldts` dependency files ship in both packages;
+Gulp/test tools do not. Builds need ordinary `npm ci`, not `--omit=dev`. Full
+`npm audit --prefix $Project` remains diagnostic: dev advisories need separate
+reachability/current-advisory review. Repository build globs never process user
+rules or downloaded PAC. Updating a test client needs API/smoke review even if
+runtime bytes stay unchanged. Never use unreviewed major overrides or
+`npm audit fix --force` to make reports green.
 
-Это фокусная команда для разработки. Финальная Chromium-проверка выполняется
-через `verify:chromium`, поэтому рядом с ней `test:pac` не повторяется.
+## Deterministic suites and builds
 
-Тесты исполняют итоговый `FindProxyForURL` и проверяют exact/wildcard scope,
-Auto/Proxy/Direct, порядок кандидатов, provider fallback, safe defaults и
-конфликтующие правила. Изменение строк генератора без проверки наблюдаемого
-результата недостаточно.
+| Command | Coverage |
+| --- | --- |
+| `npm --prefix $Project run test:pac` | Executes final FindProxyForURL: exact/wildcard scope, Auto/Proxy/Direct, candidates, fallback, defaults and conflicts; generator-string checks alone are insufficient |
+| `npm --prefix $Project run test:chromium` | Background/state queues, PAC/security/freshness/redaction, UI/action and deterministic API counters; includes PAC suite |
+| `npm --prefix $Project run test:firefox` | Firefox state/routing/auth/UI and provider suites |
+| `npm --prefix $Project run test:tooling` | Safe build cleanup, strict renderer templates, deterministic Firefox data generation, actual shared/browser ESLint rule application |
+| `npm --prefix $Project run lint:chromium` | Focused lint feedback; not a final gate |
+| `npm --prefix $Project run build:chromium` | Build plus runtime-icon and package-integrity checks |
+| `npm --prefix $Project run verify:chromium` | Chromium lint/tests/verified build |
+| `npm --prefix $Project run verify:firefox` | Firefox lint/tests/verified build |
+| `npm --prefix $Project run verify` | One aggregate lint, one all-suite Mocha run, both builds |
 
-### Все Chromium tests
+Target/aggregate lint includes `src/shared/**/*.js`. Shared ES2018 modules use
+correctness rules without browser-UI style rules; the `no-control-regex` exception
+is limited to two input validators intentionally rejecting control characters.
+Tooling tests are in aggregate verification, not duplicated in target gates.
+Build checks require correctly cased referenced icons and exclude docs, tests,
+profiles, logs, archives and secret-related metadata. Do not hard-code file counts.
 
-```powershell
-npm --prefix $Project run test:chromium
-```
+CI additionally checks the tracked tree with `git diff --exit-code`. Firefox-only
+changes need no Chromium gate unless shared inputs changed. CI runs equivalent
+policy/tooling/browser jobs independently, with Chromium smoke and stable final
+**Verify MV3**. Every required job must pass. MV2 is historical, not a maintained
+build/test target. See [Release process](RELEASE_PROCESS.md) for artifact gates.
 
-Набор покрывает фоновые модули, сериализацию состояния, PAC download/security,
-freshness, redaction, popup/options, action status и deterministic performance
-counters.
+## Chromium browser smoke
 
-### Tooling tests
-
-```powershell
-npm --prefix $Project run test:tooling
-```
-
-Эти тесты отдельно проверяют безопасное удаление build output, строгий renderer
-manifest template и детерминированный Firefox provider generator. Они входят в
-aggregate `npm test`/`verify`, но не дублируются внутри browser target gates.
-Также проверяется фактическое применение ESLint rules к shared modules и
-сохранение browser-specific lint coverage.
-
-### Lint
-
-```powershell
-npm --prefix $Project run lint:chromium
-```
-
-Используйте сфокусированный lint только для быстрой обратной связи. Финальный
-target gate уже запускает его; не используйте lint как замену tests/build и не
-начинайте массовое форматирование соседнего кода.
-
-`lint:chromium`, `lint:firefox` и общий `lint` включают
-`src/shared/**/*.js`. Для shared modules включены correctness
-rules с поддержкой существующего ES2018-синтаксиса, без переноса browser UI
-style rules. Два input validator намеренно используют regex для отбрасывания
-управляющих символов; исключение `no-control-regex` ограничено этими файлами.
-Browser-specific rules не изменены.
-
-### Build, package integrity и runtime icons
-
-```powershell
-npm --prefix $Project run build:chromium
-```
-
-Скрипт собирает `build/chromium`, затем автоматически запускает:
-
-- `test/verify-runtime-icons.js` — каждый используемый icon существует с
-  правильным регистром и попал в пакет;
-- `test/verify-package-integrity.js` — в пакете нет docs, tests, profiles,
-  logs, archives, secrets-related metadata и других repository-only файлов.
-
-Количество файлов выводится проверкой; не фиксируйте его в документации без
-необходимости.
-
-### Chrome Stable smoke
-
-После Chromium build можно запустить короткий browser-level smoke на установленном
-Google Chrome Stable:
+After building Chromium, use installed Chrome Stable or select a supported
+executable (including Edge/Brave) through `CHROME_BIN`:
 
 ```powershell
 $env:CHROME_BIN = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
 npm --prefix $Project run test:browser:chromium
 ```
 
-Тот же smoke принимает путь к Edge или Brave через `CHROME_BIN`. Он использует
-одну и ту же Chromium package tree; для Edge test-only launcher подключается к
-локальному CDP endpoint, если первый Edge process делегирует запуск и завершается
-до обычного Puppeteer handshake. Это не меняет production runtime.
+The same unpacked MV3 tree runs in a disposable profile with loopback PAC, origin
+and proxy receivers. Real HTTP receivers check Auto/Proxy/Direct via production
+RPC and `chrome.proxy.settings`. Auth covers 407/onAuthRequired/retry, an unused
+second authenticated proxy after full restart, HTTPS destination via HTTP CONNECT,
+and TLS to an HTTPS PAC proxy with 407 inside the connection. A separate Direct
+trap must remain empty. Edge may use a test-only CDP attach when its initial
+process delegates and exits; production code is unchanged.
 
-### Cross-browser visual QA
+TLS needs OpenSSL (`OPENSSL_BIN` overrides; standard Windows Git paths are also
+checked). Temporary certificate/key and a specific SPKI allowlist are used;
+certificate checks are not globally disabled and the machine trust store is not
+changed. Negative cases withhold credentials from origin 401, mismatched host/port,
+passwordless proxy and excess wrong-password retries. A receiver barrier stops the
+exact worker through CDP between 407 responses and proves the two-response budget
+survives in `storage.session` for that request ID, without timing sleeps.
 
-Детерминированный visual harness проверяет Chromium и Firefox при 100%, 125% и
-150%, на английском и русском, для девяти popup states и семи Options sections:
+Receiver logs use only categories (`none`, `expected`, `known-wrong`, `unexpected`).
+Search PAC, RPC, DOM, diagnostics and errors for password/Basic-token leakage.
+External-controller takeover, deferred Turn off and restart persistence remain
+covered. Retry metadata has no credentials and clears at browser-session/extension
+reload boundaries. All services are local and Chrome executes PAC, not Node.
+This does not prove full UI, an existing-profile upgrade, arbitrary real-network
+leakage absence or machine policy behavior.
 
-```powershell
-$env:CHROMIUM_BIN = '<installed Chromium executable>'
-$env:FIREFOX_BIN = '<installed Firefox executable>'
-node ./scripts/cross-browser-visual-qa.mjs
-```
+<a id="браузерная-qa"></a>
 
-Кадры и JSON report сохраняются только в `.local/cross-browser-visual-qa/`.
-Harness не требует pixel equality: он блокирует пропавшие секции, горизонтальный
-overflow, clipped или непригодные controls; различия font metrics и сглаживания
-между engines допустимы. Fixture меняет только disposable copy popup, а не
-проверяемые package outputs. Полная матрица milestone описана в
-[cross-browser UX gate](qa/CROSS_BROWSER_0.0.4_UX.md).
+## Browser QA
 
-`CHROME_BIN` — явный авторитетный override. Без него скрипт проверяет только
-несколько стандартных путей установки и никогда не скачивает браузер. Тест
-запускает собранное unpacked MV3-расширение в одноразовом профиле и поднимает
-локальные PAC, origin и proxy на динамических loopback-портах. Через production
-RPC он сохраняет provider и PAC modifiers, применяет реальный
-`chrome.proxy.settings` и проверяет фактические HTTP receivers для Auto, Proxy
-и Direct. Тест также выполняет настоящий HTTP proxy authentication flow:
-первый запрос без credentials, ответ `407 Proxy Authentication Required`,
-`webRequest.onAuthRequired`, повторный запрос с ожидаемыми credentials и
-детерминированный ответ proxy. Второй, ранее не использованный authenticated
-proxy проверяется только после полного перезапуска Chrome с тем же профилем.
-Отдельные transport cases подтверждают обе HTTPS-границы: HTTPS destination
-через обычный HTTP proxy проходит настоящий `CONNECT -> 407 -> authenticated
-CONNECT -> TLS tunnel`, а PAC-кандидат `HTTPS host:port` устанавливает TLS до
-самого proxy и выполняет `407` внутри этого соединения. В обоих случаях
-отдельный direct trap остаётся пустым.
+Fakes do not prove a particular browser's behavior. Use disposable profiles,
+synthetic data and an authorized test proxy account; record exact browser versions:
 
-Для локальных TLS fixtures нужен установленный OpenSSL. `OPENSSL_BIN` задаёт
-явный override; на Windows smoke также проверяет обычные пути OpenSSL из Git for
-Windows. Сертификат и ключ создаются только во временном каталоге. Chrome
-получает только SHA-256 SPKI этого сертификата через
-`--ignore-certificate-errors-spki-list`; глобальное отключение проверки
-сертификатов и изменение machine trust store не используются.
+1. Install, cold start and background stop/restart.
+2. Source selection and unified Apply.
+3. Auto/Proxy/Direct with exact and domain/subdomain scope.
+4. Turn off, reapply, external control takeover/release.
+5. Changed/unchanged data refresh; OFF must stay OFF.
+6. Tor/WARP/own proxy when the test environment provides them.
+7. Real authenticated proxy challenge.
+8. PAC/proxy errors, health status and recovery.
+9. IndexedDB/state after restart and existing-profile upgrade.
+10. EN/RU UI, keyboard, narrow and desktop layouts.
 
-Негативные browser cases подтверждают отказ передавать proxy credentials на
-обычный origin `401`, несовпадающий host/port и passwordless proxy, а также
-ограничение повторов при неверном пароле. Отдельный синхронизированный case
-останавливает точную версию MV3 service worker через CDP между двумя `407` и
-подтверждает, что `storage.session` сохраняет общий лимит из двух credential
-responses для прежнего `requestId`. Receiver logs хранят только безопасные
-классы (`none`, `expected`, `known-wrong`, `unexpected`); password и reusable
-Basic token дополнительно ищутся в PAC, RPC responses, DOM, diagnostics и
-errors. Smoke сохраняет существующую проверку external-controller takeover,
-deferred Turn off и restart persistence. Внешняя сеть не нужна; PAC исполняет
-сам Chrome, а не Node.
+Focused checklists: [Action status](qa/ACTION_STATUS_BROWSER_QA.md),
+[Apply freshness](qa/PAC_APPLY_FRESHNESS_BROWSER_QA.md),
+[Download bounds](qa/PAC_DOWNLOAD_BOUNDS_BROWSER_QA.md),
+[PAC failures](qa/PAC_FAILURE_BROWSER_QA.md),
+[RPC credential redaction](qa/RPC_CREDENTIAL_BROWSER_QA.md).
+Never use a personal profile or random public proxy. Sanitize NetLog, PAC,
+history and screenshots before sharing.
 
-Smoke не заменяет ручные проверки upgrade существующего профиля и полного UI.
-Plain HTTP `407`, HTTPS destination `CONNECT` и TLS-to-proxy (`HTTPS` PAC
-scheme) покрыты отдельно; forced mid-request worker termination также покрыт
-receiver barrier без timing sleeps. Retry metadata живёт только в
-`chrome.storage.session`, не содержит credentials и очищается на границе
-browser session/extension reload. Тест не изменяет machine policy, а
-детерминированные loopback DNS и receiver checks не доказывают отсутствие
-утечек в произвольной реальной
-сети.
+## Firefox browser smoke
 
-### Полная Chromium verification
-
-```powershell
-npm --prefix $Project run verify:chromium
-```
-
-`test:pac` уже входит в `test:chromium`; рядом с `verify:chromium` повторять его не нужно.
-CI проверяет `git diff --exit-code` после target gate.
-
-### Полная Firefox verification
-
-```powershell
-npm --prefix $Project run verify:firefox
-```
-
-Gate запускает Firefox lint, deterministic tests и проверенную сборку. Он не
-требует Chromium gate, если изменение не затрагивает shared input.
-
-### Firefox proxy-auth и внешний владелец
-
-После `verify:firefox` отдельный browser smoke проверяет собранный пакет без
-измерительных вставок на установленном Firefox (`FIREFOX_BIN` позволяет выбрать
-executable):
+After `verify:firefox`, select installed Firefox with optional `FIREFOX_BIN`:
 
 ```powershell
 node .\extension\src\firefox\test\firefox-auth-control-smoke.js
-```
-
-[Сценарий](../../extension/src/firefox/test/firefox-auth-control-smoke.js)
-создаёт одноразовый профиль, локальные HTTP receivers и временное расширение
-для захвата proxy settings. Проверяются реальные HTTP 407, изменение только
-пароля того же proxy endpoint, Save B при Effective A, настоящее event-page
-recreation с pending B, затем явный Apply B. При ошибочном пароле допускаются
-две credential attempts, следующий запрос получает собственный retry budget.
-Origin 401 остаётся ответом сайта: handler не отменяет website authentication
-и не подставляет proxy credentials. Сценарий проверяет настоящий browser retry
-с отдельными учётными данными сайта через Proxy и explicit Direct, а также
-отсутствие proxy credentials у origin. Proxy 407 без настроенных credentials
-завершается отказом без Direct fallback.
-
-Второе тестовое расширение приобретает proxy settings: product переходит в
-durable OFF и показывает `EXT`. Clear возвращает `OWNERSHIP_MISMATCH`, сохраняя
-внешний proxy. После удаления внешнего владельца старый product floor
-освобождается, остаются OFF и исходная Direct-настройка. Проверяются реальные
-receiver responses и значения Action API, не визуальная отрисовка значка.
-
-Пароли генерируются случайно; stdout содержит только этапы и категории
-`NONE`/`A`/`B`/`OTHER`, без headers, паролей и raw browser errors. Перед каждой
-сетевой проверкой privileged test driver очищает auth cache **только временного
-профиля** через Firefox
-[`nsIHttpAuthManager.clearAll`](https://searchfox.org/firefox-main/source/netwerk/protocol/http/nsIHttpAuthManager.idl).
-Это принудительно проверяет новый challenge; production Apply не очищает
-browser auth cache, а существующие соединения могут пережить Apply. Отрицательные
-сценарии используют same-origin page fetch: отменённая navigation может не
-выдать событие load, которого ждёт Marionette. Timeout fetch считается ошибкой,
-требуется настоящий network rejection.
-
-Полный запуск включает 65 секунд idle и проверяет новый boot ID. `--quick`
-пропускает только этот шаг для разработки и явно выводит
-`recreationChecked: false`; он не заменяет полный сценарий. Browser smoke не
-входит в deterministic `verify:firefox`. Профиль, helper и серверы удаляются
-после завершения. CONNECT/HTTPS proxy, native prompt/UI, гонка in-flight auth с
-Apply и полный restart подписанного постоянно установленного Firefox package
-этим smoke не проверяются.
-
-Тот же maintained smoke проверяет ручной источник отдельно:
-
-```powershell
 node .\extension\src\firefox\test\firefox-auth-control-smoke.js --manual
 ```
 
-Флаг `--manual` исключает Anticensority artifact только из одноразовой тестовой
-копии пакета. Сценарий подтверждает недоступность базы, Save при OFF, manual
-Apply с own-proxy auth и noDirect, настоящий idle event-page restart с pending
-Anticensority/password changes и восстановление manual Effective. Неудачный
-provider Apply сохраняет прежнюю manual session; проверяются последующий manual
-Apply, explicit Direct, website auth и ownership/OFF. Эта проверка не доказывает
-отсутствие фоновых source requests: в manual mode они остаются включёнными,
-а stage/defer contract проверяется детерминированными тестами.
+The disposable profile/local receivers and temporary takeover extension check real
+407, password-only changes, Save B while Effective A serves requests, recreation
+with pending B, then Apply B. Wrong passwords allow two attempts; new requests get
+their own budget. Origin 401 remains website-owned, through Proxy and explicit
+Direct, without proxy credentials. Proxy 407 without credentials fails without
+Direct fallback.
 
-### Firefox ESR и отдельный тестовый пакет
+A second extension takes ownership: product becomes durable OFF/EXT; Clear returns
+`OWNERSHIP_MISMATCH` and preserves external proxy. Removing it releases the
+resurfaced product floor, leaving OFF and original Direct. Assertions inspect real
+receivers/Action API, not visual icon painting. Random passwords never enter stdout,
+only stages/categories (`NONE`/`A`/`B`/`OTHER`); raw errors/headers are not logged.
 
-Для проверки другой версии браузера задайте `FIREFOX_BIN`. Три сценария
-`firefox-lifecycle-smoke.js`, `firefox-proxy-control-smoke.js` и
-`firefox-auth-control-smoke.js` также принимают `FIREFOX_PACKAGE_ROOT` —
-абсолютный путь к явно подготовленной тестовой копии пакета. Без него они
-используют `extension/build/firefox`. Переменная не меняет production manifest.
-Сценарии разрешают Marionette system access только запущенному тестовому
-процессу с одноразовым профилем, без изменения установленного Firefox.
-См. [проверку Firefox 153 ESR на Linux](qa/FIREFOX_ESR_153.md).
+The privileged driver clears auth cache only in its disposable profile with
+`nsIHttpAuthManager.clearAll` before network cases to force challenges. Production
+Apply does not clear browser cache or existing connections. Negative cases use
+same-origin fetch because cancelled navigation may omit Marionette's expected load
+event; timeout is failure, not a substitute for actual network rejection.
 
-### Firefox routing-data refresh
+Full smoke includes 65 seconds idle and a changed boot ID. `--quick` skips only
+that step and reports `recreationChecked: false`; it is not full coverage. The
+smoke is separate from deterministic verify and cleans its profile/helper/servers.
+It does not test HTTPS/CONNECT proxy, native prompt/UI, an in-flight auth-vs-Apply
+race, or full restart of a permanently installed signed Firefox package.
 
-Детерминированные suites `provider-source-updater`, `provider-update-control`,
-`dataset-https`, `dataset-promotion` и `saved-effective` входят в Firefox gate.
-Они проверяют фиксированные HTTPS URL, границы redirects/bytes/deadline,
-строгий разбор данных и source timestamp, distinct HTTPS/signed trust,
-rollback/conflict и immutable-artifact collision, queued input snapshot,
-OFF/ON promotion, pending Saved isolation, private-access/control loss и
-cross-store crash recovery. Manual-mode cases проверяют Apply/recovery без
-provider artifact/store/index, exact built-in identity, source Save/Apply isolation,
-legacy source default и deferred refresh при manual Saved или Effective.
-Старые signed fixtures остаются отдельными
-регрессиями; успешный HTTPS тест не доказывает проверку подписи автора.
+`--manual` removes the Anticensority artifact only from its test copy. It checks
+unavailable data storage, OFF Save, manual Apply/own-proxy auth/noDirect, idle
+recreation with pending source/password changes and manual Effective recovery.
+Failed provider Apply must preserve manual Effective; subsequent manual Apply,
+Direct, website auth, ownership and OFF are checked. It does not prove no source
+requests occur: manual mode still allows source checks; stage/defer is covered by
+deterministic tests.
 
-Проверка настоящего источника должна различать дату исходных данных и время
-проверки. Валидный старый источник может дать `UNCHANGED`; это не ошибка и не
-доказательство свежего dataset. Browser QA отдельно проверяет ручное обновление,
-срабатывание alarm, OFF без включения, обновление при READY с pending Saved и
-сохранение prepared candidate при blocked/control-loss. Детерминированный gate
-сам по себе не является подтверждением этих browser-сценариев.
+`firefox-lifecycle-smoke.js`, `firefox-proxy-control-smoke.js` and the auth smoke
+accept absolute `FIREFOX_PACKAGE_ROOT`, defaulting to `extension/build/firefox`.
+It does not modify the manifest. Marionette system access is confined to the
+launched process/profile, not installed Firefox. The optional
+[ESR/Linux procedure](qa/FIREFOX_ESR_153.md) is a scenario, not completed QA.
 
-### Aggregate maintained verification
+## Firefox data refresh
 
-```powershell
-npm --prefix $Project run verify
-```
+Included deterministic suites (`provider-source-updater`, `provider-update-control`,
+`dataset-https`, `dataset-promotion`, `saved-effective`) cover fixed URLs, redirects,
+size/deadline, parsing/timestamps, distinct HTTPS/signed trust, rollback/conflicts,
+immutable collisions, queued snapshots, OFF/ON promotion, pending Saved, private
+access/control loss and cross-store recovery. Manual cases cover absent provider
+artifact/store/index, exact built-in identity, Save/Apply isolation, legacy source
+default and deferred updates with manual Saved/Effective. Old signed fixtures stay
+separate; HTTPS success never proves author-signature verification.
 
-Aggregate gate запускает tooling и оба browser source одним ESLint process,
-все deterministic suites одним Mocha process, затем оба build. Каждая suite,
-lint и build выполняется один раз без лишних npm-wrapper процессов. MV2 в
-текущем `main` не строится и не
-тестируется; историческая воспроизводимость принадлежит Git history/frozen
-development branch. CI исполняет эквивалентные policy/Chromium/Firefox части
-параллельно, а стабильный итоговый `Verify MV3` требует успеха каждой.
+In real-source checks, distinguish source date from check time: valid old content
+may be UNCHANGED, neither an error nor proof of freshness. Browser QA separately
+checks manual/alarm refresh, OFF, READY with pending Saved and staged preservation
+when blocked or control is lost. Deterministic tests do not establish those native
+browser results.
 
-## Проверка release package
+## Release package checks
 
-Для каждого кандидата убедитесь, что:
-
-- `manifest.json` находится в корне Chromium ZIP или Firefox XPI, а не во
-  вложенном каталоге;
-- распакованное содержимое совпадает с проверенной build directory;
-- package-integrity и runtime-icon verification прошли;
-- SHA-256 вычислен после окончательной упаковки;
-- docs screenshots, `.local`, `.tmp`, profiles и reports не попали в ZIP.
-
-Firefox дополнительно требует byte-identical two-build XPI/source archive,
-Mozilla addons-linter и проверку exact Gecko/data-collection manifest fields.
-См. [Firefox release candidate build](FIREFOX_RELEASE_BUILD.md).
-
-Подробности: [процесс выпуска](RELEASE_PROCESS.md).
-
-## Браузерная QA
-
-Автоматические fakes не доказывают поведение конкретного Chromium build.
-Используйте отдельный профиль и синтетические данные. Минимальная проверка:
-
-1. Load unpacked, cold start, stop/restart service worker.
-2. Выбор provider и единый Apply configuration.
-3. Auto/Proxy/Direct для точного хоста и домена/поддоменов.
-4. Turn off, повторный apply и external owner takeover/release.
-5. Changed и unchanged PAC refresh; выключенное управление не должно само
-   включиться.
-6. Tor/WARP/собственный proxy по мере доступности тестовой среды.
-7. Реальный authenticated proxy challenge отдельным тестовым аккаунтом.
-8. Ошибки PAC/proxy, health badge и восстановление.
-9. IndexedDB/state после worker restart и upgrade существующего профиля.
-10. Русский и английский UI, keyboard flow, narrow/desktop layout.
-
-Точечные чек-листы:
-
-- [Action status](qa/ACTION_STATUS_BROWSER_QA.md)
-- [PAC apply freshness](qa/PAC_APPLY_FRESHNESS_BROWSER_QA.md)
-- [PAC download bounds](qa/PAC_DOWNLOAD_BOUNDS_BROWSER_QA.md)
-- [PAC failure behavior](qa/PAC_FAILURE_BROWSER_QA.md)
-- [RPC credential redaction](qa/RPC_CREDENTIAL_BROWSER_QA.md)
-
-Не используйте личный профиль или публичный случайный proxy. Не публикуйте
-NetLog, PAC, history или screenshots до проверки на чувствительные данные.
+Manifest must be at ZIP/XPI root; extracted bytes must match the verified build.
+Require package/icon checks and hashes after final packaging, with no docs images,
+profiles, `.local`, `.tmp` or reports. Firefox additionally requires byte-identical
+two-build XPI/source, Mozilla addons-linter and exact Gecko/data-collection fields.
+See [Firefox release build](FIREFOX_RELEASE_BUILD.md) and
+[Release process](RELEASE_PROCESS.md).

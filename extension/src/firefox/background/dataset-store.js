@@ -22,12 +22,13 @@
     function(Dataset, DatasetState, Antifilter) {
 
       const DATABASE_NAME = 'rucb-firefox-provider-datasets-v1';
-      const DATABASE_VERSION = 1;
+      const DATABASE_VERSION = 2;
       const LEGACY_POINTER_SCHEMA_VERSION = 1;
       const POINTER_SCHEMA_VERSION = 2;
       const HTTPS_POINTER_SCHEMA_VERSION = 3;
       const ARTIFACT_STORE = 'artifacts';
       const POINTER_STORE = 'providerPointers';
+      const HISTORY_STORE = 'artifactHistory';
       const SHA256_PATTERN = /^[a-f0-9]{64}$/;
       const PROVIDER_KEY_PATTERN =
         /^[a-z0-9](?:[a-z0-9._-]{0,63})$/;
@@ -415,6 +416,11 @@
                     keyPath: 'providerKey',
                   });
                 }
+                if (!database.objectStoreNames.contains(HISTORY_STORE)) {
+                  database.createObjectStore(HISTORY_STORE, {
+                    keyPath: 'artifactSha256',
+                  });
+                }
               };
               request.onsuccess = () => resolve(request.result);
               request.onerror = () => reject(
@@ -451,11 +457,12 @@
           const database = await openDatabase();
           return new Promise((resolve, reject) => {
             const transaction = database.transaction(
-                [ARTIFACT_STORE, POINTER_STORE],
+                [ARTIFACT_STORE, POINTER_STORE, HISTORY_STORE],
                 'readwrite',
             );
             const artifacts = transaction.objectStore(ARTIFACT_STORE);
             const pointers = transaction.objectStore(POINTER_STORE);
+            const history = transaction.objectStore(HISTORY_STORE);
             let failure = null;
             if (!nextArtifact) {
               pointers.put(nextPointers);
@@ -478,6 +485,7 @@
                 if (!existing) {
                   artifacts.add(nextArtifact);
                 }
+                history.put({artifactSha256: nextArtifact.artifactSha256});
                 pointers.put(nextPointers);
               } catch (error) {
                 failure = error;
@@ -499,6 +507,93 @@
 
         }
 
+        async function hasArtifactHash(artifactSha256) {
+
+          const database = await openDatabase();
+          return new Promise((resolve, reject) => {
+            const transaction = database.transaction(
+                [ARTIFACT_STORE, HISTORY_STORE], 'readonly',
+            );
+            const artifacts = transaction.objectStore(ARTIFACT_STORE);
+            const history = transaction.objectStore(HISTORY_STORE);
+            let found = false;
+            const artifactRequest = artifacts.getKey(artifactSha256);
+            const historyRequest = history.getKey(artifactSha256);
+            artifactRequest.onsuccess = () => {
+              found = found || artifactRequest.result !== undefined;
+            };
+            historyRequest.onsuccess = () => {
+              found = found || historyRequest.result !== undefined;
+            };
+            transaction.oncomplete = () => resolve(found);
+            transaction.onerror = () => reject(
+                transaction.error || storeError('INDEXED_DB_READ_FAILED'),
+            );
+            transaction.onabort = () => reject(
+                transaction.error || storeError('INDEXED_DB_READ_ABORTED'),
+            );
+          });
+
+        }
+
+        async function collectGarbage(protectedArtifactShas = []) {
+
+          const database = await openDatabase();
+          const protectedHashes = new Set(protectedArtifactShas.filter(isSha256));
+          return new Promise((resolve, reject) => {
+            const transaction = database.transaction(
+                [ARTIFACT_STORE, POINTER_STORE, HISTORY_STORE], 'readwrite',
+            );
+            const artifacts = transaction.objectStore(ARTIFACT_STORE);
+            const pointers = transaction.objectStore(POINTER_STORE);
+            const history = transaction.objectStore(HISTORY_STORE);
+            const artifactRequest = artifacts.getAllKeys();
+            const pointerRequest = pointers.getAll();
+            let deleted = 0;
+            let failure = null;
+            let artifactHashes = null;
+            let pointerRecords = null;
+            const sweep = () => {
+              if (artifactHashes === null || pointerRecords === null) return;
+              for (const pointer of pointerRecords) {
+                if (!pointer || typeof pointer !== 'object' ||
+                    !isProviderKey(pointer.providerKey) ||
+                    Object.values(normalizePointers(pointer, pointer.providerKey).corruptions)
+                        .some(Boolean)) {
+                  failure = storeError('DATASET_POINTER_STATE_CORRUPT');
+                  transaction.abort();
+                  return;
+                }
+                for (const field of POINTER_FIELDS) {
+                  if (isSha256(pointer[field])) protectedHashes.add(pointer[field]);
+                }
+              }
+              for (const artifactSha256 of artifactHashes) {
+                if (protectedHashes.has(artifactSha256)) continue;
+                history.put({artifactSha256});
+                artifacts.delete(artifactSha256);
+                deleted++;
+              }
+            };
+            artifactRequest.onsuccess = () => {
+              artifactHashes = artifactRequest.result || [];
+              sweep();
+            };
+            pointerRequest.onsuccess = () => {
+              pointerRecords = pointerRequest.result || [];
+              sweep();
+            };
+            transaction.oncomplete = () => resolve(deleted);
+            transaction.onerror = () => reject(
+                failure || transaction.error || storeError('INDEXED_DB_GC_FAILED'),
+            );
+            transaction.onabort = () => reject(
+                failure || transaction.error || storeError('INDEXED_DB_GC_ABORTED'),
+            );
+          });
+
+        }
+
         return Object.freeze({
           commit,
           readArtifact(artifactSha256) {
@@ -506,6 +601,8 @@
             return read(ARTIFACT_STORE, artifactSha256);
 
           },
+          hasArtifactHash,
+          collectGarbage,
           readPointers(providerKey) {
 
             return read(POINTER_STORE, providerKey);
@@ -519,7 +616,9 @@
 
         if (!backend || typeof backend.readArtifact !== 'function' ||
             typeof backend.readPointers !== 'function' ||
-            typeof backend.commit !== 'function') {
+            typeof backend.commit !== 'function' ||
+            typeof backend.hasArtifactHash !== 'function' ||
+            typeof backend.collectGarbage !== 'function') {
           throw storeError('INVALID_DATASET_STORE_BACKEND');
         }
         if (typeof sha256 !== 'function') {
@@ -924,7 +1023,7 @@
           }
           // Reusing an older/orphaned immutable record with a new envelope
           // cannot establish a new candidate; keep it for exact recovery only.
-          if (await backend.readArtifact(artifactSha256)) return rejection('HTTPS_KNOWN_ARTIFACT_REPLAY');
+          if (await backend.hasArtifactHash(artifactSha256)) return rejection('HTTPS_KNOWN_ARTIFACT_REPLAY');
           const sequence = pointers.httpsState ? pointers.httpsState.sequence + 1 : 1;
           if (!Number.isSafeInteger(sequence)) return rejection('HTTPS_SEQUENCE_EXHAUSTED');
           pointers.httpsState = {sequence, artifactSha256, source};
@@ -1093,6 +1192,13 @@
           },
           loadVerifications,
           loadStaged,
+          collectGarbage(protectedArtifactShas = []) {
+
+            return enqueueMutation(() => backend.collectGarbage(
+                protectedArtifactShas,
+            ));
+
+          },
           promoteStaged(providerKey) {
 
             return enqueueMutation(() => promoteStaged(providerKey));

@@ -521,6 +521,21 @@ describe('Chromium popup UI', () => {
         }
 
       });
+
+  it('distinguishes active routing from unavailable proxy sign-in', async () => {
+
+    const harness = createPopupHarness({state: createPopupState({
+      configuration: {active: true, pending: false, blocked: false},
+      proxyAuthBinding: {status: 'unavailable', reason: 'session_blocked'},
+    })});
+    harness.start();
+    await flushUi();
+    expect(harness.root.textContent).to.include('Protection active');
+    expect(harness.root.textContent).to.include('Proxy sign-in unavailable');
+    expect(harness.root.textContent).to.include('Restart the browser');
+
+  });
+
   it('checks routing data once, preserves the site draft, and renders only sanitized outcomes', async function() {
     const state = createPopupState({routingData: {source: 'antizapret',
       sourceUpdatedAt: Date.UTC(2025, 0, 1), lastCheckedAt: Date.now(),

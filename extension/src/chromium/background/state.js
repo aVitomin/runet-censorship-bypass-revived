@@ -1138,6 +1138,20 @@
 
   }
 
+  function collectPacArtifacts(retainedCaches, canCollect) {
+
+    return enqueueStateOperation(async () => {
+      const state = await loadStateFromStorage();
+      if (!canCollect()) return {status: 'busy', deleted: 0};
+      // The Effective queue is held by the caller; this queue also prevents a
+      // Saved reference or legacy inline migration from changing during sweep.
+      const refs = [state.pacCache, state.cookedPacCache, ...retainedCaches]
+          .map((cache) => cache && cache.artifactRef).filter(Boolean);
+      return mv3PacArtifacts.collectUnreferenced(refs, canCollect);
+    });
+
+  }
+
   async function saveStatePatchNow(patch, currentStateOverride) {
 
     const currentState = currentStateOverride || await loadStateFromStorage();
@@ -1891,6 +1905,7 @@
     createInvalidatedProxyHealth,
     getNextProxyHealthCheckSequence,
     loadState,
+    collectPacArtifacts,
     saveStatePatch,
     updateStateAtomically,
     savePacMods,

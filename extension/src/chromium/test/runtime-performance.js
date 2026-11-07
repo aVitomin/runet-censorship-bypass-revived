@@ -147,7 +147,7 @@ Mocha.describe('Chromium runtime performance operation counts', function() {
           'actionCalls',
         ])).to.deep.equal({
           runtimeRpcs: 1,
-          storageGets: 2, // Saved plus the immutable Effective projection.
+          storageGets: 3, // Saved, Effective and redacted session-binding status.
           hashOperations: 1,
           actionCalls: 0,
         });
@@ -162,7 +162,7 @@ Mocha.describe('Chromium runtime performance operation counts', function() {
           'alarmGets',
         ])).to.deep.equal({
           runtimeRpcs: 1,
-          storageGets: 2,
+          storageGets: 3, // Includes the redacted session-binding status.
           hashOperations: 1,
           actionCalls: 0,
           alarmGets: 2,
@@ -240,7 +240,7 @@ Mocha.describe('Chromium runtime performance operation counts', function() {
             'storageSets',
           ])).to.deep.equal({
             runtimeRpcs: 1,
-            storageGets: 3,
+            storageGets: 4, // Popup also checks session-binding status.
             storageSets: 1,
           });
         }
@@ -282,7 +282,7 @@ Mocha.describe('Chromium runtime performance operation counts', function() {
         ])).to.deep.equal({
           indexedDbReads: 3,
           indexedDbWrites: 2,
-          storageGets: 44,
+          storageGets: 46, // GC reads authoritative Effective and Saved roots.
           storageSets: 13,
           tabGets: 2,
           pacDownloads: 1,
@@ -325,7 +325,7 @@ Mocha.describe('Chromium runtime performance operation counts', function() {
           'proxySettingsWrites',
           'actionCalls',
         ])).to.deep.equal({
-          storageGets: 23,
+          storageGets: 25, // GC reads authoritative Effective and Saved roots.
           storageSets: 6,
           indexedDbReads: 2,
           indexedDbWrites: 0,

@@ -1,6 +1,6 @@
 {
   "name": "runet-censorship-bypass",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Development tools for the Chromium and Firefox extension",
   "scripts": {
     "lint:chromium": "eslint ./src/chromium/**/*.js ./src/shared/**/*.js",

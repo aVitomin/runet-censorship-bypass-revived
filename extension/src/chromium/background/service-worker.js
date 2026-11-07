@@ -272,6 +272,7 @@ async function finishActionOperation(operation) {
   activeActionOperations.delete(operation);
   supersededActionOperations.delete(operation);
   await updateActionStatusFromStoredState({}).catch(() => undefined);
+  if (operation.kind !== 'check') await collectPacArtifactsSafely();
 
 }
 
@@ -285,6 +286,19 @@ async function runWithActionOperation(kind, execute) {
     return await execute();
   } finally {
     await finishActionOperation(operation);
+  }
+
+}
+
+async function collectPacArtifactsSafely() {
+
+  try {
+    return await mv3Effective.collectArtifacts(() =>
+      activeActionOperations.size === 0 && !pacDownloadPromise &&
+      !pacCookPromise && !activePacApplyOperation && !mv3PeriodicUpdate.isUpdateInFlight());
+  } catch (_error) {
+    // Cleanup is optional; never turn a committed update into a failed Apply.
+    return {status: 'deferred', deleted: 0};
   }
 
 }
@@ -888,6 +902,7 @@ const RPC_METHODS = Object.freeze({
       providers: getProvidersForState(state, true),
       artifactStorage: mv3PacArtifacts.getStatus(),
       proxyAuth: getProxyAuthStatusFromState(state),
+      proxyAuthBinding: await mv3Effective.getBindingStatus(),
       periodicUpdate,
       reliability: {
         autoUpdate: getPacAutoUpdateSummary(state),
@@ -2119,6 +2134,7 @@ async function createPopupState(tabUrl, state, includeConfiguration = true) {
   const autoUpdate = getPacAutoUpdateSummary(state);
   return {
     configuration,
+    proxyAuthBinding: includeConfiguration ? await mv3Effective.getBindingStatus() : null,
     routingData: includeConfiguration ? popupRoutingDataStatus(state, effective) : null,
     uiLanguage: state.uiLanguage || 'auto',
     host: target.host || '',
@@ -4169,53 +4185,18 @@ async function notifyErrorIfEnabled(type, title, message) {
 async function clearPacCacheAndArtifacts() {
 
   await invalidatePacWorkflowFreshness();
-  const cache = await mv3State.getPacCache();
-  if (cache.providerKey && cache.rawPacSha256 &&
-      !await mv3Effective.protectsArtifact(cache.artifactRef)) {
-    try {
-      await mv3PacArtifacts.deleteRawPacArtifact({
-        providerKey: cache.providerKey,
-        sha256: cache.rawPacSha256,
-      });
-    } catch (err) {
-      return createPacDownloadFailure(
-          err.code || 'PAC_ARTIFACT_DELETE_FAILED',
-          err.message || 'Failed to delete raw PAC artifact.',
-          {
-            providerKey: cache.providerKey,
-            details: err.details || null,
-          },
-      );
-    }
-  }
-  return mv3State.clearPacCache();
+  const result = await mv3State.clearPacCache();
+  await collectPacArtifactsSafely();
+  return result;
 
 }
 
 async function clearCookedPacCacheAndArtifacts() {
 
   await invalidatePacWorkflowFreshness();
-  const cache = await mv3State.getCookedPacCache();
-  if (cache.providerKey && cache.cookedPacSha256 &&
-      !await mv3Effective.protectsArtifact(cache.artifactRef)) {
-    try {
-      await mv3PacArtifacts.deleteCookedPacArtifact({
-        providerKey: cache.providerKey,
-        sha256: cache.cookedPacSha256,
-      });
-    } catch (err) {
-      return createPacCookFailure(
-          err.code || 'PAC_ARTIFACT_DELETE_FAILED',
-          err.message || 'Failed to delete cooked PAC artifact.',
-          {
-            providerKey: cache.providerKey,
-            sourceRawPacSha256: cache.sourceRawPacSha256,
-            details: err.details || null,
-          },
-      );
-    }
-  }
-  return mv3State.clearCookedPacCache();
+  const result = await mv3State.clearCookedPacCache();
+  await collectPacArtifactsSafely();
+  return result;
 
 }
 
