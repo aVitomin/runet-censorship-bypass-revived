@@ -6,22 +6,21 @@ the other channels. This document grants no permission to bump
 versions, sign, tag, create releases, upload or submit store packages. Obtain
 separate maintainer authorization for those actions.
 
-The maintained source and manifests identify the unreleased `1.0.3` candidate.
-This does not declare a published release, completed store submission or
-validation of a particular archive. Record the final approved version, exact
-main SHA, browser QA, trusted-main run, artifact names and SHA-256 in the release
-record. Published-release documentation identifies the latest available
-version separately for each browser.
+The maintained source and manifests identify `1.0.3`. Its Chromium ZIP is
+published; both store submissions and the signed Firefox update remain pending.
+The [release record](../development/releases/1.0.3.md) binds source, trusted-main
+CI and canonical artifacts. Publication status remains independent per channel.
 
 ## Current channel status
 
-Last confirmed on 2026-11-04; this is not a live store-status feed.
+Last confirmed on 2026-11-07; this is not a live store-status feed.
 
-- [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph): public **1.0.2**, Revived name, updated November 4, 2026; Chromium **108+**. Publication is not a general PAC-policy exception for future changes.
+- [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph): public **1.0.2**, Revived name, updated November 5, 2026; Chromium **108+**. Publication is not a general PAC-policy exception for future changes.
 - [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/): public **1.0.2**, desktop Firefox **140+**, Revived name in English and Russian. Mozilla file **5202515** is public.
+- [GitHub Release v1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.3): Chromium ZIP and checksum are public and were downloaded again with identical bytes. Firefox 1.0.3 XPI/reviewer source are verified but not submitted or signed.
 - [GitHub Release v1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.2): Chromium ZIP and Mozilla-signed Firefox XPI, each with a checksum. The release tag and package bytes remain unchanged.
-- The signed Firefox runtime matches the canonical candidate; only manifest formatting and Mozilla signature files differ. Signature-enforced permanent update from 1.0.1 and restart passed on Windows Firefox 159.0 with OFF, applied and pending settings preserved. This does not assert automatic store delivery or Linux QA.
-- See the [release record](../development/releases/1.0.2.md) for hashes and full validation boundaries; the [link audit](LINK_AUDIT_1_0.md) lists the remaining listing-copy corrections.
+- The signed Firefox **1.0.2** runtime matches the canonical candidate; only manifest formatting and Mozilla signature files differ. Signature-enforced permanent update from 1.0.1 and restart passed on Windows Firefox 159.0 with OFF, applied and pending settings preserved. This does not assert automatic store delivery or Linux QA.
+- See the [1.0.3 record](../development/releases/1.0.3.md) and [1.0.2 record](../development/releases/1.0.2.md) for hashes and full validation boundaries; the [link audit](LINK_AUDIT_1_0.md) lists the remaining listing-copy corrections.
 
 The remaining checklists are procedures for a submission or future update;
 unchecked boxes are not a claim that the confirmed submissions did not occur.

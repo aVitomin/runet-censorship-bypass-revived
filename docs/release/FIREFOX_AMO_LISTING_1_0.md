@@ -1,17 +1,18 @@
 # Firefox Add-ons — listing copy 1.0.2
 
-**Version 1.0.2 is public; verified on 2026-11-04:**
+**Version 1.0.2 is public; verified on 2026-11-07:**
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/),
 Mozilla file 5202515. Localized names, descriptions, release notes and current
 guide links are present. The text below is maintained listing copy, not proof
-that every field matches the live card.
+that every field matches the live card. The 1.0.3 XPI/reviewer source are ready;
+submission and signing remain pending. See [1.0.3 changes](../user/CHANGES_1_0_3.md).
 
 ## Listing fields
 
 Keep the existing AMO entry, Gecko ID and public URL. Both localized homepages
 point to the renamed repository. The support field still points to its root;
-use the issue-form URL below. Five screenshot captions are present in English;
-add their Russian translations. See the [link audit](LINK_AUDIT_1_0.md).
+use the issue-form URL below. All five screenshot captions are present in both
+English and Russian. See the [link audit](LINK_AUDIT_1_0.md).
 
 - **Title:** Runet Censorship Bypass — Revived
 - **Summary:** Choose Auto, Proxy or Direct for websites. Manage site rules and proxy connections, with separate Save and Apply controls.

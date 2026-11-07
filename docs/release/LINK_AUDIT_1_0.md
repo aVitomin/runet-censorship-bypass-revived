@@ -5,7 +5,18 @@ security and official store-guidance links used by this publication set.
 This dated record does not establish current URL availability.
 Historical/upstream attribution in `docs/legacy/` is not rewritten.
 
-## Current store check — 2026-11-04
+## Current store check — 2026-11-07
+
+Both public stores still offer **1.0.2**. Chrome reports November 5, 2026 as its
+update date. The existing application IDs and install URLs are unchanged.
+
+- Chrome listing now links to `USER_GUIDE_1_0_2.md`; the previous guide correction is complete.
+- Firefox public API exposes all five screenshot captions in both Russian and English.
+- Firefox support links in both locales still point to the repository root; use the issue-form URL below when updating the listing.
+- GitHub **1.0.3** Chromium ZIP and checksum were published and downloaded again; exact bytes, tag and source SHA were verified. Store submissions and signed Firefox 1.0.3 remain pending.
+- This is public metadata/link verification, not proof of store auto-update or a new routing test.
+
+## Previous store check — 2026-11-04
 
 Chrome Web Store and Mozilla Add-ons both publicly offer **1.0.2** under the
 Revived name. Chrome reports November 4, 2026 as its update date. The existing
