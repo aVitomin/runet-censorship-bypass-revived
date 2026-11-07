@@ -1,11 +1,12 @@
-# Firefox Add-ons — listing copy 1.0.2
+# Firefox Add-ons — listing copy 1.0.x
 
-**Version 1.0.2 is public; verified on 2026-11-07:**
+**Version 1.0.3 is public; verified on 2026-11-07:**
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/),
-Mozilla file 5202515. Localized names, descriptions, release notes and current
-guide links are present. The text below is maintained listing copy, not proof
-that every field matches the live card. The 1.0.3 XPI/reviewer source are ready;
-submission and signing remain pending. See [1.0.3 changes](../user/CHANGES_1_0_3.md).
+Mozilla file 5221829. Localized names, descriptions and current guide links are
+present. Public version notes for 1.0.3 are empty; add concise notes from
+[1.0.3 changes](../user/CHANGES_1_0_3.md) when updating the dashboard. The signed
+XPI is verified and mirrored on GitHub. The text below is maintained listing
+copy, not proof that every field matches the live card.
 
 ## Listing fields
 
@@ -131,7 +132,7 @@ Firefox обрабатывает данные с закреплённых HTTPS-
 
 ## Maintainer attachments — not part of description
 
-Use the version-specific 1.0.2 reviewer notes prepared for this submission,
+Use the version-specific reviewer notes and [1.0.3 release record](../development/releases/1.0.3.md),
 the [permission/privacy audit](PERMISSIONS_AND_PRIVACY_1_0.md), and the five
 [Firefox screenshots](../assets/releases/1.0.2/README.md) for each locale.
 These are actual 1280×800 captures from the local candidate, with demonstration

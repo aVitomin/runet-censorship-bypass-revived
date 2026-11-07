@@ -10,11 +10,11 @@
 - [Приватность 1.0](release/PRIVACY_1_0.md)
 - [Снимки интерфейса 1.0.2](assets/releases/1.0.2/README.md)
 
-**Firefox 1.0.2** доступен в [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
+**Firefox 1.0.3** доступен в [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
 В [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph)
-также опубликована **1.0.2**. Для ручной установки доступны
-**Chromium ZIP 1.0.3** и **подписанный Firefox XPI 1.0.2**.
-Обновление магазинов до 1.0.3 ещё не отправлено.
+пока опубликована **1.0.2**. Для ручной установки доступны
+**Chromium ZIP 1.0.3** и **подписанный Firefox XPI 1.0.3**.
+Обновление Chrome отправлено; его публикация ещё не подтверждена.
 Для старого Firefox **0.0.4.0** сохранены отдельные [руководство](user/USER_GUIDE.md),
 [решение проблем](user/TROUBLESHOOTING.md) и [приватность](user/PRIVACY_AND_SECURITY.md).
 
@@ -40,5 +40,5 @@
 
 Start with [installation](user/INSTALLATION.md#english-summary),
 [the 1.0.2 guide](user/USER_GUIDE_1_0_2.md#english-summary), or [help and bug reports](../SUPPORT.md#english).
-**Version 1.0.2** is available in both Mozilla Add-ons and Chrome Web Store.
-Chromium ZIP **1.0.3** and signed Firefox XPI **1.0.2** are available for manual installation. Store submissions for 1.0.3 are pending. [Changes in 1.0.3](user/CHANGES_1_0_3.md#english). For development, use the separate guides above. Older Firefox **0.0.4.0** has its own documentation.
+Mozilla Add-ons publishes **1.0.3**; Chrome Web Store still publishes **1.0.2**.
+Chromium ZIP and signed Firefox XPI **1.0.3** are available for manual installation. The Chrome update was submitted; public availability is not yet confirmed. [Changes in 1.0.3](user/CHANGES_1_0_3.md#english). For development, use the separate guides above. Older Firefox **0.0.4.0** has its own documentation.

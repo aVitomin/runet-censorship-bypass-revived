@@ -5,7 +5,18 @@ security and official store-guidance links used by this publication set.
 This dated record does not establish current URL availability.
 Historical/upstream attribution in `docs/legacy/` is not rewritten.
 
-## Current store check — 2026-11-07
+## Current store check — 2026-11-07, 18:58 UTC
+
+Firefox Add-ons now offers **1.0.3**, public file **5221829**. Its signed XPI
+matches the canonical runtime and the verified GitHub mirror. Chrome Web Store
+still offers **1.0.2**; the publisher reports submitting the update, but its
+publication is not confirmed. Existing install URLs and extension IDs are unchanged.
+
+- Chrome guide link is current. Firefox support still points to the repository root in both locales.
+- Firefox has all five RU/EN screenshot captions; the new version has no release notes in the public API. Add the concise version notes in the dashboard when convenient.
+- XPI/checksum public readback and permanent signed Firefox update/restart passed. This does not assert automatic store delivery.
+
+## Earlier check — 2026-11-07, before Firefox publication
 
 Both public stores still offer **1.0.2**. Chrome reports November 5, 2026 as its
 update date. The existing application IDs and install URLs are unchanged.

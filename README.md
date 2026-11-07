@@ -5,9 +5,9 @@
 # Runet Censorship Bypass — Revived
 
 Независимый форк [Anticensority](https://github.com/anticensority/runet-censorship-bypass).
-**Chromium ZIP 1.0.3 доступен для ручной установки.**
-В Chrome Web Store и Firefox Add-ons пока доступна **1.0.2**; обновление
-магазинов до 1.0.3 ещё не отправлено. Подписанный Firefox XPI остаётся **1.0.2**.
+**Firefox 1.0.3 опубликован в Firefox Add-ons.**
+Chromium ZIP и подписанный Firefox XPI **1.0.3** доступны на GitHub.
+В Chrome Web Store пока **1.0.2**; обновление отправлено, публикация 1.0.3 ещё не подтверждена.
 
 Выбирайте, как браузер открывает сайты: по автоматическим правилам, через
 настроенный прокси или напрямую. Расширение для Chromium и Firefox с интерфейсом
@@ -28,11 +28,11 @@
 | Браузер | Версия | Установка из магазина |
 | --- | --- | --- |
 | **Chrome, Brave и совместимые Chromium-браузеры** | **1.0.2** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
-| **Firefox 140+** | **1.0.2** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
+| **Firefox 140+** | **1.0.3** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 Магазинные установки получают одобренные обновления через браузер.
 Для ручной установки доступны **Chromium ZIP 1.0.3** и
-**подписанный Mozilla Firefox XPI 1.0.2**.
+**подписанный Mozilla Firefox XPI 1.0.3**.
 
 Расчётная совместимость **1.0.1–1.0.3** — настольные **Chromium 108+** и
 **Firefox 140+**, включая ESR, с необходимыми API.
@@ -40,7 +40,7 @@
 форка. [Требования и проверенные версии](docs/development/BROWSER_COMPATIBILITY.md).
 
 **Ручная установка:** [Chromium ZIP 1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-mv3-1.0.3-34ab51b.zip) ·
-[подписанный Firefox XPI 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-firefox-1.0.2-signed.xpi) ·
+[подписанный Firefox XPI 1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-firefox-1.0.3-signed.xpi) ·
 [изменения и файлы v1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.3).
 
 В **1.0.3** уменьшена лишняя фоновая работа, добавлена очистка неиспользуемых
@@ -120,21 +120,21 @@ SHA-256: `ef7ecd3f90295857aea08abe66bca9ad1a4e6d6e75a9861c15fbe0986553419e`
 
 [Контрольная сумма ZIP](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-mv3-1.0.3-34ab51b.zip.sha256.txt)
 
-**Firefox 1.0.2** — `runet-censorship-bypass-firefox-1.0.2-signed.xpi`
+**Firefox 1.0.3** — `runet-censorship-bypass-firefox-1.0.3-signed.xpi`
 
-SHA-256: `35aec76967e2b26198139766c507d828cd95572b86679d5b0e14ff4cdc0ee203`
+SHA-256: `e4f2ce0420bc52898dc576727961fb9647f2a6e7bfc8a14345886d660a331e69`
 
-[Контрольная сумма XPI](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.2/runet-censorship-bypass-firefox-1.0.2-signed.sha256.txt) ·
-[Выпуск 1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.2)
+[Контрольная сумма XPI](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-firefox-1.0.3-signed.sha256.txt) ·
+[Выпуск 1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.3)
 
 </details>
 
 ## English
 
 **Runet Censorship Bypass — Revived** is an independent Anticensority fork.
-**Version 1.0.2 is available in Chrome Web Store and Firefox Add-ons.**
-**Chromium ZIP 1.0.3** is available for manual installation; the signed Firefox
-XPI remains **1.0.2**. Store submissions for 1.0.3 are pending.
+**Firefox Add-ons publishes 1.0.3; Chrome Web Store still publishes 1.0.2.**
+Chromium ZIP and Mozilla-signed Firefox XPI **1.0.3** are available for manual
+installation. The Chrome update was submitted; public availability is not yet confirmed.
 [Changes in 1.0.3](docs/user/CHANGES_1_0_3.md#english).
 
 Choose **Auto**, **Proxy**, or **Direct** for websites in Chromium and Firefox.
