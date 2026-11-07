@@ -1,7 +1,8 @@
 # Firefox release candidate build
 
 Firefox follows the repository release train. Both targets use the complete
-version from `extension/src/templates-data.js`; the Chromium manifest template
+version from `extension/src/templates-data.js`, exposed through explicit
+`chromium` and `firefox` contexts. The Chromium manifest template
 uses `storeVersion` without an added prefix. The current source version is read
 from these files; published versions and artifact hashes are recorded separately
 in [`release-current.json`](../release-current.json) and the version's release record.
@@ -33,12 +34,16 @@ package allowlist/integrity verifier after each build, and compares both
 release sets byte for byte. It refuses a dirty tracked tree and refuses to
 overwrite an existing release output. It then writes:
 
-- `extension/dist/firefox-release/runet-censorship-bypass-firefox-1.0.3.xpi` — unsigned
+- `extension/dist/firefox-release/runet-censorship-bypass-firefox-<version>.xpi` — unsigned
   release candidate with `manifest.json` at archive root;
 - the matching `.xpi.sha256` file;
-- `runet-censorship-bypass-firefox-1.0.3-source.zip` — all tracked source
+- `runet-censorship-bypass-firefox-<version>-source.zip` — all tracked source
   files needed for review and reproduction, under one versioned root;
 - the matching source-archive `.sha256` file.
+
+The source root has the same `runet-censorship-bypass-firefox-<version>-source`
+name as its archive. Checksums/source candidates remain local or in CI.
+Only the verified Mozilla-signed XPI is an end-user release download.
 
 Both archives use sorted entries, fixed ZIP timestamps, fixed file modes and
 the stored ZIP method. No generated profile, dependency directory, log,
@@ -64,8 +69,9 @@ source, integrity and dependency advisories at the release stage. The following
 reference invocation is not evidence of completed validation:
 
 ```powershell
+$Version = node -p "require('./extension/src/templates-data').contexts.firefox.storeVersion"
 npx --yes --ignore-scripts addons-linter@10.10.0 `
-  "$Project\dist\firefox-release\runet-censorship-bypass-firefox-1.0.3.xpi"
+  "$Project\dist\firefox-release\runet-censorship-bypass-firefox-$Version.xpi"
 ```
 
 This command is an explicit release audit tool invocation; it is not a project

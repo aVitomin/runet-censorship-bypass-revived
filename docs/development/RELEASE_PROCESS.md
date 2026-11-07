@@ -67,9 +67,11 @@ Check actual required jobs/steps, not only a green overall badge:
 - Trusted-main Chromium ZIP/checksum and Firefox XPI/source/checksum uploads.
 
 A missing required step blocks release until fixed and rerun on trusted main.
-PRs intentionally upload no canonical release artifacts. Preserve **Verify MV3**
-and existing release artifact names; check-name changes need a separate reviewed
-branch-protection change.
+PRs intentionally upload no canonical release artifacts. Preserve **Verify MV3**;
+check-name changes need a separate reviewed branch-protection change. New CI
+artifacts identify the target as `runet-censorship-bypass-chromium-<full-sha>` or
+`runet-censorship-bypass-firefox-<full-sha>`. Use recorded historical names when
+retrieving artifacts from an older run.
 
 ## 4. Inspect the trusted artifact
 
@@ -106,7 +108,7 @@ it does not replace the trusted-main release artifact. Manual packaging example:
 
 ```powershell
 $Package = '.\trusted-artifact'
-$Archive = '.\dist\runet-censorship-bypass-mv3-<version>-<short-sha>.zip'
+$Archive = '.\dist\runet-censorship-bypass-chromium-<version>-<short-sha>.zip'
 New-Item -ItemType Directory -Force .\dist | Out-Null
 Compress-Archive -Path "$Package\*" -DestinationPath $Archive
 Get-FileHash $Archive -Algorithm SHA256
@@ -117,6 +119,21 @@ installable Chromium ZIP and Mozilla-signed Firefox XPI only; do not upload sepa
 checksum files. Put exact filenames, byte counts and SHA-256 values in a collapsed
 release-notes block. GitHub-generated source archives remain developer downloads.
 Never overwrite a published package with different bytes under the same name.
+
+Use browser names consistently for new files:
+
+| Target | File | Purpose |
+| --- | --- | --- |
+| Chromium | `runet-censorship-bypass-chromium-<version>-<short-sha>.zip` | Unpacked manual installation |
+| Firefox | `runet-censorship-bypass-firefox-<version>.xpi` | Unsigned candidate for Mozilla |
+| Firefox | `runet-censorship-bypass-firefox-<version>-signed.xpi` | Verified signed package for users |
+| Firefox | `runet-censorship-bypass-firefox-<version>-source.zip` | Reviewer sources, not an installable package |
+
+For published files, preserve names, URLs and bytes. Set GitHub asset labels to
+`Chromium <version> — ZIP` and `Firefox <version> — подписанный XPI`.
+Historical checksum files keep their links and a clear checksum label. Old release
+pages link to current installation instructions and separate original notes from
+current guidance; do not turn historical store availability into a current claim.
 
 ## 6. Tag and release scope
 

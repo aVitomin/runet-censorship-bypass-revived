@@ -64,6 +64,9 @@ MV2 is historical and is not built from maintained `main`.
 
 Use the current fork name in new links/remotes. Old release asset names,
 provenance, RPC and storage identifiers do not change with repository naming.
+Use `chromium` and `firefox` for both target contexts and new artifact names.
+Their template contexts share one immutable release version; Firefox does not
+read its version from the Chromium context. Manifest V3 describes both targets.
 Release tooling resolves the root through Git, not directory name or depth.
 Moving the npm root requires reviewed paired manifest/lock renames and unchanged
 package identity; see the supply-chain gate in [Testing](TESTING.md).

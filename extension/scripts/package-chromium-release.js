@@ -76,7 +76,7 @@ function createRelease() {
 
   const identity = releaseIdentity();
   const filename = [
-    'runet-censorship-bypass-mv3',
+    'runet-censorship-bypass-chromium',
     identity.version,
     identity.shortSha,
   ].join('-') + '.zip';
