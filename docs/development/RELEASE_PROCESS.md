@@ -112,8 +112,11 @@ Compress-Archive -Path "$Package\*" -DestinationPath $Archive
 Get-FileHash $Archive -Algorithm SHA256
 ```
 
-Create a checksum asset naming the exact ZIP. Never overwrite a published asset
-with different bytes under the same name.
+Keep generated checksum files in local/CI evidence. Public release assets contain
+installable Chromium ZIP and Mozilla-signed Firefox XPI only; do not upload separate
+checksum files. Put exact filenames, byte counts and SHA-256 values in a collapsed
+release-notes block. GitHub-generated source archives remain developer downloads.
+Never overwrite a published package with different bytes under the same name.
 
 ## 6. Tag and release scope
 
@@ -132,7 +135,8 @@ Release notes state status/audience, confirmed changes, browser QA/CI, manual
 installation and its lack of store auto-update, asset names/hashes, security/routing
 impact, limits and safe feedback channel. After authorized upload and before news:
 
-1. Download public ZIP/checksum again; verify size, hash, checksum filename and root.
+1. Download public ZIP/XPI again; verify size, SHA-256 against the release notes
+   and metadata, and manifest at the package root.
 2. Compare extracted runtime with the trusted artifact.
 3. Verify tag target/prerelease metadata and exclusion of secrets/repository files.
 
@@ -144,7 +148,8 @@ README describes latest published, installable versions per target, not arbitrar
 main. Chromium and signed Firefox can ship independently. After authorized release:
 
 1. Update `docs/release-current.json` with exact public metadata.
-2. Update README/status/QA/install text and check release, ZIP, checksum URLs/hashes.
+2. Update README/status/QA/install text and check release/package URLs and hashes.
+   Link checksum guidance to release notes, not separate checksum downloads.
 3. Keep targets separate: pending AMO review/signature does not replace latest
    installable signed Firefox; unsigned XPI is not a normal-user link.
 4. Run docs integrity and require successful CI for the changed documentation.

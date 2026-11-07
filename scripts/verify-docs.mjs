@@ -438,11 +438,9 @@ if (fs.existsSync(readmePath)) {
         'zipFilename',
         'zipSize',
         'zipSha256',
-        'checksumFilename',
         'firefoxXpiFilename',
         'firefoxXpiSize',
         'firefoxXpiSha256',
-        'firefoxChecksumFilename',
       ];
       for (const field of requiredFields) {
         if (release[field] === undefined || release[field] === '') {
@@ -501,9 +499,7 @@ if (fs.existsSync(readmePath)) {
       const expectedFirefoxAssetBase = `https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/${firefoxTag}`;
       for (const assetUrl of [
         `${expectedAssetBase}/${release.zipFilename}`,
-        `${expectedAssetBase}/${release.checksumFilename}`,
         `${expectedFirefoxAssetBase}/${release.firefoxXpiFilename}`,
-        `${expectedFirefoxAssetBase}/${release.firefoxChecksumFilename}`,
       ]) {
         if (!readme.includes(`](${assetUrl})`)) {
           addError('README.md', 1, assetUrl, 'README current-release asset link is missing or inconsistent');
@@ -514,13 +510,11 @@ if (fs.existsSync(readmePath)) {
         ['releaseUrl', release.releaseUrl],
         ['zipFilename', release.zipFilename],
         ['zipSha256', release.zipSha256],
-        ['checksumFilename', release.checksumFilename],
         ['firefoxVersionName', firefoxVersionName],
         ['firefoxTag', firefoxTag],
         ['firefoxReleaseUrl', firefoxReleaseUrl],
         ['firefoxXpiFilename', release.firefoxXpiFilename],
         ['firefoxXpiSha256', release.firefoxXpiSha256],
-        ['firefoxChecksumFilename', release.firefoxChecksumFilename],
       ]) {
         if (value && !readme.toLowerCase().includes(String(value).toLowerCase())) {
           addError('README.md', 1, value, `README current-release block does not match ${field} in ${releaseMetadataPath}`);
