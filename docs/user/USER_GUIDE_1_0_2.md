@@ -1,6 +1,6 @@
 # Руководство 1.0.2
 
-**Доступные версии:** Firefox Add-ons — 1.0.3, Chrome Web Store — пока 1.0.2.
+**Доступная версия:** 1.0.3 в Chrome Web Store и Firefox Add-ons.
 Для ручной установки есть Chromium ZIP и подписанный Firefox XPI 1.0.3.
 Основные действия также применимы к 1.0.3: [изменения и новые подсказки](CHANGES_1_0_3.md).
 Это руководство описывает 1.0.2; для прежней версии 1.0.1 есть
@@ -199,6 +199,6 @@ extension's proxy routing. The extension provides no VPN or proxy service.
 Imports save settings without activating them. Updates preserve applied settings
 and keep inactive routing inactive. Antifilter is an optional exact-host list
 for separately configured connections. The popup shows source date and last
-successful check separately. Firefox Add-ons publishes 1.0.3; Chrome Web Store
-still offers 1.0.2. Chromium ZIP and signed Firefox XPI 1.0.3 are also available.
+successful check separately. Version 1.0.3 is available in Chrome Web Store and
+Firefox Add-ons. Chromium ZIP and signed Firefox XPI 1.0.3 are also available.
 Use the [installation page](INSTALLATION.md) for store links and manual downloads.

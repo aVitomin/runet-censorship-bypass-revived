@@ -1,12 +1,12 @@
-# Chrome Web Store — listing copy 1.0.2
+# Chrome Web Store — listing copy 1.0.x
 
-**Version 1.0.2 is public; verified on 2026-11-07:**
+**Version 1.0.3 is public; verified on 2026-11-08:**
 [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph). The
 [reviewer notes](CHROME_REVIEWER_NOTES_1_0.md) retain the PAC disclosure and
 review requirements for future changes.
 The text below is the maintained listing copy, not proof that every field was
 saved in the dashboard. The public description now links to the 1.0.2 guide.
-The publisher reports submitting 1.0.3; its public availability is not yet confirmed. Its [changes](../user/CHANGES_1_0_3.md)
+The public listing reports November 8, 2026 as its update date. The [1.0.3 changes](../user/CHANGES_1_0_3.md)
 supplement the existing guide and do not require replacing unchanged screenshots.
 
 ## Published name
@@ -18,8 +18,8 @@ supplement the existing guide and do not require replacing unchanged screenshots
 - Keep the existing extension ID and store URL. Canonical homepage, support and
   privacy destinations are in the
   [link audit](LINK_AUDIT_1_0.md#revived-preparation--2026-10-28).
-  Repository URLs have changed; saving the corresponding dashboard fields
-  has not yet been verified. Earlier repository addresses redirect.
+  Public homepage, support and privacy links use the renamed repository,
+  confirmed on November 8, 2026. Earlier repository addresses redirect.
 
 ## Short description
 
