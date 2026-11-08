@@ -1,7 +1,7 @@
 # Изменения в 1.0.3
 
-**1.0.3 доступна в Firefox Add-ons и на GitHub:** Chromium ZIP и подписанный
-Firefox XPI. Chrome Web Store пока предлагает 1.0.2; обновление отправлено. Способы установки указаны
+**1.0.3 доступна в Chrome Web Store и Firefox Add-ons.** На GitHub доступны
+Chromium ZIP и подписанный Firefox XPI. Способы установки указаны
 в [инструкции](INSTALLATION.md). Основные настройки описаны в
 [руководстве](USER_GUIDE_1_0_2.md).
 
@@ -32,8 +32,8 @@ Firefox XPI. Chrome Web Store пока предлагает 1.0.2; обновл�
 
 ## English
 
-**1.0.3 is available in Firefox Add-ons and on GitHub** as Chromium ZIP and
-signed Firefox XPI. Chrome Web Store still offers 1.0.2; its update was submitted.
+**1.0.3 is available in Chrome Web Store and Firefox Add-ons.** Chromium ZIP and
+signed Firefox XPI are also available on GitHub.
 See [Installation](INSTALLATION.md).
 
 - Less unnecessary background work in Chromium and fewer duplicate site-status

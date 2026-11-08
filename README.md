@@ -5,9 +5,8 @@
 # Runet Censorship Bypass — Revived
 
 Независимый форк [Anticensority](https://github.com/anticensority/runet-censorship-bypass).
-**Firefox 1.0.3 опубликован в Firefox Add-ons.**
+**Версия 1.0.3 опубликована в Chrome Web Store и Firefox Add-ons.**
 Chromium ZIP и подписанный Firefox XPI **1.0.3** доступны на GitHub.
-В Chrome Web Store пока **1.0.2**; обновление отправлено, публикация 1.0.3 ещё не подтверждена.
 
 Выбирайте, как браузер открывает сайты: по автоматическим правилам, через
 настроенный прокси или напрямую. Расширение для Chromium и Firefox с интерфейсом
@@ -31,7 +30,7 @@ Chromium ZIP и подписанный Firefox XPI **1.0.3** доступны н
 
 | Браузер | Версия | Установка из магазина |
 | --- | --- | --- |
-| **Chrome, Brave и совместимые Chromium-браузеры** | **1.0.2** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
+| **Chrome, Brave и совместимые Chromium-браузеры** | **1.0.3** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
 | **Firefox 140+** | **1.0.3** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 Магазинные установки получают одобренные обновления через браузер.
@@ -133,9 +132,9 @@ SHA-256: `e4f2ce0420bc52898dc576727961fb9647f2a6e7bfc8a14345886d660a331e69`
 ## English
 
 **Runet Censorship Bypass — Revived** is an independent Anticensority fork.
-**Firefox Add-ons publishes 1.0.3; Chrome Web Store still publishes 1.0.2.**
+**Version 1.0.3 is available in Chrome Web Store and Firefox Add-ons.**
 Chromium ZIP and Mozilla-signed Firefox XPI **1.0.3** are available for manual
-installation. The Chrome update was submitted; public availability is not yet confirmed.
+installation.
 [Changes in 1.0.3](docs/user/CHANGES_1_0_3.md#english).
 
 Choose **Auto**, **Proxy**, or **Direct** for websites in Chromium and Firefox.

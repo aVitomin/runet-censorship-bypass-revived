@@ -1,15 +1,14 @@
 # Установка, обновление и удаление
 
-**Firefox 1.0.3 доступен в Firefox Add-ons.**
+**Версия 1.0.3 доступна в Chrome Web Store и Firefox Add-ons.**
 Для ручной установки доступны Chromium ZIP и подписанный Firefox XPI **1.0.3**.
-В Chrome Web Store пока **1.0.2**; обновление отправлено, публикация 1.0.3 ещё не подтверждена.
-Публичные версии проверены 7 ноября 2026.
+Публичные версии проверены 8 ноября 2026.
 
 ## Установить из магазина
 
 | Браузер | Версия | Где установить |
 | --- | --- | --- |
-| Chrome, Brave и совместимые Chromium-браузеры | **1.0.2** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
+| Chrome, Brave и совместимые Chromium-браузеры | **1.0.3** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
 | Firefox **140+** | **1.0.3** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 1. Откройте магазин в нужном браузере, нажмите кнопку установки и подтвердите разрешения.
@@ -137,13 +136,13 @@ Chromium-версии на магазинную могут создать отд
 
 ## English summary
 
-Install **Chrome 1.0.2** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.0.3** from
+Install **Chromium 1.0.3** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.0.3** from
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/). Firefox requires **140+** and private-window
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
 
-**Chromium 1.0.3** is available as a manual ZIP. The Chrome update was submitted;
-its store still offers 1.0.2. **Firefox 1.0.3** is also available as a Mozilla-signed XPI. Versions **1.0.1–1.0.3** target desktop **Chromium 108+** and **Firefox 140+**,
+**Chromium 1.0.3** is also available as a manual ZIP; **Firefox 1.0.3** as a
+Mozilla-signed XPI. Versions **1.0.1–1.0.3** target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR releases on a compatible base. These are API-based compatibility
 estimates, not test results for every version or fork. Required MV3 and proxy
 extension APIs must be available; mobile browsers and WebView are outside this scope.

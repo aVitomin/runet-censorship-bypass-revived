@@ -16,7 +16,7 @@
   "firefoxXpiSha256": "e4f2ce0420bc52898dc576727961fb9647f2a6e7bfc8a14345886d660a331e69",
   "chromeWebStoreUrl": "https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph",
   "firefoxAddonsUrl": "https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/",
-  "storeAvailabilityCheckedAt": "2026-11-07",
-  "chromeWebStoreVersion": "1.0.2",
+  "storeAvailabilityCheckedAt": "2026-11-08",
+  "chromeWebStoreVersion": "1.0.3",
   "firefoxAddonsVersion": "1.0.3"
 }

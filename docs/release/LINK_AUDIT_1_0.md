@@ -5,7 +5,22 @@ security and official store-guidance links used by this publication set.
 This dated record does not establish current URL availability.
 Historical/upstream attribution in `docs/legacy/` is not rewritten.
 
-## Current store check — 2026-11-07, 18:58 UTC
+## Current store check — 2026-11-08, 12:30 UTC
+
+Chrome Web Store and Firefox Add-ons both publicly offer **1.0.3**. Chrome
+reports November 8, 2026 as its update date. Store IDs and install URLs are unchanged.
+
+- Chrome homepage, support form, privacy and current guide links use the renamed repository.
+- Firefox names and all five screenshot captions are present in English and Russian.
+  Both descriptions link to the current guide, support documentation and privacy notice.
+- Firefox support fields still point to the repository root; use the issue-form URL.
+  Public version notes remain empty; add the concise [1.0.3 notes](../user/CHANGES_1_0_3.md).
+- Mozilla file **5221829**, size and SHA-256 match the signed XPI already verified
+  and mirrored on GitHub. Published packages were not replaced or renamed.
+- This check establishes public availability and listing metadata. It reuses the
+  November 7 signed-update evidence, without claiming a new runtime or automatic-delivery test.
+
+## Earlier store check — 2026-11-07, 18:58 UTC
 
 Firefox Add-ons now offers **1.0.3**, public file **5221829**. Its signed XPI
 matches the canonical runtime and the verified GitHub mirror. Chrome Web Store

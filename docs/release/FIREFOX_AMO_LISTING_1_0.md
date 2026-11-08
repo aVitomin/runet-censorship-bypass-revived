@@ -1,6 +1,6 @@
 # Firefox Add-ons — listing copy 1.0.x
 
-**Version 1.0.3 is public; verified on 2026-11-07:**
+**Version 1.0.3 is public; verified on 2026-11-08:**
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/),
 Mozilla file 5221829. Localized names, descriptions and current guide links are
 present. Public version notes for 1.0.3 are empty; add concise notes from
