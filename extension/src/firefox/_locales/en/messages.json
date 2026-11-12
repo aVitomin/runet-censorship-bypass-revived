@@ -102,7 +102,10 @@
     "message": "Settings imported. They are saved but not applied."
   },
   "transferExported": {
-    "message": "Export prepared. Keep settings files private."
+    "message": "Settings file prepared. It contains site rules and proxy addresses; keep it private."
+  },
+  "transferSupportExported": {
+    "message": "Support report prepared. You can attach it to an issue: site rules, addresses and credentials are excluded."
   },
   "transferInvalid": {
     "message": "The file is not a valid settings export. Nothing was imported."

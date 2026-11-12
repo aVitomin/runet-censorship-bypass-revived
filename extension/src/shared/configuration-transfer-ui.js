@@ -64,7 +64,7 @@
       export: (support) => run(async () => {
         const value = await options.call('export', {support});
         await options.download(value, support);
-        state.message = 'transferExported';
+        state.message = support ? 'transferSupportExported' : 'transferExported';
       }),
       cancel() { state.preview = null; state.text = null; notify(); },
     };
