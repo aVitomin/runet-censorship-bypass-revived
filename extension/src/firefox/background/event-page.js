@@ -1028,7 +1028,10 @@
             return {ok: true, result: transfer.create(message.support === true ? null :
               transferAdapter.fromSettings(saved.settings), metadata,
             status ? Object.assign({}, status,
-                {sourceAvailable: routingSourceAvailable(sourceSettings.settings.source)}) : null)};
+                {sourceAvailable: routingSourceAvailable(sourceSettings.settings.source)}) : null,
+            status ? {saved: transferAdapter.supportSettings(saved.settings),
+              effective: status.active && snapshot.effective ?
+                transferAdapter.supportSettings(snapshot.effective.settings) : null} : null)};
           }
           const parsed = transfer.parse(message.text);
           if (!parsed.configuration) transfer.fail('TRANSFER_NO_CONFIGURATION');

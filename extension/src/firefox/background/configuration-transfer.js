@@ -11,6 +11,18 @@
 
 })(typeof globalThis === 'object' ? globalThis : this, function(Format, Settings) {
 
+  function supportSettings(settings) {
+
+    return {source: ['manual', 'anticensority', 'antifilter'].includes(settings.source) ? settings.source : 'unknown',
+      providerProxies: settings.flags.useProviderProxies,
+      useProxyRulesForAntifilter: settings.flags.useProxyRulesForAntifilter === true,
+      proxyAuthentication: true,
+      ownProxiesOnlyForOwnSites: settings.flags.ownProxiesOnlyForOwnSites,
+      replaceDirectWithProxy: settings.flags.replaceDirectWithProxy,
+      noDirect: settings.flags.noDirect};
+
+  }
+
   function fromSettings(settings) {
 
     const profile = (value, kind, index) => ({name: `${kind}-${index + 1}`, kind,
@@ -88,6 +100,6 @@
 
   }
 
-  return Object.freeze({fromSettings, toSettings});
+  return Object.freeze({fromSettings, toSettings, supportSettings});
 
 });

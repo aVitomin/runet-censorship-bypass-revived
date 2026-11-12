@@ -11,6 +11,21 @@
   const type = (value) => value === 'PROXY' ? 'HTTP' : value;
   const chromiumType = (value) => value === 'HTTP' ? 'PROXY' : value;
 
+  function supportSettings(state) {
+
+    const mods = Mods.normalizePacMods(state.pacMods);
+    const selected = Object.keys(PROVIDERS).find((key) =>
+      PROVIDERS[key] === state.currentPacProviderKey);
+    // Never export custom provider keys, labels, URLs or connection details.
+    return {source: selected || (state.currentPacProviderKey ? 'custom' : 'none'),
+      providerProxies: mods.usePacScriptProxies,
+      useProxyRulesForAntifilter: mods.useProxyRulesForAntifilter === true,
+      proxyAuthentication: !state.proxyAuth || state.proxyAuth.enabled !== false,
+      ownProxiesOnlyForOwnSites: mods.ownProxiesOnlyForOwnSites,
+      replaceDirectWithProxy: mods.replaceDirectWithProxy, noDirect: mods.noDirect};
+
+  }
+
   function fromState(state) {
 
     const mods = Mods.normalizePacMods(state.pacMods);
@@ -114,6 +129,6 @@
 
   }
 
-  return Object.freeze({fromState, toPatch});
+  return Object.freeze({fromState, toPatch, supportSettings});
 
 });

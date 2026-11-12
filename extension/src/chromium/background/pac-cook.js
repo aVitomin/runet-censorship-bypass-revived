@@ -6,7 +6,7 @@
 
   // IndexedDB artifact storage supports provider PACs larger than storage.local.
   const MAX_PAC_BYTES = 16 * 1024 * 1024;
-  const PAC_COOK_SEMANTICS_VERSION = 4;
+  const PAC_COOK_SEMANTICS_VERSION = 5;
   const COOK_START = '\n\n//%#@@@@@@ MV3_PAC_COOK_START @@@@@@#%';
   const COOK_END = '//%#@@@@@@ MV3_PAC_COOK_END @@@@@@#%';
 
@@ -326,7 +326,10 @@
     if (mv3OnionProxies && String(host || "").toLowerCase().endsWith(".onion")) {
       return mv3OnionProxies;
     }
-    return mv3ApplyProviderPolicy(mv3OriginalFindProxyForURL(url, host));
+    // A disabled provider cannot affect the result; avoid its DNS lookups and work.
+    return mv3ApplyProviderPolicy(
+      mv3UsePacScriptProxies ? mv3OriginalFindProxyForURL(url, host) : ""
+    );
   }
 
   if (global) {
@@ -503,7 +506,7 @@ ${COOK_END}`;
         stableStringify({
           pacCookSemanticsVersion: PAC_COOK_SEMANTICS_VERSION,
           pacMods: normalizePacMods({}),
-        }).includes('"pacCookSemanticsVersion":4'),
+        }).includes('"pacCookSemanticsVersion":5'),
       directRuleReturnsDirect:
         buildWrapper(normalizePacMods({
           localTor: {enabled: true},

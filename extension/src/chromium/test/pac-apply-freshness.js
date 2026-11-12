@@ -39,6 +39,50 @@ function expectStaleWithoutProxyWrite(harness, result) {
 }
 
 describe('PAC apply freshness', () => {
+  for (const off of [false, true]) {
+    it(`rebuilds a version-4 cook without applying saved changes (off=${off})`, async () => {
+      const harness = await createRuntimeHarness({
+        pacMods: {usePacScriptProxies: false},
+      });
+      if (off) await harness.callRpc('clearProxy');
+      const effectiveBefore = await harness.context.mv3Effective.current();
+      const proxyBefore = harness.getProxyDetails();
+      await harness.installPacVersion({
+        pacMods: {usePacScriptProxies: false, noDirect: true},
+      });
+
+      // These settings have no credentials or notes, so their apply identity
+      // also represents the stored cook hash input. Seed the previous recipe.
+      const {mv3PacCook, mv3Hash, mv3PacArtifacts, mv3State} = harness.context;
+      const state = harness.getState();
+      const identity = JSON.parse(mv3PacCook.getPacApplyModsIdentity(state.pacMods));
+      identity.pacCookSemanticsVersion = 4;
+      const legacyHash = await mv3Hash.sha256Hex(JSON.stringify(identity));
+      const cache = state.cookedPacCache;
+      const artifact = await mv3PacArtifacts.getCookedPacArtifact({
+        providerKey: cache.providerKey,
+        sha256: cache.cookedPacSha256,
+      });
+      await mv3PacArtifacts.putCookedPacArtifact(
+          Object.assign({}, artifact, {pacModsSha256: legacyHash}),
+      );
+      await mv3State.saveStatePatch({
+        cookedPacCache: Object.assign({}, cache, {pacModsSha256: legacyHash}),
+      });
+      harness.resetCounts();
+
+      const result = await harness.audit.cookPacAndPersist({providerKey: cache.providerKey});
+
+      expect(result).to.include({ok: true, status: 'success'});
+      expect(harness.counts.pacCooks).to.equal(1);
+      expect(harness.getState().cookedPacCache.pacModsSha256).not.to.equal(legacyHash);
+      expect(harness.getState().pacMods).to.deep.equal(state.pacMods);
+      expect(await harness.context.mv3Effective.current()).to.deep.equal(effectiveBefore);
+      expect(harness.getProxyDetails()).to.deep.equal(proxyBefore);
+      expect(harness.counts.proxySettingsWrites).to.equal(0);
+    });
+  }
+
   it('keeps a popup PAC workflow stale after clear during download', async () => {
     const harness = await createRuntimeHarness();
     await harness.context.mv3State.clearPacCache();

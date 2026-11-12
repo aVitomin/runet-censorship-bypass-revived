@@ -12,6 +12,8 @@
   const MAX_RULES = 5000;
   const MAX_PROXIES = 64;
   const CATEGORIES = ['siteRules', 'proxyConnections', 'routingSettings'];
+  const SUPPORT_FLAGS = ['providerProxies', 'useProxyRulesForAntifilter',
+    'proxyAuthentication', 'ownProxiesOnlyForOwnSites', 'replaceDirectWithProxy', 'noDirect'];
   const fail = (code = 'TRANSFER_INVALID') => {
     const error = new TypeError(code);
     error.code = code;
@@ -174,12 +176,30 @@
     if (JSON.stringify(value.credentials.missing) !== JSON.stringify(missing)) fail();
     // Diagnostics are schema-checked but NEVER consulted when building settings.
     if (value.diagnostics !== null) {
-      keys(value.diagnostics, ['active', 'pending', 'pendingCategories', 'sourceAvailable']);
+      keys(value.diagnostics, ['active', 'pending', 'pendingCategories', 'sourceAvailable'], ['settings']);
       bool(value.diagnostics.active); bool(value.diagnostics.pending); bool(value.diagnostics.sourceAvailable);
       array(value.diagnostics.pendingCategories, 3).forEach((item) => choice(item, CATEGORIES));
+      if (Object.hasOwn(value.diagnostics, 'settings')) {
+        if (config !== null) fail();
+        const settings = value.diagnostics.settings;
+        keys(settings, ['saved', 'effective']);
+        validateSupportSettings(settings.saved);
+        if (settings.effective !== null) {
+          if (!value.diagnostics.active) fail();
+          validateSupportSettings(settings.effective);
+        }
+      }
     }
     return {schemaVersion: 1, metadata: value.metadata, configuration: config,
       credentials: {included: false, missing}, diagnostics: value.diagnostics};
+
+  }
+
+  function validateSupportSettings(value) {
+
+    keys(value, ['source'].concat(SUPPORT_FLAGS));
+    choice(value.source, ['none', 'manual', 'antizapret', 'anticensority', 'antifilter', 'custom', 'unknown']);
+    SUPPORT_FLAGS.forEach((key) => bool(value[key]));
 
   }
 
@@ -193,11 +213,15 @@
 
   }
 
-  function create(config, metadata, status = null) {
+  function create(config, metadata, status = null, settings = null) {
 
     const diagnostics = status ? {active: status.active === true, pending: status.pending === true,
       pendingCategories: (status.pendingCategories || []).filter((item) => CATEGORIES.includes(item)),
       sourceAvailable: status.sourceAvailable === true} : null;
+    if (settings !== null) {
+      if (!diagnostics || config !== null) fail();
+      diagnostics.settings = {saved: settings.saved, effective: settings.effective};
+    }
     const result = validate({schemaVersion: 1, metadata, configuration: config,
       credentials: {included: false,
         missing: config ? config.proxies.filter((entry) => entry.credentialsRequired).map((entry) => entry.name) : []},

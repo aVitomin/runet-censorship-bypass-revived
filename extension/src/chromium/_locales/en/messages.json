@@ -102,7 +102,7 @@
     "message": "Export for support"
   },
   "transferSupportHelp": {
-    "message": "Support files contain only environment and status information, without site rules or proxy addresses. They cannot be imported as settings."
+    "message": "The report includes environment, status, source type and saved/applied routing flags. Applied settings are unavailable when control is off or unverified. Site rules, addresses and credentials are excluded. The report cannot be imported as settings."
   },
   "transferPreview": {
     "message": "Import preview"

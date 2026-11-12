@@ -823,7 +823,8 @@ const RPC_METHODS = Object.freeze({
   async exportConfiguration(params = {}) {
 
     const saved = await mv3State.loadState();
-    const status = params.support === true ? await configurationStatus(saved) : null;
+    const effective = params.support === true ? await mv3Effective.current() : null;
+    const status = params.support === true ? await configurationStatus(saved, effective) : null;
     const platform = await chrome.runtime.getPlatformInfo();
     const metadata = {exportedAt: new Date().toISOString(),
       browser: {family: 'chromium', version: (navigator.userAgent.match(/Chrome\/([\d.]+)/) || [])[1] || 'unknown'},
@@ -832,7 +833,10 @@ const RPC_METHODS = Object.freeze({
       platform: platform.os};
     return rucbConfigurationTransfer.create(params.support === true ? null :
       mv3ConfigurationTransfer.fromState(saved), metadata, status ? Object.assign({}, status,
-          {sourceAvailable: Boolean(saved.currentPacProviderKey)}) : null);
+          {sourceAvailable: Boolean(saved.currentPacProviderKey)}) : null,
+    status ? {saved: mv3ConfigurationTransfer.supportSettings(saved),
+      effective: effective ?
+        mv3ConfigurationTransfer.supportSettings(effective.config) : null} : null);
 
   },
 

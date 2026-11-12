@@ -953,6 +953,44 @@ describe('Firefox production control package', function() {
     Assert.strictEqual((await page.send({type: 'firefox.activation.apply', expectedRevision: 0})).ok, true);
   });
 
+  it('exports safe Saved and Effective summaries without promoting pending Firefox settings', async function() {
+    const page = await unifiedFixture();
+    Assert.strictEqual((await page.send({type: 'firefox.activation.apply', expectedRevision: 0})).ok, true);
+    const beforeStatus = (await page.send({type: 'firefox.configuration.get'})).result;
+    const saved = (await page.send({type: 'firefox.settings.get'})).result;
+    saved.settings.source = 'manual';
+    saved.settings.flags.useProviderProxies = false;
+    saved.settings.flags.noDirect = true;
+    saved.settings.rules.direct = ['private.example'];
+    Assert.strictEqual((await page.send({type: 'firefox.settings.replace',
+      expectedRevision: saved.revision, settings: saved.settings})).ok, true);
+    const writes = page.proxySettingsCalls.set;
+    page.context.fetch = () => {
+      throw new Error('Support export must not fetch');
+    };
+
+    const response = await page.send({type: 'firefox.transfer.export', support: true});
+    Assert.strictEqual(response.ok, true);
+    const report = response.result;
+    Assert.strictEqual(report.diagnostics.pending, true);
+    Assert.strictEqual(report.diagnostics.settings.saved.source, 'manual');
+    Assert.strictEqual(report.diagnostics.settings.saved.providerProxies, false);
+    Assert.strictEqual(report.diagnostics.settings.saved.noDirect, true);
+    Assert.strictEqual(report.diagnostics.settings.effective.source, 'anticensority');
+    Assert.strictEqual(report.diagnostics.settings.effective.providerProxies, true);
+    Assert.strictEqual(report.diagnostics.settings.effective.noDirect, false);
+    Assert.doesNotMatch(JSON.stringify(report), /private|password|ownProxies"|savedRevision|effectiveId/);
+    Assert.strictEqual(page.proxySettingsCalls.set, writes);
+    Assert.strictEqual((await page.send({type: 'firefox.configuration.get'})).result.effectiveId,
+        beforeStatus.effectiveId);
+
+    Assert.strictEqual((await page.send({type: 'firefox.activation.clear'})).ok, true);
+    const off = (await page.send({type: 'firefox.transfer.export', support: true})).result;
+    Assert.strictEqual(off.diagnostics.active, false);
+    Assert.strictEqual(off.diagnostics.settings.effective, null);
+    Assert.strictEqual(off.diagnostics.settings.saved.source, 'manual');
+  });
+
   it('imports inactive settings without activation, provider fetches or accepting stale revisions', async function() {
     const page = await unifiedFixture();
     const exported = (await page.send({type: 'firefox.transfer.export'})).result;

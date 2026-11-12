@@ -43,6 +43,39 @@ describe('Portable configuration boundary', function() {
     Assert.throws(() => Format.validate(nested), {code: 'TRANSFER_LIMIT'});
   });
 
+  it('allows only source identifiers and boolean flags in support setting summaries', function() {
+    const settings = Firefox.supportSettings(FirefoxSettings.createDefaultSettings());
+    const value = Format.create(null, metadata, {active: true},
+        {saved: settings, effective: settings});
+    Assert.deepEqual(Format.parse(JSON.stringify(value)).diagnostics.settings.saved, settings);
+    for (const mutate of [
+      (report) => {
+        report.diagnostics.settings.saved.source = 'https://private.example/token';
+      },
+      (report) => {
+        report.diagnostics.settings.saved.password = 'secret';
+      },
+      (report) => {
+        report.diagnostics.settings.saved.providerProxies = 'true';
+      },
+      (report) => {
+        report.diagnostics.settings.effective.note = 'private';
+      },
+      (report) => {
+        report.diagnostics.active = false;
+      },
+      (report) => {
+        report.configuration = portable();
+      },
+    ]) {
+      const changed = copy(value);
+      mutate(changed);
+      Assert.throws(() => Format.parse(JSON.stringify(changed)), {code: 'TRANSFER_INVALID'});
+    }
+    const off = Format.create(null, metadata, {active: false}, {saved: settings, effective: null});
+    Assert.equal(off.diagnostics.settings.effective, null);
+  });
+
   it('rejects injected properties, HTML domains, credentials, unsafe URLs, arrays and types', function() {
     for (const mutate of [
       (value) => {
@@ -102,6 +135,23 @@ describe('Portable configuration boundary', function() {
     Assert.deepEqual(imported.rules, settings.rules);
     Assert.deepEqual(imported.ownProxies.map((value) => value.host), ['first.example', 'second.example']);
     Assert.ok(imported.ownProxies.every((value) => value.credentials.mode === 'MISSING'));
+  });
+
+  it('uses the same safe source and routing flags in both browser summaries', async function() {
+    const h = await createRuntimeHarness();
+    for (const enabled of [false, true]) {
+      const settings = FirefoxSettings.createDefaultSettings();
+      settings.source = 'manual';
+      for (const key of Object.keys(settings.flags)) settings.flags[key] = enabled;
+      settings.flags.useProxyRulesForAntifilter = enabled;
+      const patch = h.context.mv3ConfigurationTransfer.toPatch(
+          Firefox.fromSettings(settings),
+      ).patch;
+      const chromium = h.context.mv3ConfigurationTransfer.supportSettings(
+          Object.assign({}, h.getState(), patch),
+      );
+      Assert.deepEqual(copy(chromium), Firefox.supportSettings(settings));
+    }
   });
 
   it('round-trips manual-only source between Firefox and Chromium', function() {
@@ -175,6 +225,52 @@ describe('Chromium configuration transfer RPC', function() {
       await h.callRpc('importConfiguration', {text, expectedRevision: preview.expectedRevision});
       Assert.equal(h.getState().pacMods.ownProxies[0].type, type);
     }
+  });
+
+  it('exports separate safe Saved and verified Effective settings without applying them', async function() {
+    const h = await createRuntimeHarness({pacMods: {ownProxies: [{enabled: true, type: 'HTTPS',
+      host: 'private.example', port: 8443, username: 'private-user', password: 'private-secret'}]}});
+    Assert.equal((await h.audit.applyCookedPacAndPersist({})).ok, true);
+    const mods = await h.callRpc('getPacMods');
+    await h.callRpc('setPacMods', {pacMods: Object.assign(mods, {usePacScriptProxies: false, noDirect: true})});
+    await h.callRpc('setCurrentPacProvider', {providerKey: 'onlyOwnSites'});
+    const before = copy(h.getState());
+    h.resetCounts();
+
+    const report = await h.callRpc('exportConfiguration', {support: true});
+    const summaries = report.diagnostics.settings;
+    Assert.equal(report.diagnostics.pending, true);
+    Assert.equal(summaries.saved.source, 'manual');
+    Assert.equal(summaries.saved.providerProxies, false);
+    Assert.equal(summaries.saved.noDirect, true);
+    Assert.equal(summaries.effective.source, 'antizapret');
+    Assert.equal(summaries.effective.providerProxies, true);
+    Assert.equal(summaries.effective.noDirect, false);
+    Assert.doesNotMatch(JSON.stringify(report), /private|password|ownProxies"|savedRevision|effectiveId/);
+    Assert.deepEqual(h.getState(), before);
+    Assert.equal(h.counts.proxySettingsWrites, 0);
+    Assert.equal(h.counts.pacDownloads, 0);
+
+    const custom = h.context.mv3ConfigurationTransfer.supportSettings(
+        Object.assign({}, before, {currentPacProviderKey: 'private-provider-url'}),
+    );
+    Assert.equal(custom.source, 'custom');
+    Assert.doesNotMatch(JSON.stringify(custom), /private/);
+    h.setProxyDetails({levelOfControl: 'controlled_by_other_extensions', value: {mode: 'direct'}});
+    const lost = await h.callRpc('exportConfiguration', {support: true});
+    Assert.equal(lost.diagnostics.active, false);
+    Assert.equal(lost.diagnostics.settings.effective, null);
+  });
+
+  it('omits Effective settings while Chromium proxy control is off', async function() {
+    const h = await createRuntimeHarness();
+    await h.callRpc('clearProxy');
+    h.resetCounts();
+    const report = await h.callRpc('exportConfiguration', {support: true});
+    Assert.equal(report.diagnostics.active, false);
+    Assert.equal(report.diagnostics.settings.effective, null);
+    Assert.equal(report.diagnostics.settings.saved.source, 'antizapret');
+    Assert.equal(h.counts.proxySettingsWrites, 0);
   });
 
   it('imports inactive into a new Saved revision without downloads, Apply or credentials restoration', async function() {
