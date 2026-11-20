@@ -5,6 +5,10 @@ security and official store-guidance links used by this publication set.
 This dated record does not establish current URL availability.
 Historical/upstream attribution in `docs/legacy/` is not rewritten.
 
+## Store check — 2026-11-21
+
+[Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) and [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) offer **1.1.0**. The public Chrome update service returned 1.1.0 for the existing extension ID, and the Mozilla API reported its 1.1.0 file as public.
+
 ## Store check — 2026-11-20
 
 Firefox Add-ons publishes [1.1.0](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) with release notes in English and Russian. The signed XPI is mirrored in [GitHub Release v1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0).

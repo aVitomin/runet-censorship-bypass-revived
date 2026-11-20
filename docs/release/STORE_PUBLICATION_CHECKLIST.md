@@ -11,10 +11,10 @@ CI and canonical artifacts. Publication status remains independent per channel.
 
 ## Current channel status
 
-Checked on 2026-11-20.
+Checked on 2026-11-21.
 
 - [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) offers Firefox **1.1.0**, Mozilla file **5283665**. Windows Firefox 159.0.1 passed a signature-enforced update from 1.0.3 and restart with routing settings preserved.
-- Chrome Web Store serves **1.0.3** through its public update service. **1.1.0** was submitted for review.
+- [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) offers Chromium **1.1.0**. The public Chrome update service returned 1.1.0 for the existing extension ID.
 - [GitHub Release v1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0) offers the Chromium ZIP and signed Firefox XPI. Both downloads were verified against their SHA-256 values.
 
 ## Previous channel status — 1.0.3
