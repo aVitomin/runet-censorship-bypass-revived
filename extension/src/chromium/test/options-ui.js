@@ -1070,45 +1070,51 @@ describe('Chromium options UI', function() {
 
   });
 
-  it('guides a pristine setup through source, optional proxy, and Apply',
+  it('lets a pristine setup be skipped and resumed without saving or applying',
       async function() {
 
         const snapshot = createInitialSetupSnapshot();
         const harness = await createHarness({snapshot});
         const setup = harness.root.querySelector('#initial-setup-card');
         expect(setup).to.exist;
-        expect(setup.textContent).to.include('Set up routing');
         expect(setup.textContent).to.include('Choose a routing source');
-        expect(setup.textContent).to.include('Not selected');
-        expect(setup.textContent).to.include('Proxy connections — optional');
-        expect(setup.textContent).to.include(
-            'Optional — none configured',
-        );
-        expect(setup.textContent).to.include('Waiting for a source');
-        expect(findButton(setup, 'Apply')).not.to.exist;
-        expect(harness.root.querySelector('#global-action-bar').hidden)
-            .to.equal(false);
-        expect(harness.root.querySelectorAll('button').filter((button) =>
-          button.textContent === 'Choose source',
-        )).to.have.length(2);
-        expect(harness.calls.map((call) => call.method)).to.deep.equal([
-          'getState',
-        ]);
+        expect(findButton(setup, 'Save source and continue').disabled).to.equal(true);
+        expect(harness.root.querySelector('#global-action-bar').hidden).to.equal(true);
 
-        findButton(setup, 'Choose source').dispatch('click');
-        expect(harness.location.hash).to.equal('routing-sources');
-        expect(harness.document.activeElement.id)
-            .to.equal('routing-sources-heading');
-        expect(harness.root.querySelector('#global-action-bar').hidden)
-            .to.equal(false);
-        harness.location.hash = '#overview';
-        harness.context.window.dispatch('hashchange');
-        findButton(setup, 'Configure proxy connections').dispatch('click');
-        expect(harness.location.hash).to.equal('proxy-methods');
-        expect(harness.document.activeElement.id)
-            .to.equal('proxy-methods-heading');
+        findButton(setup, 'Set up later').dispatch('click');
+        expect(harness.root.querySelector('#initial-setup-card')).not.to.exist;
+        findButton(harness.root, 'Resume setup').dispatch('click');
+        expect(harness.root.querySelector('#initial-setup-card')).to.exist;
+        expect(harness.document.activeElement.id).to.equal('initial-setup-heading');
+        expect(harness.calls.map((call) => call.method)).to.deep.equal(['getState']);
+
+      });
+
+  it('saves Antizapret from quick setup while waiting for explicit Apply',
+      async function() {
+
+        const snapshot = createInitialSetupSnapshot();
+        snapshot.state.pacMods.usePacScriptProxies = true;
+        const harness = await createHarness({snapshot, rpcHandler(method, params) {
+          if (method === 'getState') return snapshot;
+          if (method === 'setCurrentPacProvider') {
+            snapshot.state.currentPacProviderKey = params.providerKey;
+            return {ok: true};
+          }
+          throw new Error(method);
+        }});
+        const setup = harness.root.querySelector('#initial-setup-card');
+        const choice = setup.querySelectorAll('input[name="setup-source"]')
+            .find((input) => input.value === 'Антизапрет');
+        choice.checked = true;
+        choice.dispatch('change');
+        expect(harness.calls.map((call) => call.method)).to.deep.equal(['getState']);
+        await findButton(setup, 'Save source and continue').onclick();
+        const updated = harness.root.querySelector('#initial-setup-card');
+        expect(updated.textContent).to.include('without adding your own proxy');
+        expect(findButton(updated, 'Apply')).to.exist;
         expect(harness.calls.map((call) => call.method)).to.deep.equal([
-          'getState',
+          'getState', 'setCurrentPacProvider', 'getState',
         ]);
 
       });
@@ -1174,7 +1180,7 @@ describe('Chromium options UI', function() {
         expect(refreshedSetup.textContent).to.include(
             'Selected: Anticensority',
         );
-        expect(refreshedSetup.textContent).to.include('Ready to apply');
+        expect(refreshedSetup.textContent).to.include('Review and apply');
         const setupApply = findButton(
             refreshedSetup,
             'Apply',
@@ -1213,7 +1219,7 @@ describe('Chromium options UI', function() {
 
       });
 
-  it('runs setup Apply through the existing guarded workflow and then exits',
+  it('runs exact-revision Apply and keeps verification separate from activation',
       async function() {
 
         const snapshot = createInitialSetupSnapshot();
@@ -1253,6 +1259,18 @@ describe('Chromium options UI', function() {
         expect(harness.calls.filter((call) =>
           call.method === 'applySavedConfiguration',
         )).to.have.length(1);
+        const verification = harness.root.querySelector('#initial-setup-card');
+        expect(verification.textContent).to.include('Routing applied · Site not checked');
+        expect(verification.textContent).to.include('Check the site mode in the extension popup');
+        findButton(verification, 'The site did not open').dispatch('click');
+        const failedSite = harness.root.querySelector('#initial-setup-card');
+        expect(failedSite.textContent).to.include('Site did not open in your check');
+        findButton(failedSite, 'The site opened').dispatch('click');
+        const checked = harness.root.querySelector('#initial-setup-card');
+        expect(checked.textContent).to.include('Site opened in your check');
+        expect(harness.calls.filter((call) => call.method !== 'getState'))
+            .to.have.length(1);
+        findButton(checked, 'Return to Overview').dispatch('click');
         expect(harness.root.querySelector('#initial-setup-card')).not.to.exist;
         expect(harness.root.textContent).to.include('Routing is active');
 
@@ -2891,7 +2909,7 @@ describe('Chromium options UI', function() {
             'Настройте маршрутизацию',
         );
         expect(initial.root.textContent).to.include(
-            'Прокси-подключения — необязательно',
+            'Сохранить источник и продолжить',
         );
         expect(initial.root.textContent).to.include('Только мои правила и подключения');
         expect(initial.root.textContent).not.to.include('Set up routing');

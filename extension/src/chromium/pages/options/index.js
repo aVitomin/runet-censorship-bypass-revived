@@ -57,6 +57,11 @@
     listenersInstalled: false,
     setupEligibilityInitialized: false,
     setupEligible: false,
+    setupStep: null,
+    setupSource: null,
+    setupDismissed: false,
+    setupSiteResult: null,
+    setupSiteEffectiveId: null,
   };
   let refreshPromise = null;
   let activeRefreshOptions = null;
@@ -147,6 +152,12 @@
     if (code === 'ANTIFILTER_PROXY_REQUIRED' || code === 'DOMAIN_PROVIDER_PROXY_REQUIRED') {
       return t('antifilterProxyRequired');
     }
+    const localPacErrors = {
+      ANTIZAPRET_INVALID_PAC: 'optionsLocalAntizapretInvalid',
+      ANTIZAPRET_LOCAL_PROXY_REQUIRED: 'optionsLocalAntizapretProxyRequired',
+      ANTIZAPRET_LOCAL_FILE_REQUIRED: 'optionsLocalAntizapretFileRequired',
+    };
+    if (localPacErrors[code]) return t(localPacErrors[code]);
     if (context === 'provider-update') {
       return t(providerUpdateErrorKey(code));
     }
@@ -1044,7 +1055,7 @@
         kind: 'active',
         tone: 'success',
         title: t('popupControlActive'),
-        help: t('popupControlActiveHelp'),
+        help: t('popupControlActiveShort'),
         controlsPac: true,
         external: false,
         busy: false,
@@ -1080,6 +1091,7 @@
     if (provider.key === 'onlyOwnSites') {
       return t('providerOnlyOwnSitesLabel');
     }
+    if (provider.key === 'antizapret-local') return t('optionsLocalAntizapretTitle');
     return provider.label || provider.key;
 
   }
@@ -1094,6 +1106,7 @@
   function getProviderDescription(provider) {
 
     if (provider.key === 'antifilter') return t('antifilterSourceHelp');
+    if (provider.key === 'antizapret-local') return t('optionsLocalAntizapretHelp');
     if (provider.key === 'Антизапрет') {
       return t('providerAntizapretDescription');
     }
@@ -1134,6 +1147,10 @@
     }
     const view = deriveControlView();
     const apply = getDurableProxyApply();
+    if (state.setupSiteResult && (view.kind !== 'active' ||
+      state.setupSiteEffectiveId !== getSetupEffectiveId())) {
+      state.setupSiteResult = null;
+    }
     if (
       view.controlsPac ||
       ['applied', 'cleared'].includes(String(apply.status || 'idle'))
@@ -1146,6 +1163,8 @@
   function ifShowInitialSetup() {
 
     const view = deriveControlView();
+    if (state.setupDismissed) return false;
+    if (state.setupStep === 'verify') return view.kind === 'active';
     return state.setupEligible && !view.external && !view.controlsPac;
 
   }
@@ -1188,6 +1207,7 @@
         'optionsOverviewDescription',
     );
     renderInitialSetupCard(section);
+    if (ifShowInitialSetup()) return;
     const view = deriveControlView();
     const card = append(section, 'div', `settings-card ui-card status-card ${
       view.tone
@@ -1229,10 +1249,13 @@
     appendSummaryItem(
         grid,
         t('optionsSavedConfiguration'),
-        view.stale ? t('optionsApplyRequired') : t('optionsConfigurationCurrent'),
+        t(getOverviewFreshness(view)),
         'freshness',
     );
-    if (!getSelectedProvider() && !ifShowInitialSetup()) {
+    if (view.controlsPac) {
+      appendText(card, 'p', t('optionsSetupVerifyHelp'), 'section-description');
+    }
+    if (!getSelectedProvider() && !state.setupEligible) {
       const warning = append(card, 'div', 'status-banner warning');
       warning.setAttribute('role', 'status');
       appendText(warning, 'strong', t('optionsChooseSourceTitle'));
@@ -1247,153 +1270,231 @@
 
   }
 
+  function getOverviewFreshness(view) {
+
+    if (view.stale) return 'optionsApplyRequired';
+    return view.controlsPac ? 'optionsConfigurationCurrent' : 'optionsStateOff';
+
+  }
+
   function renderInitialSetupCard(parent) {
 
     if (!ifShowInitialSetup()) {
+      if (state.setupDismissed && state.setupEligible && !deriveControlView().external) {
+        const resume = createButton(parent, t('optionsSetupResume'), 'quiet');
+        resume.onclick = () => {
+          state.setupDismissed = false;
+          focusSetup();
+        };
+      }
       return;
     }
     const provider = getSelectedProvider();
+    const step = state.setupStep === 'verify' ? 'verify' :
+      provider && state.setupStep !== 'source' ? 'review' : 'source';
     const view = deriveControlView();
     const card = append(parent, 'section', 'settings-card ui-card setup-card');
     card.id = 'initial-setup-card';
     card.setAttribute('aria-labelledby', 'initial-setup-heading');
-    const header = append(card, 'div', 'setup-header');
-    const copy = append(header, 'div');
-    const heading = appendText(copy, 'h3', t('optionsSetupTitle'));
+    const steps = append(card, 'ol', 'setup-progress');
+    ['source', 'review', 'verify'].forEach((name, index) => {
+      const item = appendText(steps, 'li', t([
+        'optionsSetupProgressSource', 'optionsSetupProgressReview', 'optionsSetupProgressVerify',
+      ][index]));
+      if (name === step) item.setAttribute('aria-current', 'step');
+    });
+    const heading = appendText(card, 'h3', t({
+      source: 'optionsSetupSourceTitle',
+      review: 'optionsSetupReviewTitle',
+      verify: 'optionsSetupVerifyTitle',
+    }[step]));
     heading.id = 'initial-setup-heading';
-    appendText(copy, 'p', t('optionsSetupIntro'), 'section-description');
-    appendText(header, 'span', t('optionsSetupStatus'), 'ui-pill');
-    const steps = append(card, 'ol', 'setup-steps');
-    renderSetupSourceStep(steps, provider);
-    renderSetupProxyStep(steps);
-    renderSetupApplyStep(steps, provider, view);
+    heading.tabIndex = -1;
+
+    if (step === 'source') {
+      renderSetupSource(card, provider);
+    } else if (step === 'review') {
+      renderSetupReview(card, provider, view);
+    } else {
+      renderSetupVerification(card);
+    }
+    const skip = createButton(card, t(step === 'verify' ?
+      'optionsSetupFinish' : 'optionsSetupSkip'), 'quiet setup-step-action');
+    skip.onclick = () => {
+      if (state.pending.size) return;
+      state.setupDismissed = true;
+      focusSetup();
+    };
 
   }
 
-  function createSetupStep(parent, number, title, description, status, tone) {
+  function renderSetupVerification(card) {
 
-    const item = append(parent, 'li', `setup-step ${tone || ''}`.trim());
-    const marker = appendText(item, 'span', String(number), 'setup-step-marker');
-    marker.setAttribute('aria-hidden', 'true');
-    const body = append(item, 'div', 'setup-step-body');
-    const header = append(body, 'div', 'setup-step-header');
-    appendText(header, 'h4', title);
-    appendText(
-        header,
-        'span',
-        status,
-        `setup-step-status ${tone || ''}`.trim(),
-    );
-    appendText(body, 'p', description, 'section-description');
-    return body;
-
-  }
-
-  function renderSetupSourceStep(parent, provider) {
-
-    const selected = Boolean(provider);
-    const body = createSetupStep(
-        parent,
-        1,
-        t('optionsSetupSourceTitle'),
-        t('optionsSetupSourceHelp'),
-        selected ?
-          t('optionsSetupSourceSelected', [getProviderLabel(provider)]) :
-          t('optionsSetupSourceNotSelected'),
-        selected ? 'complete' : 'current',
-    );
-    const action = createButton(
-        body,
-        t(selected ? 'optionsSetupChangeSource' : 'optionsGoToRoutingSources'),
-        'quiet setup-step-action',
-    );
-    action.onclick = () => navigateTo('routing-sources');
+    const result = state.setupSiteResult;
+    appendText(card, 'p', t(result || 'optionsSetupSiteUnchecked'), 'ui-pill');
+    appendText(card, 'p', t('optionsSetupVerifyHelp'), 'section-description');
+    if (result === 'optionsSetupSiteFailed') {
+      appendText(card, 'p', t('optionsSetupSiteFailureHelp'), 'section-description');
+    }
+    const actions = append(card, 'div', 'setup-actions');
+    if (result === 'optionsSetupSiteFailed') {
+      const review = createButton(actions, t('optionsSetupConfigureProxies'), 'primary');
+      review.onclick = () => navigateTo('proxy-methods');
+    }
+    if (result !== 'optionsSetupSiteOpened') {
+      const opened = createButton(actions, t('optionsSetupMarkOpened'),
+          result ? 'quiet' : 'primary');
+      opened.onclick = () => {
+        state.setupSiteResult = 'optionsSetupSiteOpened';
+        state.setupSiteEffectiveId = getSetupEffectiveId();
+        focusSetup();
+      };
+    }
+    if (!result) {
+      const failed = createButton(actions, t('optionsSetupMarkFailed'), 'quiet');
+      failed.onclick = () => {
+        state.setupSiteResult = 'optionsSetupSiteFailed';
+        state.setupSiteEffectiveId = getSetupEffectiveId();
+        focusSetup();
+      };
+    }
 
   }
 
-  function renderSetupProxyStep(parent) {
+  function getSetupEffectiveId() {
 
-    const count = getProxyCandidateCount();
-    const antifilter = state.snapshot.state.currentPacProviderKey === 'antifilter';
+    return (state.snapshot.configuration || {}).effectiveId ||
+      getDurableProxyApply().cookedPacSha256 || null;
+
+  }
+
+  function focusSetup() {
+
+    render();
+    const target = root.querySelector('#initial-setup-heading') ||
+      root.querySelector('#overview-heading');
+    if (target && !root.querySelector('#overview').hidden) target.focus();
+
+  }
+
+  function renderSetupSource(card, provider) {
+
+    appendText(card, 'p', t('optionsSetupSourceHelp'), 'section-description');
+    const list = append(card, 'fieldset', 'source-choice-group');
+    appendText(list, 'legend', t('optionsChooseAutomaticSource'), 'ui-sr-only');
+    const sources = getProviders().filter((entry) => entry.enabled !== false);
+    const choice = sources.find((entry) => entry.key === state.setupSource) ||
+      sources.find((entry) => provider && entry.key === provider.key);
+    const actions = append(card, 'div', 'setup-actions');
+    const next = createButton(actions, t('optionsSetupSaveSourceContinue'), 'primary');
+    sources.forEach((entry) => {
+      const label = append(list, 'label', 'source-choice');
+      const radio = append(label, 'input', 'source-choice-input');
+      radio.type = 'radio';
+      radio.name = 'setup-source';
+      radio.value = entry.key;
+      radio.checked = Boolean(choice && choice.key === entry.key);
+      const content = append(label, 'div', 'source-choice-content');
+      appendText(content, 'strong', getProviderLabel(entry));
+      const help = {
+        Антизапрет: 'optionsSetupSourceAntizapret',
+        Антицензорити: 'optionsSetupSourceAnticensority',
+        antifilter: 'optionsSetupSourceAntifilter',
+        onlyOwnSites: 'optionsSetupSourceManual',
+      }[entry.key];
+      appendText(content, 'p', help ? t(help) : getProviderDescription(entry), 'item-meta');
+      radio.onchange = () => {
+        if (!radio.checked) return;
+        state.setupSource = entry.key;
+        next.disabled = false;
+      };
+    });
+    next.disabled = !choice;
+    next.onclick = async () => {
+      if (state.pending.size) return;
+      const selected = sources.find((entry) => entry.key === state.setupSource) || choice;
+      if (!selected) return;
+      const key = selected.key;
+      if (key === (getSelectedProvider() || {}).key) {
+        state.setupStep = 'review';
+        focusSetup();
+        return;
+      }
+      await selectProvider(key, next, () => {
+        state.setupStep = 'review';
+      });
+      if (state.setupStep === 'review' && state.activeSection === 'overview') focusSetup();
+    };
+    const other = createButton(actions, t('optionsSetupSourceSettings'), 'quiet');
+    other.onclick = () => navigateTo('routing-sources');
+
+  }
+
+  function renderSetupReview(card, provider, view) {
+
     const mods = state.snapshot.state.pacMods;
-    const ready = count > 0 && count <= 32 && mods.useProxyRulesForAntifilter &&
-      mods.usePacScriptProxies;
-    const status = count ?
-      formatCount(
-          count,
-          'optionsSetupOneProxyConnection',
-          'optionsSetupManyProxyConnections',
-      ) :
-      t(antifilter ? 'optionsDisabled' : 'optionsSetupNoProxyConnections');
-    const body = createSetupStep(
-        parent,
-        2,
-        t(antifilter ? 'optionsNavProxyMethods' : 'optionsSetupProxyTitle'),
-        t(antifilter ? 'antifilterProxyRequired' : 'optionsSetupProxyHelp'),
-        status,
-        antifilter ? ready ? 'complete' : 'current' : 'optional',
-    );
-    const action = createButton(
-        body,
-        t('optionsSetupConfigureProxies'),
-        'quiet setup-step-action',
-    );
-    action.onclick = () => navigateTo('proxy-methods');
+    const count = getProxyCandidateCount(mods);
+    const antifilter = provider.key === 'antifilter';
+    const antizapret = provider.key === 'Антизапрет';
+    const localAntizapret = provider.key === 'antizapret-local';
+    const sourceProxies = mods.usePacScriptProxies !== false;
+    const needsConnection = antifilter &&
+      !(count > 0 && count <= 32 && mods.useProxyRulesForAntifilter && sourceProxies) ||
+      antizapret && !sourceProxies && !count || localAntizapret && (!count || count > 32);
+    appendText(card, 'p', t('optionsSetupSourceSelected', [getProviderLabel(provider)]));
+    const description = localAntizapret ? 'optionsLocalAntizapretHelp' :
+      antifilter ? 'antifilterProxyRequired' :
+      antizapret ? (sourceProxies ? 'optionsSetupAntizapretProxyHelp' : 'optionsSetupAntizapretProxyOffHelp') :
+        provider.key === 'Антицензорити' ? 'optionsSetupAnticensorityProxyHelp' : 'optionsSetupProxyHelp';
+    appendText(card, 'p', t(description), 'section-description');
+    const privacy = append(card, 'details');
+    appendText(privacy, 'summary', t('optionsSetupProxyPrivacyTitle'));
+    appendText(privacy, 'p', t('optionsSetupProxyPrivacy'), 'section-description');
+    const status = appendText(card, 'p', getSetupApplyStatus(provider, view), 'field-help');
+    status.dataset.setupApplyStatus = 'true';
+    status.id = 'options-setup-apply-status';
+    const actions = append(card, 'div', 'setup-actions');
+    if (needsConnection) {
+      const configure = createButton(actions, t('optionsSetupConfigureProxies'), 'primary');
+      configure.onclick = () => navigateTo('proxy-methods');
+    } else {
+      const apply = createButton(actions, t(state.lastErrorCode ?
+        'popupRetry' : 'optionsApplyConfiguration'), 'primary', t('optionsApplyingConfiguration'));
+      apply.dataset.setupApplyAction = 'true';
+      apply.disabled = state.pending.size > 0 || hasDirtyDrafts();
+      apply.setAttribute('aria-describedby', status.id);
+      apply.onclick = () => applyConfiguration(apply, true);
+    }
+    const back = createButton(actions, t('optionsSetupBack'), 'quiet');
+    back.onclick = () => {
+      if (state.pending.size) return;
+      state.setupSource = provider.key;
+      state.setupStep = 'source';
+      focusSetup();
+    };
 
   }
 
   function getSetupApplyStatus(provider, view) {
 
-    if (!provider) {
-      return t('optionsSetupWaitingForSource');
-    }
+    if (!provider) return t('optionsSetupWaitingForSource');
     if (state.pending.has('configuration:apply') || view.kind === 'applying') {
       return t('optionsSetupApplying');
     }
-    if (
-      view.kind === 'error' ||
-      state.message && state.message.tone === 'error'
-    ) {
+    if (provider.key === 'Антизапрет' &&
+        ['PAC_DOWNLOAD_FAILED', 'PAC_TIMEOUT'].includes(state.lastErrorCode)) {
+      return t('optionsSetupAntizapretUnavailable');
+    }
+    if (['PAC_DOWNLOAD_FAILED', 'PAC_TIMEOUT', 'PAC_INVALID'].includes(state.lastErrorCode)) {
+      return t('optionsSetupSourceUnavailable');
+    }
+    if (view.kind === 'error' || state.message && state.message.tone === 'error') {
       return t('optionsSetupApplyError');
     }
-    if (hasDirtyDrafts()) {
-      return t('optionsSetupSaveChangesFirst');
-    }
-    return t('optionsSetupReadyToApply');
+    if (hasDirtyDrafts()) return t('optionsSetupSaveChangesFirst');
+    return t('optionsSetupApplyHelp');
 
   }
-
-  function renderSetupApplyStep(parent, provider, view) {
-
-    const ifApplying = state.pending.has('configuration:apply') ||
-      view.kind === 'applying';
-    const body = createSetupStep(
-        parent,
-        3,
-        t('optionsSetupApplyTitle'),
-        t('optionsSetupApplyHelp'),
-        getSetupApplyStatus(provider, view),
-        provider ? 'current' : '',
-    );
-    const status = body.querySelector('.setup-step-status');
-    status.dataset.setupApplyStatus = 'true';
-    status.id = 'options-setup-apply-status';
-    if (!provider) {
-      return;
-    }
-    const apply = createButton(
-        body,
-        t('optionsApplyConfiguration'),
-        'primary setup-step-action',
-        t('optionsApplyingConfiguration'),
-    );
-    apply.dataset.setupApplyAction = 'true';
-    apply.disabled = ifApplying || hasDirtyDrafts();
-    apply.setAttribute('aria-describedby', status.id);
-    apply.onclick = () => applyConfiguration(apply);
-
-  }
-
   function getControlPillLabel(view) {
 
     const keys = {
@@ -1431,9 +1532,7 @@
           state.snapshot.reliability.autoUpdate &&
           state.snapshot.reliability.autoUpdate.lastSuccessfulUpdateAt,
       ),
-      'freshness': view.stale ?
-        t('optionsApplyRequired') :
-        t('optionsConfigurationCurrent'),
+      'freshness': t(getOverviewFreshness(view)),
     };
     root.querySelectorAll('[data-live-value]').forEach((node) => {
       if (Object.prototype.hasOwnProperty.call(
@@ -1478,6 +1577,11 @@
     const list = append(builtInCard, 'fieldset', 'source-choice-group');
     appendText(list, 'legend', t('optionsChooseAutomaticSource'));
     builtIn.forEach((provider) => renderProviderChoice(list, provider));
+    const nativeHelp = append(builtInCard, 'p', 'field-help');
+    const nativeLink = appendText(nativeHelp, 'a', t('optionsAntizapretNativeSetup'));
+    nativeLink.href = 'https://antizapret.prostovpn.org/';
+    nativeLink.target = '_blank';
+    nativeLink.rel = 'noopener noreferrer';
     const customCard = append(section, 'div', 'settings-card ui-card');
     const customHeader = append(customCard, 'div', 'card-header');
     appendText(customHeader, 'h3', t('optionsCustomProviders'));
@@ -1492,6 +1596,54 @@
       );
     }
     renderAddProviderEditor(customCard);
+
+    const checkCard = append(section, 'div', 'settings-card ui-card');
+    const check = createButton(checkCard, t('sourceCheckButton'));
+    const status = appendText(checkCard, 'p', '', 'field-help');
+    status.setAttribute('role', 'status');
+    check.onclick = async () => {
+      const selected = getSelectedProvider();
+      if (!selected) {
+        status.textContent = t('sourceCheck_unavailable');
+        return;
+      }
+      check.disabled = true;
+      status.textContent = t('sourceCheckChecking');
+      try {
+        const result = await rpc.callBackground('checkRoutingSource', {providerKey: selected.key});
+        status.textContent = t(`sourceCheck_${result.code}`,
+            result.code === 'http' ? [String(result.httpStatus)] : []);
+      } catch (_error) {
+        status.textContent = t('sourceCheck_failed');
+      } finally {
+        check.disabled = false;
+      }
+    };
+    const importCard = append(section, 'div', 'settings-card ui-card');
+    appendText(importCard, 'h3', t('optionsLocalAntizapretTitle'));
+    appendText(importCard, 'p', t('optionsLocalAntizapretHelp'), 'field-help');
+    const label = append(importCard, 'label', 'field');
+    appendText(label, 'span', t('optionsLocalAntizapretImport'));
+    const input = append(label, 'input');
+    input.type = 'file';
+    input.accept = '.pac,application/x-ns-proxy-autoconfig';
+    input.onchange = async () => {
+      const file = input.files[0];
+      input.value = '';
+      if (!file) return;
+      const expectedRevision = savedRevision();
+      const result = await runOperation('import-local-antizapret', input, async () => {
+        let text;
+        try {
+          if (!file.size || file.size > 2 * 1024 * 1024) throw new TypeError();
+          text = new TextDecoder('utf-8', {fatal: true}).decode(await file.arrayBuffer());
+        } catch (_error) {
+          throw Object.assign(new TypeError(), {code: 'ANTIZAPRET_INVALID_PAC'});
+        }
+        return rpc.callBackground('importLocalAntizapret', {text, expectedRevision});
+      });
+      if (result) await refresh({message: t('optionsLocalAntizapretSaved'), tone: 'success'});
+    };
 
   }
 
@@ -1539,7 +1691,7 @@
 
   }
 
-  async function selectProvider(providerKey, button) {
+  async function selectProvider(providerKey, button, onSaved) {
 
     const result = await runOperation(
         'select-provider',
@@ -1548,6 +1700,7 @@
         {context: 'provider'},
     );
     if (result) {
+      if (onSaved) onSaved();
       await refresh({
         message: t('optionsRoutingSourceSaved'),
         tone: 'success',
@@ -4449,6 +4602,10 @@
 
     bar.hidden = false;
     const dirty = getDirtyDrafts();
+    if (!dirty.length && state.activeSection === 'overview' && ifShowInitialSetup()) {
+      bar.hidden = true;
+      return;
+    }
     const conflicts = dirty.filter((entry) => entry[1].conflict);
     const view = deriveControlView();
     const configuration = state.snapshot.configuration || {};
@@ -4635,13 +4792,14 @@
 
   }
 
-  async function applyConfiguration(button) {
+  async function applyConfiguration(button, fromSetup = false) {
 
     if (hasDirtyDrafts()) {
       setMessage(t('optionsSaveSectionBeforeApply'), 'warning');
       return;
     }
     const configuration = state.snapshot.configuration;
+    const previousDownload = state.snapshot.state.pacDownload;
     const result = await runOperation(
         'configuration:apply',
         button,
@@ -4651,23 +4809,38 @@
         }),
         {
           context: 'apply',
-          retry: () => applyConfiguration(button),
+          retry: fromSetup ? null : () => applyConfiguration(button),
         },
     );
     if (result) {
+      if (fromSetup) {
+        state.setupStep = 'verify';
+        state.setupSiteResult = null;
+      }
       await refresh({
         message: t('optionsConfigurationApplied'),
         tone: 'success',
       });
+      if (fromSetup && state.activeSection === 'overview' && ifShowInitialSetup()) focusSetup();
     } else {
       await refresh();
+      const download = state.snapshot.state.pacDownload;
+      if (fromSetup && state.lastErrorCode === 'APPLY_FAILED' &&
+          download && download.providerKey === 'Антизапрет' && download.status === 'error' &&
+          download.finishedAt !== (previousDownload && previousDownload.finishedAt) &&
+          download.error && ['PAC_DOWNLOAD_FAILED', 'PAC_TIMEOUT'].includes(download.error.code)) {
+        state.lastErrorCode = download.error.code;
+        updateDraftPresentation();
+      }
       const current = state.snapshot.configuration;
       if (state.lastErrorCode === 'SAVED_REVISION_CHANGED' || state.lastErrorCode === 'PAC_APPLY_STALE') {
         setMessage(t('unifiedConflict'), 'warning');
       } else if (configuration && current && configuration.active && current.active &&
           configuration.effectiveId === current.effectiveId) {
-        setMessage(t('unifiedApplyFailed') + (state.lastErrorCode === 'CREDENTIALS_REQUIRED' ?
-          ` ${t('transferCredentialsRequired')}` : ''), 'warning');
+        const addDetail = state.lastErrorCode === 'CREDENTIALS_REQUIRED' ||
+          String(state.lastErrorCode).startsWith('ANTIZAPRET_LOCAL_');
+        setMessage(t('unifiedApplyFailed') + (addDetail ?
+          ` ${getSafeError({code: state.lastErrorCode}, 'apply')}` : ''), 'warning');
       }
     }
 
@@ -4723,8 +4896,7 @@
     }
     const setupApply = root.querySelector('[data-setup-apply-action]');
     if (setupApply) {
-      setupApply.disabled = hasDirtyDrafts() ||
-        state.pending.has('configuration:apply');
+      setupApply.disabled = hasDirtyDrafts() || state.pending.size > 0;
     }
     const live = root.querySelector('.ui-sr-only[aria-live="polite"]');
     if (live) {

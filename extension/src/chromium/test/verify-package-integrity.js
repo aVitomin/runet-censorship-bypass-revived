@@ -5,6 +5,7 @@ const Assert = require('assert');
 const Fs = require('fs');
 const Os = require('os');
 const Path = require('path');
+const Templates = require('../../templates-data');
 const {distributionNoticeSources, verifyDistributionNotices} =
   require('../../tooling/distribution-notices');
 
@@ -19,8 +20,8 @@ const PACKAGED_CHROMIUM_ROOT = Path.resolve(
 
 const CHROMIUM_SOURCE_ROOT = Path.resolve(__dirname, '..');
 const CHROMIUM_LOCALES = Object.freeze(['en', 'ru']);
-const EXPECTED_CHROMIUM_VERSION = '1.0.3';
-const EXPECTED_CHROMIUM_VERSION_NAME = '1.0.3';
+const EXPECTED_CHROMIUM_VERSION = Templates.contexts.chromium.storeVersion;
+const EXPECTED_CHROMIUM_VERSION_NAME = Templates.contexts.chromium.version;
 
 const ALLOWED_RUNTIME_DIRECTORIES = new Set([
   'background/vendor/tldts/dist',

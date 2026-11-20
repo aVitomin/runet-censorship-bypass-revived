@@ -170,7 +170,7 @@ describe('Firefox fail-closed proxy control', function() {
       Object.assign(floor(), {socks: '127.0.0.1:0'}),
       Object.assign(floor(), {socks: '127.0.0.1:1080'}),
       Object.assign(floor(), {socks: 'localhost:55001'}),
-      Object.assign(floor(), {proxyDNS: false}),
+      Object.assign(floor(), {proxyDNS: 'false'}),
       Object.assign(floor(), {extra: true}),
     ]) {
       Assert.strictEqual(

@@ -1,6 +1,5 @@
 body {
   width: 392px;
-  min-height: 420px;
 }
 
 main {
@@ -45,17 +44,19 @@ fieldset {
   padding: var(--ui-space-1-5);
 }
 
-.control-card h2,
-.facts-card h2 {
-  font-size: var(--ui-font-size-heading);
-  line-height: var(--ui-line-height-tight);
+.facts-card {
+  display: block;
 }
 
-.status-row {
-  display: flex;
+.facts-card summary {
+  cursor: pointer;
+  font-weight: var(--ui-font-weight-medium);
+}
+
+.details-body {
+  display: grid;
   gap: var(--ui-space-1);
-  align-items: center;
-  justify-content: space-between;
+  margin-top: var(--ui-space-1-5);
 }
 
 .pill {
@@ -68,8 +69,6 @@ fieldset {
   background: var(--ui-color-surface-subtle);
   font-size: var(--ui-font-size-caption);
   font-weight: var(--ui-font-weight-bold);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
 }
 
 .pill.success {
@@ -88,14 +87,6 @@ fieldset {
   border-color: var(--ui-color-error);
   color: var(--ui-color-error);
   background: var(--ui-color-error-surface);
-}
-
-.eyebrow {
-  color: var(--ui-color-text-muted);
-  font-size: var(--ui-font-size-caption);
-  font-weight: var(--ui-font-weight-bold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .site-host {
@@ -193,54 +184,16 @@ fieldset {
   font-size: var(--ui-font-size-caption);
 }
 
-.proxy-warning {
-  margin-top: var(--ui-space-0-5);
-}
-
-.link-button {
-  min-height: auto;
-  padding: 0;
-  border: 0;
-  color: var(--ui-color-accent);
-  background: transparent;
-  text-align: left;
-}
-
-.health-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-space-1);
-  align-items: center;
-  justify-content: space-between;
-}
-
-.facts {
-  display: grid;
-  gap: var(--ui-space-1);
-}
-
-.fact {
-  display: flex;
-  gap: var(--ui-space-1);
-  justify-content: space-between;
-  padding-bottom: var(--ui-space-1);
-  border-bottom: 1px solid var(--ui-color-divider);
-}
-
-.fact:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.fact dd {
-  max-width: 55%;
-  overflow-wrap: anywhere;
-  font-weight: var(--ui-font-weight-medium);
-  text-align: right;
-}
-
 .actions button {
   flex: 1;
+}
+
+.actions .primary {
+  flex-basis: 100%;
+}
+
+.actions:empty {
+  display: none;
 }
 
 .message {

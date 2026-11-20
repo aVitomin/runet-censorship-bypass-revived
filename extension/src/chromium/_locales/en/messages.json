@@ -1,4 +1,64 @@
 {
+  "optionsLocalAntizapretTitle": {
+    "message": "Antizapret (local file)"
+  },
+  "optionsLocalAntizapretImport": {
+    "message": "Import a trusted Antizapret PAC file"
+  },
+  "optionsLocalAntizapretHelp": {
+    "message": "If the online source is unavailable, import a trusted Antizapret PAC file. Your configured proxies handle public hostnames, including sites outside the list. Your explicit Direct rules still apply. Chromium may connect directly if it cannot run the routing script."
+  },
+  "optionsLocalAntizapretSaved": {
+    "message": "File imported and source saved. Configure your proxy, then select Apply."
+  },
+  "optionsLocalAntizapretInvalid": {
+    "message": "Choose a supported Antizapret PAC file smaller than 2 MB."
+  },
+  "optionsLocalAntizapretProxyRequired": {
+    "message": "Enable a configured proxy for the imported Antizapret rules."
+  },
+  "optionsLocalAntizapretFileRequired": {
+    "message": "Import an Antizapret PAC file in Routing sources first."
+  },
+  "optionsLocalAntizapretUpdate": {
+    "message": "Import a newer PAC file in Routing sources to update this source."
+  },
+  "sourceCheckButton": {
+    "message": "Check source"
+  },
+  "sourceCheckChecking": {
+    "message": "Checking source…"
+  },
+  "sourceCheck_ready": {
+    "message": "Source responded and its data passed validation. Active routing is unchanged."
+  },
+  "sourceCheck_manual": {
+    "message": "This source uses local rules and needs no download."
+  },
+  "sourceCheck_http": {
+    "message": "The source returned HTTP $CODE$. Check your connection or VPN and try again.",
+    "placeholders": {
+      "code": {"content": "$1"}
+    }
+  },
+  "sourceCheck_timeout": {
+    "message": "The source did not respond in time. Try again."
+  },
+  "sourceCheck_busy": {
+    "message": "This source is already being checked or updated. Try again shortly."
+  },
+  "sourceCheck_network": {
+    "message": "Could not connect to the source. Check your connection or VPN."
+  },
+  "sourceCheck_invalid": {
+    "message": "The source data or address failed validation."
+  },
+  "sourceCheck_unavailable": {
+    "message": "Choose an available source first."
+  },
+  "sourceCheck_failed": {
+    "message": "Could not complete the source check."
+  },
   "providerLifecycleControlHelp": {
     "message": "Check the protection status above. Updated routing data alone does not confirm that routing is active."
   },
@@ -102,7 +162,7 @@
     "message": "Export for support"
   },
   "transferSupportHelp": {
-    "message": "Support files contain only environment and status information, without site rules or proxy addresses. They cannot be imported as settings."
+    "message": "The report includes environment, status, source type and saved/applied routing flags. Applied settings are unavailable when control is off or unverified. Site rules, addresses and credentials are excluded. The report cannot be imported as settings."
   },
   "transferPreview": {
     "message": "Import preview"
@@ -123,7 +183,10 @@
     "message": "Settings imported. They are saved but not applied."
   },
   "transferExported": {
-    "message": "Export prepared. Keep settings files private."
+    "message": "Settings file prepared. It contains site rules and proxy addresses; keep it private."
+  },
+  "transferSupportExported": {
+    "message": "Support report prepared. You can attach it to an issue: site rules, addresses and credentials are excluded."
   },
   "transferInvalid": {
     "message": "The file is not a valid settings export. Nothing was imported."
@@ -592,10 +655,10 @@
     "message": "Extension proxy is on — Current page routing is unavailable"
   },
   "providerAntizapretDescription": {
-    "message": "Automatically routes sites using the built-in Antizapret source."
+    "message": "Uses Antizapret’s own proxies for sites covered by its rules. Availability depends on your connection."
   },
   "providerAnticensorityDescription": {
-    "message": "Uses the alternative built-in routing source."
+    "message": "Uses Anticensority rules. Start a compatible local service such as Tor for its proxy routes."
   },
   "providerOnlyOwnSitesLabel": {
     "message": "Only my rules and connections"
@@ -1321,8 +1384,71 @@
   "optionsGoToRoutingSources": {
     "message": "Choose source"
   },
+  "optionsSetupProgressSource": {
+    "message": "1. Source"
+  },
+  "optionsSetupProgressReview": {
+    "message": "2. Apply"
+  },
+  "optionsSetupProgressVerify": {
+    "message": "3. Verify"
+  },
+  "optionsSetupReviewTitle": {
+    "message": "Review and apply"
+  },
+  "optionsSetupVerifyTitle": {
+    "message": "Verify your site"
+  },
+  "optionsSetupSaveSourceContinue": {
+    "message": "Save source and continue"
+  },
+  "optionsSetupSiteOpened": {
+    "message": "Site opened in your check"
+  },
+  "optionsSetupSiteFailed": {
+    "message": "Site did not open in your check"
+  },
+  "optionsSetupSiteFailureHelp": {
+    "message": "Check the site's mode in the popup and confirm the selected source or proxy is available."
+  },
+  "optionsSetupMarkOpened": {
+    "message": "The site opened"
+  },
+  "optionsSetupMarkFailed": {
+    "message": "The site did not open"
+  },
+  "optionsSetupSiteUnchecked": {
+    "message": "Routing applied · Site not checked"
+  },
+  "optionsSetupProxyPrivacyTitle": {
+    "message": "What the proxy receives"
+  },
+  "optionsSetupProxyPrivacy": {
+    "message": "For a proxied request, the proxy sees the destination and any traffic its protocol exposes. When a site uses a normal HTTPS tunnel, TLS protects the page contents. A matching proxy may also receive the credentials you configured for it."
+  },
+  "optionsSetupSkip": {
+    "message": "Set up later"
+  },
+  "optionsSetupResume": {
+    "message": "Resume setup"
+  },
+  "optionsSetupBack": {
+    "message": "Change source"
+  },
+  "optionsSetupFinish": {
+    "message": "Return to Overview"
+  },
   "optionsSetupTitle": {
     "message": "Set up routing"
+  },
+  "optionsSetupAntizapretUnavailable": {
+    "message": "Could not download Antizapret. The PAC may only be reachable from a Russian IP. Check your connection or VPN, then retry or choose another source."
+  },
+  "optionsAntizapretNativeSetup": {
+    "message": "Set up Antizapret in the browser separately"
+  },
+  "optionsSetupSourceUnavailable": {
+    "message": "Could not load rules for this source. Check your connection, try again, or choose another source."
   },
   "optionsSetupIntro": {
     "message": "Three short steps are enough to start. Nothing changes in the browser until you apply routing."
@@ -1334,7 +1460,40 @@
     "message": "Choose a routing source"
   },
   "optionsSetupSourceHelp": {
-    "message": "Choose how sites in Auto mode are routed."
+    "message": "Choose the source that fits your connection."
+  },
+  "optionsSetupSourceSettings": {
+    "message": "All source settings"
+  },
+  "optionsSetupSourceAntizapret": {
+    "message": "Start without your own proxy if the service is available on your network."
+  },
+  "optionsSetupSourceAnticensority": {
+    "message": "Requires a compatible local service such as Tor for proxy routes."
+  },
+  "optionsSetupSourceAntifilter": {
+    "message": "Provides a list of sites. You supply the proxy connection."
+  },
+  "optionsSetupSourceManual": {
+    "message": "Set a route per site. Direct needs no proxy."
+  },
+  "optionsSetupChooseAntizapret": {
+    "message": "Choose Antizapret"
+  },
+  "optionsSetupSourceProxyOn": {
+    "message": "Source proxies enabled"
+  },
+  "optionsSetupAntizapretProxyHelp": {
+    "message": "Antizapret supplies proxies for sites its rules match. You can start without adding your own proxy."
+  },
+  "optionsSetupAntizapretProxyOffHelp": {
+    "message": "Turn on Use proxies from the source in Proxy connections and save your changes to use Antizapret’s proxies. If you keep it off, configure your own connection and routing rules to send traffic through it."
+  },
+  "optionsSetupAnticensorityProxyHelp": {
+    "message": "Anticensority’s routes normally use a local service such as Tor. Start that service, or configure your own connection and routing rules."
+  },
+  "optionsSetupVerifyHelp": {
+    "message": "Return to the site tab and reload it. Check the site mode in the extension popup. To change it, select a mode and click Apply."
   },
   "optionsSetupSourceNotSelected": {
     "message": "Not selected"
@@ -1379,7 +1538,7 @@
     "message": "Configure proxy connections"
   },
   "optionsSetupApplyTitle": {
-    "message": "Apply routing"
+    "message": "Apply and verify"
   },
   "optionsSetupApplyHelp": {
     "message": "Saved settings affect the browser only after you apply them."

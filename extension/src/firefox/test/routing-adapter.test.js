@@ -48,6 +48,55 @@ function adapterForDecision(decision, options = {}) {
 
 describe('Firefox fail-closed routing adapter', function() {
 
+  it('discards an Antizapret DNS result from the previous Effective configuration', async function() {
+
+    let resolveDns;
+    const dns = new Promise((resolve) => {
+      resolveDns = resolve;
+    });
+    let session = {datasetRuntime: {routingInputForRequest: () => dns},
+      resolveCredentials: () => null};
+    const adapter = Adapter.createAdapter({
+      initialState: Adapter.STATES.READY,
+      decideRoute: (value) => value,
+      antizapretSession: () => session,
+      verifyAntizapretSession: async (active) => active === session,
+    });
+    const details = {requestId: 'old', url: 'https://test.example/'};
+    const pending = adapter.onProxyRequest(details);
+    session = {datasetRuntime: {routingInputForRequest: () => DIRECT_DECISION}};
+    resolveDns(DIRECT_DECISION);
+    Assert.strictEqual((await pending).at(-1), null);
+    Assert.deepStrictEqual(adapter.onBeforeRequest(details), {cancel: true});
+    Assert.strictEqual(adapter.authorizationCount(), 0);
+
+  });
+
+  it('requires the authorized Antizapret transport and retains a stale deny through OFF', async function() {
+
+    let state = Adapter.STATES.READY;
+    const decision = proxyDecision([candidate('own', 'HTTP', '127.0.0.1', 9999)]);
+    const session = {datasetRuntime: {routingInputForRequest: () => decision},
+      resolveCredentials: () => null};
+    const adapter = Adapter.createAdapter({
+      runtimeStateForRequest: () => state,
+      decideRoute: (value) => value,
+      antizapretSession: () => state === Adapter.STATES.READY ? session : null,
+      verifyAntizapretSession: async () => true,
+    });
+    const details = {requestId: 'active', url: 'https://test.example/'};
+    await adapter.onProxyRequest(details);
+    Assert.deepStrictEqual(adapter.onBeforeRequest(details), {cancel: true});
+    Assert.deepStrictEqual(adapter.onBeforeRequest(Object.assign({}, details, {
+      proxyInfo: {type: 'http', host: '127.0.0.1', port: 9999},
+    })), {cancel: false});
+    state = Adapter.STATES.OFF;
+    adapter.clearAllAuthorizations();
+    Assert.deepStrictEqual(adapter.onBeforeRequest(details), {cancel: true});
+    Assert.deepStrictEqual(adapter.onBeforeRequest({requestId: 'new'}), {cancel: false});
+
+  });
+
   it('leaves ordinary traffic alone while durable runtime is OFF', function() {
 
     const adapter = Adapter.createAdapter();

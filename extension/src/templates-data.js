@@ -1,8 +1,8 @@
 'use strict';
 
 const release = Object.freeze({
-  version: '1.0.3',
-  storeVersion: '1.0.3',
+  version: '1.1.0',
+  storeVersion: '1.1.0',
 });
 
 exports.contexts = Object.freeze({

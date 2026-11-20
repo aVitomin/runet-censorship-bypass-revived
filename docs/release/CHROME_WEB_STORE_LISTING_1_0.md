@@ -38,9 +38,10 @@ description change requires a new validated artifact.
 
 ## Long description — English
 
-Choose how Chrome opens websites: follow automatic rules, use a configured
-proxy, or connect directly. Runet Censorship Bypass — Revived is an independent
-Anticensority fork that controls browser routing; it provides no VPN or proxy service.
+Runet Censorship Bypass — Revived is an independent Anticensority fork. Choose
+how Chrome connects to sites: follow automatic rules, use a configured proxy,
+or connect directly. Proxy connections come from the routing provider, your own
+proxy, or a separately running local service.
 
 - Choose Auto, Proxy or Direct for a site, an exact host or a domain with subdomains.
 - Use a built-in or custom PAC source, the optional Antifilter list, or Only my rules and connections.
@@ -57,15 +58,24 @@ takes priority over Proxy. Proxy needs a suitable enabled connection. Updates
 do not turn routing on or activate pending settings. The popup asks before
 including other saved changes; unsaved Options edits are not included.
 
-Antifilter supplies an exact-host list, not proxy servers. It uses your selected
-Proxy connections only after explicit consent. Old or unknown source dates show
-a warning without switching routing off.
+To get started, choose Antizapret if its service is available on your connection.
+It can use its own proxies for sites its rules match when source proxies are
+enabled. Antifilter supplies an exact-host list and uses your enabled Proxy-rule
+connections with your consent. Save changes, select Apply, then reload a site
+covered by the source or your rule. Check its mode in the popup and confirm the
+page loads. Old or unknown source dates show a warning without switching routing off.
 
-Settings and optional proxy credentials stay in your browser profile. There is
-no developer telemetry or cloud synchronization. Sources, proxies and connection
-checks make network requests; proxies receive destinations and traffic visible
-to their protocol. Settings exports omit credentials and custom-source URLs,
-but still contain site rules and proxy addresses: keep them private.
+Settings and configured proxy credentials are stored in your browser profile.
+The extension has no developer telemetry or cloud synchronization. When a
+request goes through a proxy, the proxy sees the destination and the traffic
+its protocol exposes. If a matching proxy requests authentication for an
+authorized route, Chrome can send the configured proxy credentials to that
+proxy. An HTTPS proxy protects the connection to the proxy with TLS. For a
+normally tunneled HTTPS site, the proxy sees the destination while the browser's
+TLS connection to the site protects page content. Source servers receive
+download requests and connection metadata such as IP address. Connection checks
+can contact the destination and redirects. Settings exports omit credentials and
+custom-source URLs and still include site rules and proxy addresses.
 
 The active indicator confirms routing control, not connectivity or anonymity.
 The extension does not guarantee bypass or encryption, and does not route other
@@ -80,8 +90,8 @@ SOCKS authentication depends on the browser.
 
 «Обход блокировок Рунета — Revived» — независимый форк Anticensority.
 Выбирайте, как Chrome открывает сайты: по автоматическим правилам, через
-настроенный прокси или напрямую. Расширение управляет маршрутами браузера;
-VPN или прокси-сервер в комплект не входят.
+настроенный прокси или напрямую. Подключение обеспечивает провайдер
+маршрутизации, ваш прокси или отдельно запущенная локальная служба.
 
 - Режимы «Авто», «Прокси» и «Напрямую» для одного хоста или домена с поддоменами.
 - Встроенный или свой PAC-источник, дополнительный список Antifilter либо режим «Только мои правила и подключения».
@@ -99,15 +109,26 @@ VPN или прокси-сервер в комплект не входят.
 отложенные настройки. Панель спрашивает перед применением других сохранённых
 изменений; несохранённые правки настроек в применение не входят.
 
-Antifilter предоставляет список точных имён сайтов, без прокси-серверов. Он
-использует выбранные вами подключения для правил «Прокси» с явного разрешения.
-Предупреждение о старой или неизвестной дате базы не отключает маршрутизацию.
+Для первого запуска выберите Antizapret, если сервис доступен на вашем
+подключении. Если использование прокси источника включено, сайты, подходящие
+под его правила, могут открываться через прокси Antizapret. Antifilter
+предоставляет список точных имён сайтов и с вашего разрешения использует
+подключения для правил «Прокси». Сохраните изменения, нажмите «Применить»
+и перезагрузите сайт из списка источника или своего правила. Проверьте режим
+сайта в панели расширения и убедитесь, что страница загружается. Предупреждение
+о старой или неизвестной дате базы не отключает маршрутизацию.
 
 Настройки и учётные данные прокси хранятся в профиле браузера. Телеметрии
-разработчика и облачной синхронизации нет. Источники, прокси и проверки подключений
-выполняют сетевые запросы; прокси получают адреса назначения и видимую им часть
-трафика. Экспорт исключает учётные данные и адреса своих источников, но сохраняет
-правила сайтов и адреса прокси. Храните его приватно.
+разработчика и облачной синхронизации нет. Прокси видит адрес назначения и
+доступную его протоколу часть трафика. Если прокси, соответствующий применённому
+маршруту, запрашивает аутентификацию, Chrome может передать ему настроенные
+учётные данные. HTTPS-прокси защищает соединение с прокси с помощью TLS.
+При обычном туннелировании HTTPS прокси видит адрес назначения, а соединение
+браузера с сайтом по TLS защищает содержимое страницы. Серверы источников
+получают запросы загрузки и данные подключения, например IP-адрес. Проверки
+соединения могут обращаться к сайту и адресам переадресации. Файл настроек
+содержит правила сайтов и адреса прокси. Учётные данные и URL своих источников
+из него исключены.
 
 Активный статус подтверждает управление маршрутами, а не доступность сайтов
 или анонимность. Гарантий обхода и шифрования нет; другие приложения не
@@ -117,6 +138,20 @@ Antifilter предоставляет список точных имён сай�
 [Руководство](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/user/USER_GUIDE_1_0_2.md) ·
 [Помощь](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/SUPPORT.md) ·
 [Приватность](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/release/PRIVACY_1_0.md)
+
+## First-use copy for an unreleased build
+
+Use in the listing after verifying the release with the new Overview.
+See the [first-use guide draft](../development/release-drafts/FIRST_USE.md).
+
+**English.** In Options → Overview, choose a source in the setup guide and save
+it. Review the connection requirements, select Apply, then load a covered site
+and check its mode in the popup.
+
+**Русский.** В настройках на вкладке «Обзор» выберите источник в мастере и
+сохраните его. Проверьте требования к подключению, нажмите «Применить»,
+откройте сайт из списка или своего правила и проверьте его режим в панели
+расширения.
 
 ## Permission justifications for the dashboard
 

@@ -190,7 +190,9 @@
             continue;
           }
           if (response.status !== 200) {
-            throw sourceError('SOURCE_HTTP_REJECTED');
+            const error = sourceError('SOURCE_HTTP_REJECTED');
+            error.httpStatus = response.status;
+            throw error;
           }
           if (response.redirected === true || !response.url ||
             safeUrl(response.url).href !== current.href) {
@@ -226,7 +228,7 @@
 
     }
 
-    async function fetchAndStage() {
+    async function fetchAndStage(checkOnly = false) {
 
       const controller = new AbortControllerImpl();
       let timer;
@@ -242,12 +244,14 @@
           }),
         ]);
       } catch (error) {
-        return Object.freeze({ok: false, status: 'REJECTED',
-          code: error.code || 'SOURCE_UPDATE_REJECTED'});
+        const failure = {ok: false, status: 'REJECTED', code: error.code || 'SOURCE_UPDATE_REJECTED'};
+        if (checkOnly && Number.isInteger(error.httpStatus)) failure.httpStatus = error.httpStatus;
+        return Object.freeze(failure);
       } finally {
         root.clearTimeout(timer);
         controller.abort();
       }
+      if (checkOnly) return Object.freeze({ok: true});
       // The deadline bounds network/parse work. Only its completed result may
       // enter the store's serialized transaction; a late fetch cannot stage data.
       try {
@@ -258,7 +262,7 @@
 
     }
 
-    return Object.freeze({fetchAndStage});
+    return Object.freeze({fetchAndStage: () => fetchAndStage(), check: () => fetchAndStage(true)});
 
   }
 

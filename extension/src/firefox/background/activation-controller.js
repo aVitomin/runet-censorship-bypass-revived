@@ -348,6 +348,20 @@
 
         }
 
+        function antizapretSession() {
+          return durableState && durableState.providerKey === 'antizapret-local' ? activeSession : null;
+        }
+
+        async function verifyAntizapretSession(session) {
+          if (session !== antizapretSession() || !session) return false;
+          try {
+            const owned = await floorControl.inspectOwnedFloor(durableState.floorIdentity);
+            return owned && owned.ok === true && session === antizapretSession();
+          } catch (_error) {
+            return false;
+          }
+        }
+
         function resolveCredentials(authRef) {
 
           const session = activeSession;
@@ -447,7 +461,7 @@
 
         }
 
-        async function persistOn(prepared, floorIdentity) {
+        async function persistOn(prepared, floorIdentity, floorTransition = false) {
 
           try {
             return await OffState.writeOnState(storageArea, {
@@ -455,6 +469,7 @@
               providerKey: prepared.providerKey,
               datasetIdentity: prepared.datasetIdentity,
               routingDescriptor: prepared.routingDescriptor,
+              floorTransition,
             });
           } catch (_error) {
             return null;
@@ -488,7 +503,7 @@
 
           let acquired;
           try {
-            acquired = await floorControl.acquireRandomFloor();
+            acquired = await floorControl.acquireRandomFloor(prepared.providerKey !== 'antizapret-local');
           } catch (_error) {
             setUnavailable(ProxyControl.ERRORS.PROXY_SET_FAILED);
             return errorResult(ProxyControl.ERRORS.PROXY_SET_FAILED);
@@ -620,6 +635,9 @@
                 exactRuntime.runtime.getState() !== DatasetRuntime.STATES.READY) {
               return errorResult(ERRORS.CONTROL_LOSS);
             }
+            if (previousState.floorIdentity.proxyDNS !== (prepared.providerKey !== 'antizapret-local')) {
+              return replaceFloorAndSession(previousState, prepared, exactRuntime);
+            }
             // Retain the owned floor throughout. The ON record is the commit
             // point; a restart selects exactly its retained generation.
             writing = true;
@@ -649,6 +667,55 @@
 
         }
 
+        async function replaceFloorAndSession(previousState, prepared, exactRuntime) {
+          const floor = Object.assign({}, previousState.floorIdentity, {
+            proxyDNS: prepared.providerKey !== 'antizapret-local',
+          });
+          activeSession = null;
+          runtimeState = DatasetRuntime.STATES.INITIALIZING;
+          recoveryStatus = RECOVERY_STATUS.INITIALIZING;
+          try {
+            if (!clearEphemeralState()) throw new Error(ERRORS.EPHEMERAL_CLEAR_FAILED);
+            durableState = await OffState.writeOnState(storageArea,
+                Object.assign({}, previousState, {floorTransition: true}));
+            if (!(await floorControl.updateOwnedFloorDns(floor)).ok) {
+              throw new Error(ERRORS.CONTROL_LOSS);
+            }
+            if (!(await floorControl.checkPrivateAccess()).ok) throw new Error(ERRORS.CONTROL_LOSS);
+            if (prepared.checkSavedRevision) await prepared.checkSavedRevision();
+            if (exactRuntime.runtime.getState() !== DatasetRuntime.STATES.READY) {
+              throw new Error(ERRORS.DATASET_NOT_READY);
+            }
+            const nextState = await persistOn(prepared, floor, true);
+            if (!nextState) throw new Error(ERRORS.DURABLE_ON_PERSIST_FAILED);
+            if (!(await floorControl.inspectOwnedFloor(floor)).ok ||
+                !(await floorControl.checkPrivateAccess()).ok) {
+              // Keep protected intent even if the target source normally goes OFF on control loss.
+              durableState = nextState;
+              throw new Error(ERRORS.CONTROL_LOSS);
+            }
+            const committed = Object.assign({}, nextState);
+            delete committed.floorTransition;
+            durableState = await OffState.writeOnState(storageArea, committed);
+            if (!(await floorControl.inspectOwnedFloor(floor)).ok) {
+              durableState = await OffState.writeOnState(storageArea, nextState);
+              throw new Error(ERRORS.CONTROL_LOSS);
+            }
+            publishSession(
+                exactRuntime.runtime, prepared.resolveCredentials, RECOVERY_STATUS.ACTIVE,
+            );
+            return {ok: true, status: RESULTS.ACTIVE, dataset: exactRuntime.selected};
+          } catch (error) {
+            const code = error && error.code || error && error.message || ERRORS.ACTIVATION_FAILED;
+            try {
+              await recoverOnState(durableState);
+            } catch (_error) {
+              setUnavailable(ERRORS.ACTIVATION_FAILED);
+            }
+            return errorResult(code);
+          }
+        }
+
         async function transitionLostFloorToOff(floorIdentity) {
 
           try {
@@ -666,7 +733,43 @@
 
         }
 
+        async function holdAntizapretControlLoss(state) {
+          setUnavailable(ERRORS.CONTROL_LOSS, RECOVERY_STATUS.BLOCKED_CONTROL_LOSS);
+          try {
+            durableState = await OffState.writeOnState(storageArea,
+                Object.assign({}, state, {controlLossBlocked: true}));
+          } catch (_error) {
+            // Remain blocked in memory and keep the previous ON identity for recovery.
+            return errorResult(ERRORS.DURABLE_OFF_PERSIST_FAILED, {floorRetained: true});
+          }
+          return errorResult(ERRORS.CONTROL_LOSS, {floorRetained: true});
+        }
+
         async function recoverOnState(state) {
+
+          if (state.controlLossBlocked) {
+            setUnavailable(ERRORS.CONTROL_LOSS, RECOVERY_STATUS.BLOCKED_CONTROL_LOSS);
+            return errorResult(ERRORS.CONTROL_LOSS, {floorRetained: true});
+          }
+
+          if (state.floorTransition) {
+            let restored;
+            try {
+              const access = await floorControl.checkPrivateAccess();
+              if (!access.ok) {
+                setUnavailable(access.error.code, RECOVERY_STATUS.BLOCKED_PRIVATE_ACCESS);
+                return access;
+              }
+              restored = await floorControl.updateOwnedFloorDns(state.floorIdentity);
+            } catch (_error) {
+              setUnavailable(ERRORS.ACTIVATION_FAILED);
+              return errorResult(ERRORS.ACTIVATION_FAILED, {floorRetained: true});
+            }
+            if (!restored.ok) {
+              setUnavailable(ERRORS.CONTROL_LOSS, RECOVERY_STATUS.BLOCKED_CONTROL_LOSS);
+              return errorResult(ERRORS.CONTROL_LOSS, {floorRetained: true});
+            }
+          }
 
           const privateAccess = await floorControl.checkPrivateAccess();
           const owned = await floorControl.inspectOwnedFloor(
@@ -675,6 +778,11 @@
           if (!owned || owned.ok !== true) {
             if (owned && owned.error &&
                 owned.error.code === ProxyControl.ERRORS.OWNERSHIP_MISMATCH) {
+              if (state.floorTransition) {
+                setUnavailable(ERRORS.CONTROL_LOSS, RECOVERY_STATUS.BLOCKED_CONTROL_LOSS);
+                return errorResult(ERRORS.CONTROL_LOSS, {floorRetained: true});
+              }
+              if (state.providerKey === 'antizapret-local') return holdAntizapretControlLoss(state);
               const transitioned = await transitionLostFloorToOff(
                   state.floorIdentity,
               );
@@ -699,6 +807,14 @@
               RECOVERY_STATUS.BLOCKED_PRIVATE_ACCESS :
               RECOVERY_STATUS.FAILED);
             return errorResult(code, {floorRetained: true});
+          }
+          if (state.providerKey === 'antizapret-local' && state.floorIdentity.proxyDNS) {
+            // The earlier local-helper build persisted this same source with remote DNS.
+            durableState = await OffState.writeOnState(storageArea, Object.assign({}, state, {
+              floorIdentity: Object.assign({}, state.floorIdentity, {proxyDNS: false}),
+              floorTransition: true,
+            }));
+            return recoverOnState(durableState);
           }
           if (typeof recoveryFactory !== 'function') {
             setUnavailable(ERRORS.RECOVERY_UNAVAILABLE);
@@ -749,6 +865,29 @@
             return errorResult(ERRORS.EPHEMERAL_CLEAR_FAILED, {
               floorRetained: true,
             });
+          }
+          if (state.floorTransition || state.providerKey === 'antizapret-local') {
+            const live = await floorControl.inspectOwnedFloor(state.floorIdentity);
+            if (!live || !live.ok) {
+              if (!state.floorTransition) return holdAntizapretControlLoss(state);
+              setUnavailable(ERRORS.CONTROL_LOSS, RECOVERY_STATUS.BLOCKED_CONTROL_LOSS);
+              return errorResult(ERRORS.CONTROL_LOSS, {floorRetained: true});
+            }
+            if (state.floorTransition) {
+              try {
+                const committed = Object.assign({}, state);
+                delete committed.floorTransition;
+                durableState = await OffState.writeOnState(storageArea, committed);
+                if (!(await floorControl.inspectOwnedFloor(state.floorIdentity)).ok) {
+                  durableState = await OffState.writeOnState(storageArea, state);
+                  setUnavailable(ERRORS.CONTROL_LOSS, RECOVERY_STATUS.BLOCKED_CONTROL_LOSS);
+                  return errorResult(ERRORS.CONTROL_LOSS, {floorRetained: true});
+                }
+              } catch (_error) {
+                setUnavailable(ERRORS.DURABLE_ON_PERSIST_FAILED);
+                return errorResult(ERRORS.DURABLE_ON_PERSIST_FAILED, {floorRetained: true});
+              }
+            }
           }
           publishSession(
               exactRuntime.runtime,
@@ -823,9 +962,14 @@
           }
           let persistedOff;
           try {
+            let floorToClear = state.floorIdentity;
+            if (state.floorTransition) {
+              const alternate = Object.assign({}, floorToClear, {proxyDNS: !floorToClear.proxyDNS});
+              if ((await floorControl.inspectOwnedFloor(alternate)).ok) floorToClear = alternate;
+            }
             persistedOff = await OffState.writeOffState(
                 storageArea,
-                state.floorIdentity || null,
+                floorToClear || null,
             );
           } catch (_error) {
             return errorResult(ERRORS.DURABLE_OFF_PERSIST_FAILED);
@@ -973,6 +1117,12 @@
             recoveryStatus = RECOVERY_STATUS.BLOCKED_CONTROL_LOSS;
             failureCode = ERRORS.CONTROL_LOSS;
             clearEphemeralState();
+            if (state.providerKey === 'antizapret-local') {
+              return errorResult(ERRORS.CONTROL_LOSS, {
+                reconciliation: enqueue(() => durableState === state ?
+                  holdAntizapretControlLoss(state) : null),
+              });
+            }
             if (!floorIdentity || controlLossPersistencePending) {
               return errorResult(ERRORS.CONTROL_LOSS, {
                 reconciliation: operationQueue,
@@ -1043,6 +1193,8 @@
 
           },
           currentRuntimeState,
+          antizapretSession,
+          verifyAntizapretSession,
           credentialResolverForRequest,
           initializeFromDurable() {
 

@@ -62,6 +62,13 @@ const providerLookupSource = Fs.readFileSync(
     Path.join(sourceRoot, 'background', 'provider-lookup.js'),
     'utf8',
 );
+const antizapretLocalSource = Fs.readFileSync(
+    Path.join(sourceRoot, 'background', 'antizapret-local.js'),
+    'utf8',
+);
+const antizapretPacSource = Fs.readFileSync(
+    Path.resolve(sourceRoot, '..', 'shared', 'antizapret-pac.js'), 'utf8',
+);
 const datasetRuntimeSource = Fs.readFileSync(
     Path.join(sourceRoot, 'background', 'dataset-runtime.js'),
     'utf8',
@@ -453,10 +460,12 @@ function startEventPage(options = {}) {
   };
   const context = Vm.createContext({
     AbortController,
+    atob: global.atob,
     browser,
     tldts: require('tldts'),
     TextDecoder,
     TextEncoder,
+    Uint8Array,
     URL,
     async fetch() {
 
@@ -504,7 +513,10 @@ function startEventPage(options = {}) {
   Vm.runInContext(datasetStoreSource, context, {filename: 'dataset-store.js'});
   if (options.datasetStore) {
     context.rucbFirefoxDatasetStore = Object.assign({}, context.rucbFirefoxDatasetStore, {
-      createIndexedDbBackend: () => ({}), createStore: () => options.datasetStore,
+      createIndexedDbBackend: (_indexedDB, config) =>
+        config && config.databaseName === 'rucb-firefox-antizapret-v1' ?
+          options.antizapretBackend || {} : {},
+      createStore: () => options.datasetStore,
     });
   }
   Vm.runInContext(providerUpdaterSource, context, {
@@ -520,6 +532,8 @@ function startEventPage(options = {}) {
   Vm.runInContext(providerLookupSource, context, {
     filename: 'provider-lookup.js',
   });
+  Vm.runInContext(antizapretPacSource, context, {filename: 'antizapret-pac.js'});
+  Vm.runInContext(antizapretLocalSource, context, {filename: 'antizapret-local.js'});
   Vm.runInContext(datasetRuntimeSource, context, {
     filename: 'dataset-runtime.js',
   });
@@ -953,6 +967,44 @@ describe('Firefox production control package', function() {
     Assert.strictEqual((await page.send({type: 'firefox.activation.apply', expectedRevision: 0})).ok, true);
   });
 
+  it('exports safe Saved and Effective summaries without promoting pending Firefox settings', async function() {
+    const page = await unifiedFixture();
+    Assert.strictEqual((await page.send({type: 'firefox.activation.apply', expectedRevision: 0})).ok, true);
+    const beforeStatus = (await page.send({type: 'firefox.configuration.get'})).result;
+    const saved = (await page.send({type: 'firefox.settings.get'})).result;
+    saved.settings.source = 'manual';
+    saved.settings.flags.useProviderProxies = false;
+    saved.settings.flags.noDirect = true;
+    saved.settings.rules.direct = ['private.example'];
+    Assert.strictEqual((await page.send({type: 'firefox.settings.replace',
+      expectedRevision: saved.revision, settings: saved.settings})).ok, true);
+    const writes = page.proxySettingsCalls.set;
+    page.context.fetch = () => {
+      throw new Error('Support export must not fetch');
+    };
+
+    const response = await page.send({type: 'firefox.transfer.export', support: true});
+    Assert.strictEqual(response.ok, true);
+    const report = response.result;
+    Assert.strictEqual(report.diagnostics.pending, true);
+    Assert.strictEqual(report.diagnostics.settings.saved.source, 'manual');
+    Assert.strictEqual(report.diagnostics.settings.saved.providerProxies, false);
+    Assert.strictEqual(report.diagnostics.settings.saved.noDirect, true);
+    Assert.strictEqual(report.diagnostics.settings.effective.source, 'anticensority');
+    Assert.strictEqual(report.diagnostics.settings.effective.providerProxies, true);
+    Assert.strictEqual(report.diagnostics.settings.effective.noDirect, false);
+    Assert.doesNotMatch(JSON.stringify(report), /private|password|ownProxies"|savedRevision|effectiveId/);
+    Assert.strictEqual(page.proxySettingsCalls.set, writes);
+    Assert.strictEqual((await page.send({type: 'firefox.configuration.get'})).result.effectiveId,
+        beforeStatus.effectiveId);
+
+    Assert.strictEqual((await page.send({type: 'firefox.activation.clear'})).ok, true);
+    const off = (await page.send({type: 'firefox.transfer.export', support: true})).result;
+    Assert.strictEqual(off.diagnostics.active, false);
+    Assert.strictEqual(off.diagnostics.settings.effective, null);
+    Assert.strictEqual(off.diagnostics.settings.saved.source, 'manual');
+  });
+
   it('imports inactive settings without activation, provider fetches or accepting stale revisions', async function() {
     const page = await unifiedFixture();
     const exported = (await page.send({type: 'firefox.transfer.export'})).result;
@@ -1254,6 +1306,64 @@ describe('Firefox production control package', function() {
 
   });
 
+  it('staging Antizapret rules rejects stale Apply and protects unrelated popup edits', async function() {
+    const antizapretBackend = Helpers.memoryBackend();
+    const page = await unifiedFixture(true, {antizapretBackend, verifyDatasetIdentity: true});
+    const sample = [
+      '// ProstoVPN.AntiZapret PAC-host File',
+      'domains = {"test":{3:3}};',
+      'var d_ipaddr = "1".split(" ");',
+      'var special = [["192.0.2.0", "255.255.255.0"]];',
+      'var domains_lzp = "bad";',
+      'var mask_lzp = "!==";',
+      'var patterns = {\'!A\': \'foo\'};',
+      'var patterns = {\'AA\': \'!\'};',
+      '  fbtw = ["known.test"];',
+      'if (/\\.(co)\\.[^.]+$/.test(host)) {}',
+    ].join('\n');
+    const stage = (text) => page.send({type: 'firefox.antizapret.import', text});
+    const apply = (expectedRevision) => page.send({type: 'firefox.activation.apply', expectedRevision});
+    const status = async () => (await page.send({type: 'firefox.configuration.get'})).result;
+    const effectiveHash = () =>
+      page.storage.values[OffState.STORAGE_KEY].datasetIdentity.artifactSha256;
+
+    Assert.strictEqual((await stage(sample)).ok, true);
+    const saved = (await page.send({type: 'firefox.settings.get'})).result;
+    saved.settings.source = 'antizapret-local';
+    saved.settings.ownProxies = [{
+      id: 'one', enabled: true, type: 'HTTP', host: 'proxy.example', port: 8080,
+      proxyDNS: false, failoverTimeoutSeconds: null, useAsDirectReplacement: false,
+      credentials: {mode: 'NONE'},
+    }];
+    const updated = await page.send({type: 'firefox.settings.replace',
+      expectedRevision: saved.revision, settings: saved.settings});
+    Assert.strictEqual(updated.ok, true);
+    Assert.strictEqual((await apply(updated.result.revision)).ok, true);
+    const active = await status();
+    const activeHash = effectiveHash();
+    const popup = await page.send({type: 'firefox.popup.get', tabUrl: 'https://known.test/'});
+    Assert.strictEqual(popup.result.routingData.source, 'antizapret-local');
+    Assert.strictEqual(popup.result.routingData.canCheck, false);
+
+    Assert.strictEqual((await stage(sample.replace('known.test', 'different.test'))).ok, true);
+    const stagedHash = (await antizapretBackend.readPointers('antizapret-local')).activeArtifactSha256;
+    const pending = await status();
+    Assert.notStrictEqual(stagedHash, activeHash);
+    Assert.strictEqual(pending.savedRevision, active.savedRevision + 1);
+    Assert.strictEqual(pending.pending, true);
+    Assert.strictEqual(pending.effectiveId, active.effectiveId);
+    Assert.deepStrictEqual((await apply(active.savedRevision)).error, {code: 'SAVED_REVISION_CHANGED'});
+    const siteEdit = await page.send({
+      type: 'firefox.site.apply', tabUrl: 'https://unrelated.example/',
+      expectedRevision: pending.savedRevision, expectedEffectiveId: pending.effectiveId,
+      mode: 'DIRECT', scope: 'HOST', applyAll: false,
+    });
+    Assert.deepStrictEqual(siteEdit.error, {code: 'PENDING_CONFIRMATION_REQUIRED'});
+    Assert.strictEqual(effectiveHash(), activeHash);
+    Assert.strictEqual((await apply(pending.savedRevision)).ok, true);
+    Assert.strictEqual(effectiveHash(), stagedHash);
+  });
+
   it('popup composite retains Saved on denied private access and never claims active', async function() {
 
     const page = await unifiedFixture(false);
@@ -1282,6 +1392,7 @@ describe('Firefox production control package', function() {
         'background/common/domain-source-policy.js',
         'background/common/domain-stream-import.js',
         'background/common/antifilter-source.js',
+        'background/common/antizapret-pac.js',
         'background/common/domain-candidate-store.js',
         'background/common/provider-dataset-state.js',
         'background/off-state.js',
@@ -1293,6 +1404,7 @@ describe('Firefox production control package', function() {
         'background/antifilter-updater.js',
         'background/provider-update-control.js',
         'background/provider-lookup.js',
+        'background/antizapret-local.js',
         'background/dataset-runtime.js',
         'background/routing-adapter.js',
         'background/proxy-auth.js',
@@ -1329,6 +1441,7 @@ describe('Firefox production control package', function() {
           'storage',
           'alarms',
           'proxy',
+          'dns',
           'webRequest',
           'webRequestBlocking',
           'notifications',

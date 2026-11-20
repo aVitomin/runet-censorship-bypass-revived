@@ -1,4 +1,53 @@
 {
+  "optionsAntizapretLocalSource": {
+    "message": "Antizapret"
+  },
+  "optionsAntizapretLocalHelp": {
+    "message": "Download rules or import a PAC file. Antizapret uses Firefox DNS and your own proxy. Auto sends public domains through your proxy. Add a Direct rule for exceptions."
+  },
+  "antizapretDownload": {"message": "Download Antizapret rules"},
+  "antizapretImport": {"message": "Import PAC file"},
+  "antizapretStaged": {"message": "Rules ready. Save your settings and select Apply to use them."},
+  "antizapretPreparationRequired": {"message": "Download Antizapret rules or import a PAC file first."},
+  "antizapretDownloadFailed": {"message": "Could not load Antizapret rules. Import a PAC file. Active rules are unchanged."},
+  "antizapretDownloadForbidden": {"message": "The Antizapret server returned HTTP 403. Import a PAC file. Active rules are unchanged."},
+  "antizapretImportFailed": {"message": "Could not import this PAC file. Choose a supported Antizapret PAC. Active rules are unchanged."},
+  "sourceCheckButton": {
+    "message": "Check source"
+  },
+  "sourceCheckChecking": {
+    "message": "Checking source…"
+  },
+  "sourceCheck_ready": {
+    "message": "Source responded and its data passed validation. Active routing is unchanged."
+  },
+  "sourceCheck_manual": {
+    "message": "This source uses local rules and needs no download."
+  },
+  "sourceCheck_http": {
+    "message": "The source returned HTTP $CODE$. Check your connection or VPN and try again.",
+    "placeholders": {
+      "code": {"content": "$1"}
+    }
+  },
+  "sourceCheck_timeout": {
+    "message": "The source did not respond in time. Try again."
+  },
+  "sourceCheck_busy": {
+    "message": "This source is already being checked or updated. Try again shortly."
+  },
+  "sourceCheck_network": {
+    "message": "Could not connect to the source. Check your connection or VPN."
+  },
+  "sourceCheck_invalid": {
+    "message": "The source data or address failed validation."
+  },
+  "sourceCheck_unavailable": {
+    "message": "Choose an available source first."
+  },
+  "sourceCheck_failed": {
+    "message": "Could not complete the source check."
+  },
   "providerLifecycleControlHelp": {
     "message": "Check the protection status above. Updated routing data alone does not confirm that routing is active."
   },
@@ -81,7 +130,7 @@
     "message": "Export for support"
   },
   "transferSupportHelp": {
-    "message": "Support files contain only environment and status information, without site rules or proxy addresses. They cannot be imported as settings."
+    "message": "The report includes environment, status, source type and saved/applied routing flags. Applied settings are unavailable when control is off or unverified. Site rules, addresses and credentials are excluded. The report cannot be imported as settings."
   },
   "transferPreview": {
     "message": "Import preview"
@@ -102,7 +151,10 @@
     "message": "Settings imported. They are saved but not applied."
   },
   "transferExported": {
-    "message": "Export prepared. Keep settings files private."
+    "message": "Settings file prepared. It contains site rules and proxy addresses; keep it private."
+  },
+  "transferSupportExported": {
+    "message": "Support report prepared. You can attach it to an issue: site rules, addresses and credentials are excluded."
   },
   "transferInvalid": {
     "message": "The file is not a valid settings export. Nothing was imported."
@@ -258,7 +310,7 @@
     "message": "Site rule saved, but not applied. Previous settings remain active."
   },
   "unifiedPopupPending": {
-    "message": "Other saved settings have not been applied. Applying this site rule will also apply those settings."
+    "message": "Other saved settings are waiting. Applying all changes will activate them too."
   },
   "unifiedTransition": {
     "message": "Currently: $1. Selected: $2."
@@ -360,7 +412,7 @@
     "message": "Operation in progress"
   },
   "popupDetails": {
-    "message": "Readiness"
+    "message": "Diagnostics and details"
   },
   "popupDataset": {
     "message": "Routing data"
@@ -378,7 +430,7 @@
     "message": "Firefox did not return the current permission state. Activation remains unavailable until the extension can verify it."
   },
   "permissionPrivateAccessSteps": {
-    "message": "Open the Firefox menu → Add-ons and themes → Extensions. Select Runet Censorship Bypass — Revived, then under Run in Private Windows choose Allow. Return here when finished."
+    "message": "Open the Firefox menu → Add-ons and themes → Extensions. Select Runet Censorship Bypass — Revived, then under Run in Private Windows choose Allow. If Firefox closes this page, reopen Settings from the extension menu. If you were choosing a source, choose it again."
   },
   "permissionCheckAgain": {
     "message": "Check again"
@@ -459,7 +511,7 @@
     "message": "Direct"
   },
   "popupAutoModeDescription": {
-    "message": "Use the built-in Anticensority routing rules for this site."
+    "message": "Follow the routing source selected in Settings."
   },
   "popupProxyModeDescription": {
     "message": "Always use your configured proxy connections for this site."
@@ -484,6 +536,9 @@
   },
   "popupRulePreview": {
     "message": "Rule: $1"
+  },
+  "popupScopeNotApplied": {
+    "message": "The selected scope takes effect after you apply."
   },
   "popupNotApplied": {
     "message": "Not applied"
@@ -550,6 +605,105 @@
   },
   "optionsProtectionState": {
     "message": "Protection"
+  },
+  "quickStartAnticensority": {
+    "message": "Anticensority uses built-in routing data. For listed sites, one compatible local Anticensority service, Tor Browser, or Tor is enough."
+  },
+  "setupOpen": {
+    "message": "Set up routing"
+  },
+  "setupChoose": {
+    "message": "Choose a routing source"
+  },
+  "setupChooseHelp": {
+    "message": "Choose a source that works with the connection you can use."
+  },
+  "setupAntifilterHelp": {
+    "message": "Use the Antifilter site list with your own proxy connection. Download the list and allow it to use your Proxy-rule connections."
+  },
+  "setupManualHelp": {
+    "message": "Use your own site rules. A Proxy rule needs an enabled proxy connection."
+  },
+  "setupNext": {
+    "message": "Continue"
+  },
+  "setupBack": {
+    "message": "Back"
+  },
+  "setupLater": {
+    "message": "Set up later"
+  },
+  "setupReview": {
+    "message": "Review and apply"
+  },
+  "setupProxyPrivacyTitle": {
+    "message": "What can the proxy see?"
+  },
+  "setupProxyPrivacy": {
+    "message": "The proxy can see the destination address. With plain HTTP it can also read the request and response. HTTPS normally encrypts their contents between Firefox and the website."
+  },
+  "setupWaiting": {
+    "message": "Waiting for the current operation to finish…"
+  },
+  "setupBlocked": {
+    "message": "Routing is currently blocked. Resolve the Firefox status shown above and check again."
+  },
+  "setupNeedProxy": {
+    "message": "Enable a proxy connection for Proxy rules before applying Antifilter."
+  },
+  "setupEnableSource": {
+    "message": "Enable the source’s proxy routes in Automatic routing to use the built-in list."
+  },
+  "setupStartService": {
+    "message": "Start a compatible local Anticensority service, Tor Browser, or Tor."
+  },
+  "setupServiceReady": {
+    "message": "My local service is running"
+  },
+  "setupSaveHelp": {
+    "message": "Save your changes before applying them. Routing stays as it is until Apply."
+  },
+  "setupApplyHelp": {
+    "message": "Apply the current saved settings, including any pending changes."
+  },
+  "setupRepairSource": {
+    "message": "Routing data for the saved source is unavailable. Review the source data in Maintenance."
+  },
+  "setupVerify": {
+    "message": "Check your site"
+  },
+  "setupApplied": {
+    "message": "Routing settings applied"
+  },
+  "setupVerifyHelp": {
+    "message": "Open or reload the site you care about. On that tab, open the extension popup to see the site’s route."
+  },
+  "setupSiteUnchecked": {
+    "message": "Site not checked"
+  },
+  "setupSiteConfirmed": {
+    "message": "You reported that the site opened."
+  },
+  "setupSiteFailed": {
+    "message": "You reported that the site did not open. Check that your connection is running and review the route in the popup before trying again."
+  },
+  "setupCheckAgain": {
+    "message": "Try the site again"
+  },
+  "setupSiteOpened": {
+    "message": "Site opened"
+  },
+  "setupSiteDidNotOpen": {
+    "message": "Site did not open"
+  },
+  "setupFinish": {
+    "message": "Return to Overview"
+  },
+  "optionsAntizapretNativeSetup": {
+    "message": "Set up Antizapret in the browser separately"
+  },
+  "optionsAntizapretNativeHelp": {
+    "message": "Turn off routing in Revived. In Firefox Connection Settings, choose Automatic proxy configuration URL and enter https://p.thenewone.lol:8443/proxy.pac. Availability depends on your connection. For a trusted local PAC file, enter a file URL instead."
   },
   "optionsAutomaticSourceHelp": {
     "message": "Choose a website list source or use only your own rules and connections. Saving a source change does not apply it."
@@ -1102,6 +1256,12 @@
   },
   "routingDataSource_antizapret": {
     "message": "Antizapret"
+  },
+  "optionsLocalAntizapretTitle": {
+    "message": "Antizapret"
+  },
+  "optionsLocalAntizapretUpdate": {
+    "message": "Download rules or import a newer PAC file in Options → Routing source. Select Apply to use the new rules."
   },
   "routingDataSource_custom": {
     "message": "Custom source"

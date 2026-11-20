@@ -452,6 +452,41 @@ Mocha.describe('Chromium PAC routing regressions', function() {
 
       });
 
+  Mocha.it('does not call a disabled provider and preserves the remaining routing policy',
+      async function() {
+
+        const broadProxy = {
+          ownProxiesOnlyForOwnSites: false,
+          ownProxies: [ownProxy('own.example', 443)],
+        };
+        const cases = [
+          [{}, 'DIRECT'],
+          [{noDirect: true}, ''],
+          [broadProxy, 'HTTPS own.example:443; DIRECT'],
+          [Object.assign({}, broadProxy, {noDirect: true}), 'HTTPS own.example:443'],
+          [{
+            replaceDirectWithProxy: true,
+            ownProxies: [Object.assign(ownProxy('replacement.example', 443), {
+              useAsDirectReplacement: true,
+            })],
+          }, 'HTTPS replacement.example:443'],
+          [{
+            noDirect: true,
+            exceptions: [{pattern: 'ordinary.example', action: 'DIRECT'}],
+          }, 'DIRECT'],
+        ];
+        for (const [mods, expected] of cases) {
+          const result = await cook(Object.assign({
+            usePacScriptProxies: false,
+          }, mods), RAW_THROWING_PAC);
+
+          Chai.expect(result.ok).to.equal(true);
+          Chai.expect(evaluatePac(result.cookedPacData, 'ordinary.example'))
+              .to.equal(expected);
+        }
+
+      });
+
   Mocha.it('lets an explicit Proxy rule override the provider result', async function() {
 
     const result = await cook({

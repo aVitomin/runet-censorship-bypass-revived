@@ -20,6 +20,8 @@ describe('Routing data freshness presentation', function() {
 
   it('rejects extra payloads and invalid timestamps instead of exposing them', function() {
     Assert.deepEqual(Status.validate(base), base);
+    const local = {...base, source: 'antizapret-local', canCheck: false};
+    Assert.deepEqual(Status.validate(local), local);
     for (const patch of [{url: 'https://private.invalid/?secret=synthetic'},
       {sourceUpdatedAt: 'not-a-date'}, {lastCheckedAt: -1}, {source: 'untrusted'}, {active: 1}]) {
       Assert.throws(() => Status.validate({...base, ...patch}), /INVALID_ROUTING_DATA_STATUS/);

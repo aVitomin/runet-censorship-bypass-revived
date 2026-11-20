@@ -22,6 +22,7 @@
   let busyOperation = '';
   let lastOperation = null;
   let scopeOpen = false;
+  let detailsOpen = false;
   let requestedFocus = '';
   let initPromise = null;
   let refreshAfterInit = false;
@@ -277,24 +278,9 @@
       presentation.pillText = t('popupAuthBindingUnavailablePill');
       presentation.pillClass = 'warning';
     }
-    renderHeader(root, presentation);
+    renderHeader(root);
     renderGlobalCard(root, state, presentation, lastOperation);
-    if (presentation.kind !== 'setup') {
-      renderSiteCard(root, state);
-      renderDailyDetails(root, state, presentation);
-    }
-    const routingCard = append(root, 'section', 'ui-card card');
-    window.rucbRoutingDataStatus.render(routingCard, {
-      status: state.routingData ? window.rucbRoutingDataStatus.validate(state.routingData) : null,
-      pending: isOperationBusy(state), result: routingUpdateResult,
-      translate: t, onCheck: refreshRoutingData,
-    });
-    const resourcesButton = appendButton(routingCard, t('resourcesTitle'), 'ui-button');
-    resourcesButton.disabled = !resourceTab || resourceTab.incognito !== false ||
-      !Number.isSafeInteger(resourceTab.id) || !/^https?:\/\//u.test(activeTabUrl);
-    resourcesButton.onclick = () => {
-      chrome.tabs.create({url: chrome.runtime.getURL(`pages/resources/index.html#${resourceTab.id}`)});
-    };
+    renderDailyDetails(root, state, presentation);
     renderLiveAnnouncement(root, state, presentation, lastOperation);
     focusRequestedControl();
 
@@ -304,9 +290,9 @@
 
     const header = append(parent, 'header', 'popup-header');
     const titleGroup = append(header, 'div');
-    appendText(titleGroup, 'h1', t('popupTitle'), 'popup-title');
-    const statusRow = append(titleGroup, 'div', 'header-status-row');
-    if (presentation.pillText) {
+    appendText(titleGroup, 'h1', t('popupCurrentSiteRouting'), 'popup-title');
+    if (presentation && presentation.pillText) {
+      const statusRow = append(titleGroup, 'div', 'header-status-row');
       appendText(
           statusRow,
           'span',
@@ -328,23 +314,38 @@
     );
     card.dataset.area = 'global-status';
     const headingId = 'popup-global-heading';
-    card.setAttribute('aria-labelledby', headingId);
+    const site = presentation.kind !== 'setup';
+    card.setAttribute('aria-labelledby', site ? 'popup-site-heading' : headingId);
+    if (site) {
+      const host = appendText(card, 'h2', state.controllable ?
+        state.host : t('popupCurrentTabUnavailable'), 'site-host');
+      host.id = 'popup-site-heading';
+    }
+    const status = append(card, 'div', 'popup-control-status');
     const heading = appendText(
-        card,
-        'h2',
+        status,
+        site ? 'h3' : 'h2',
         presentation.title,
         'card-title',
     );
     heading.id = headingId;
     const description = appendText(
-        card,
+        status,
         'p',
         presentation.description,
-        'card-copy',
+        presentation.kind === 'active' && presentation.tone === 'success' ?
+          'ui-sr-only' : 'card-copy',
     );
     description.id = 'popup-global-description';
+    if (presentation.pillText && (presentation.tone === 'warning' ||
+        presentation.pillText === t('popupHealthWorkingPill')) &&
+        presentation.pillText !== presentation.title) {
+      appendText(status, 'span', presentation.pillText,
+          `ui-pill ${presentation.pillClass || ''}`.trim());
+    }
 
     renderOperationMessage(card, operation);
+    if (site) renderSiteCard(card, state);
     renderGlobalActions(card, state, presentation, operation);
 
   }
@@ -496,16 +497,8 @@
 
   function renderSiteCard(parent, state) {
 
-    const card = append(parent, 'section', 'ui-card card site-card');
+    const card = append(parent, 'div', 'site-card');
     card.dataset.area = 'site-routing';
-    const headingId = 'popup-site-heading';
-    card.setAttribute('aria-labelledby', headingId);
-    appendText(card, 'p', t('popupCurrentSiteRouting'), 'eyebrow');
-    const headingText = state.controllable ?
-      state.host :
-      t('popupCurrentTabUnavailable');
-    const heading = appendText(card, 'h2', headingText, 'site-host');
-    heading.id = headingId;
 
     if (!state.controllable) {
       appendText(
@@ -578,7 +571,7 @@
           card,
           t('popupConfigureProxyMethods'),
           'proxy-methods',
-          'ui-button quiet compact-link',
+          ifDisabled ? 'ui-button quiet compact-link' : 'ui-button primary compact-link',
       );
     }
 
@@ -721,6 +714,10 @@
         'ui-card daily-details',
     );
     details.dataset.area = 'details';
+    details.open = detailsOpen;
+    details.ontoggle = () => {
+      detailsOpen = details.open;
+    };
     const summary = appendText(
         details,
         'summary',
@@ -750,6 +747,18 @@
           'maintenance',
       );
     }
+    const routing = append(content, 'div', 'routing-details');
+    window.rucbRoutingDataStatus.render(routing, {
+      status: state.routingData ? window.rucbRoutingDataStatus.validate(state.routingData) : null,
+      pending: isOperationBusy(state), result: routingUpdateResult,
+      translate: t, onCheck: refreshRoutingData,
+    });
+    const resources = appendButton(routing, t('resourcesTitle'), 'ui-button');
+    resources.disabled = !resourceTab || resourceTab.incognito !== false ||
+      !Number.isSafeInteger(resourceTab.id) || !/^https?:\/\//u.test(activeTabUrl);
+    resources.onclick = () => {
+      chrome.tabs.create({url: chrome.runtime.getURL(`pages/resources/index.html#${resourceTab.id}`)});
+    };
 
   }
 
@@ -1091,6 +1100,7 @@
     if (provider.key === 'onlyOwnSites') {
       return t('providerOnlyOwnSitesLabel');
     }
+    if (provider.key === 'antizapret-local') return t('optionsLocalAntizapretTitle');
     return provider.label || provider.key;
 
   }

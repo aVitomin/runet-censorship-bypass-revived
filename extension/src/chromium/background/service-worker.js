@@ -5,6 +5,7 @@
 /* global mv3PacMods, mv3PeriodicUpdate, mv3SiteScope, mv3DomainProviderPac */
 /* global mv3Providers, mv3ProxyAuth, mv3ProxyHealth, mv3ProxySettings */
 /* global mv3State, mv3Effective, mv3ConfigurationTransfer, rucbConfigurationTransfer */
+/* global rucbAntizapretPac */
 
 importScripts(
     'vendor/tldts/dist/index.umd.min.js',
@@ -24,6 +25,7 @@ importScripts(
     'common/domain-stream-import.js',
     'common/antifilter-source.js',
     'common/domain-candidate-store.js',
+    'common/antizapret-pac.js',
     'domain-provider-pac.js',
     'pac-download.js',
     'pac-cook.js',
@@ -68,6 +70,7 @@ let popupRoutingRefresh = null;
 let activeProxyHealthCheck = null;
 let pacProxyOperationQueue = Promise.resolve();
 let activePacApplyOperation = null;
+let localAntizapretImportInFlight = false;
 let actionOperationSequence = 0;
 const activeActionOperations = new Set();
 const supersededActionOperations = new WeakSet();
@@ -115,7 +118,8 @@ function getProvidersForState(state, ifIncludeDisabled) {
   return mv3Providers.getPacProviders(
       state && state.customPacProviders || [],
       {includeDisabled: ifIncludeDisabled === true},
-  );
+  ).filter((provider) => provider.key !== 'antizapret-local' ||
+    state && (state.localAntizapretCache || state.currentPacProviderKey === provider.key));
 
 }
 
@@ -295,7 +299,8 @@ async function collectPacArtifactsSafely() {
   try {
     return await mv3Effective.collectArtifacts(() =>
       activeActionOperations.size === 0 && !pacDownloadPromise &&
-      !pacCookPromise && !activePacApplyOperation && !mv3PeriodicUpdate.isUpdateInFlight());
+      !pacCookPromise && !activePacApplyOperation && !localAntizapretImportInFlight &&
+      !mv3PeriodicUpdate.isUpdateInFlight());
   } catch (_error) {
     // Cleanup is optional; never turn a committed update into a failed Apply.
     return {status: 'deferred', deleted: 0};
@@ -823,7 +828,8 @@ const RPC_METHODS = Object.freeze({
   async exportConfiguration(params = {}) {
 
     const saved = await mv3State.loadState();
-    const status = params.support === true ? await configurationStatus(saved) : null;
+    const effective = params.support === true ? await mv3Effective.current() : null;
+    const status = params.support === true ? await configurationStatus(saved, effective) : null;
     const platform = await chrome.runtime.getPlatformInfo();
     const metadata = {exportedAt: new Date().toISOString(),
       browser: {family: 'chromium', version: (navigator.userAgent.match(/Chrome\/([\d.]+)/) || [])[1] || 'unknown'},
@@ -832,7 +838,10 @@ const RPC_METHODS = Object.freeze({
       platform: platform.os};
     return rucbConfigurationTransfer.create(params.support === true ? null :
       mv3ConfigurationTransfer.fromState(saved), metadata, status ? Object.assign({}, status,
-          {sourceAvailable: Boolean(saved.currentPacProviderKey)}) : null);
+          {sourceAvailable: Boolean(saved.currentPacProviderKey)}) : null,
+    status ? {saved: mv3ConfigurationTransfer.supportSettings(saved),
+      effective: effective ?
+        mv3ConfigurationTransfer.supportSettings(effective.config) : null} : null);
 
   },
 
@@ -870,6 +879,70 @@ const RPC_METHODS = Object.freeze({
 
     return configurationStatus();
 
+  },
+
+  async importLocalAntizapret(params = {}) {
+    if (!Number.isSafeInteger(params.expectedRevision)) throw configurationConflict();
+    const text = params.text;
+    let dataset;
+    try {
+      if (typeof text !== 'string' || text.length > rucbAntizapretPac.MAX_BYTES ||
+          mv3Hash.getUtf8Length(text) > rucbAntizapretPac.MAX_BYTES) throw new TypeError();
+      dataset = rucbAntizapretPac.parsePac(text);
+    } catch (_error) {
+      throw createProviderError('ANTIZAPRET_INVALID_PAC', 'The imported PAC data is invalid.');
+    }
+    localAntizapretImportInFlight = true;
+    try {
+      const rawPacData = JSON.stringify({sourceSha256: await mv3Hash.sha256Hex(text),
+        addresses: dataset.ipv4, subnets: dataset.subnets.map((pair) =>
+          pair.map(rucbAntizapretPac.ipv4))});
+      const result = {providerKey: 'antizapret-local', url: null, etag: null, lastModified: null,
+        sha256: await mv3Hash.sha256Hex(rawPacData)};
+      const now = Date.now();
+      const artifact = await mv3PacArtifacts.putRawPacArtifact({
+        providerKey: result.providerKey, rawPacData, rawPacSha256: result.sha256,
+        fetchedAt: now, contentLength: mv3Hash.getUtf8Length(rawPacData),
+      });
+      const saved = await mv3State.updateStateAtomically((current) => {
+        if (params.expectedRevision !== current.savedRevision) throw configurationConflict();
+        return {
+          currentPacProviderKey: result.providerKey,
+          localAntizapretCache: createPacCacheFromDownload(result, artifact, now),
+          pacWorkflowGeneration: getNextPacWorkflowGeneration(current),
+        };
+      });
+      return {savedRevision: saved.savedRevision};
+    } finally {
+      localAntizapretImportInFlight = false;
+      await collectPacArtifactsSafely();
+    }
+  },
+
+  async checkRoutingSource(params = {}) {
+    const provider = getProviderForState(await mv3State.loadState(), params.providerKey);
+    if (!provider || provider.enabled === false) return {code: 'unavailable'};
+    if (['onlyOwnSites', 'antizapret-local'].includes(provider.key)) return {code: 'manual'};
+    const result = provider.key === 'antifilter' ?
+      await mv3DomainProviderPac.download(true) : await mv3PacDownload.checkPac(provider);
+    if (result.ok) {
+      if (provider.key === 'Антизапрет') {
+        try {
+          rucbAntizapretPac.parsePac(result.rawPacData);
+        } catch (_error) {
+          return {code: 'invalid'};
+        }
+      }
+      return {code: 'ready'};
+    }
+    const code = result.code || result.error && result.error.code || '';
+    const httpStatus = result.httpStatus ||
+      result.error && result.error.details && result.error.details.httpStatus;
+    if (Number.isInteger(httpStatus) && httpStatus >= 400 && httpStatus <= 599) return {code: 'http', httpStatus};
+    if (code.includes('TIMEOUT')) return {code: 'timeout'};
+    if (code.includes('BUSY')) return {code: 'busy'};
+    if (code.includes('FETCH_FAILED') || code === 'PAC_DOWNLOAD_FAILED') return {code: 'network'};
+    return {code: 'invalid'};
   },
 
   applySavedConfiguration(params = {}) {
@@ -1683,7 +1756,9 @@ async function applyPopupChangesForWorkflow(params, operation, workflow) {
   const forceDownload = operation === 'updatePac';
   const needsDownload = forceDownload ||
     !state.pacCache.rawPacSha256 ||
-    state.pacCache.providerKey !== providerKey;
+    state.pacCache.providerKey !== providerKey ||
+    providerKey === 'antizapret-local' && (!state.localAntizapretCache ||
+      state.localAntizapretCache.rawPacSha256 !== state.pacCache.rawPacSha256);
   let download = null;
   if (needsDownload) {
     pacDownloadPromise = downloadPacAndPersist({
@@ -2036,7 +2111,7 @@ function popupRoutingDataStatus(state, effective) {
   const key = values.currentPacProviderKey;
   const source = !key ? 'none' : key === 'onlyOwnSites' ? 'manual' :
     key === 'Антизапрет' ? 'antizapret' : key === 'Антицензорити' ? 'anticensority' :
-      key === 'antifilter' ? 'antifilter' : 'custom';
+      ['antifilter', 'antizapret-local'].includes(key) ? key : 'custom';
   const cache = values.pacCache && values.pacCache.providerKey === key ? values.pacCache : {};
   const date = Date.parse(cache.lastModified);
   const download = state.pacDownload || {};
@@ -2051,7 +2126,8 @@ function popupRoutingDataStatus(state, effective) {
     sourceUpdatedAt: Number.isSafeInteger(date) && date > 0 &&
       date <= Date.now() + 5 * 60 * 1000 ? date : null,
     lastCheckedAt: times.length ? Math.max(...times) : null,
-    canCheck: !['none', 'manual'].includes(source) && Boolean(getProviderForState(values, key)) &&
+    canCheck: !['none', 'manual', 'antizapret-local'].includes(source) &&
+      Boolean(getProviderForState(values, key)) &&
       !(!effective && state.proxyApply.status === 'applied'),
     updating: Boolean(popupRoutingRefresh || periodic.status === 'running' ||
       download.status === 'downloading'),
@@ -2545,6 +2621,9 @@ async function executePeriodicUpdatePipeline({trigger, applyIfSafe}) {
     );
   }
   const providerKey = initialState.currentPacProviderKey;
+  if (providerKey === 'antizapret-local') {
+    return createPeriodicSkip('SOURCE_LOCAL_FILE', 'Update the local file in Settings.', {trigger, providerKey});
+  }
   if (!providerKey) {
     return createPeriodicSkip(
         'PROVIDER_NOT_SELECTED',
@@ -2852,7 +2931,7 @@ const CONFIGURATION_MUTATIONS = new Set([
   'updatePopupDraft', 'setCurrentSiteMode',
   'applyPopupChanges', 'applyCookedPac',
   'applySavedConfiguration', 'applySiteConfiguration',
-  'importConfiguration',
+  'importConfiguration', 'importLocalAntizapret',
 ]);
 
 function configurationConflict(code = 'SAVED_REVISION_CHANGED') {
@@ -3254,7 +3333,7 @@ function createCookedPacCacheFromCook(result, cookedArtifact, finishedAt) {
 
 }
 
-async function getCookedPacStaleness(state) {
+async function getCookedPacStaleness(state, restorePrevious = false) {
 
   const cache = state.cookedPacCache;
   const reasons = [];
@@ -3274,7 +3353,9 @@ async function getCookedPacStaleness(state) {
   }
 
   const currentPacModsSha256 = await mv3PacCook.hashPacMods(state.pacMods);
-  if (cache.pacModsSha256 !== currentPacModsSha256) {
+  if (cache.pacModsSha256 !== currentPacModsSha256 &&
+      !(restorePrevious && await mv3PacCook.matchesPreviousPacMods(
+          cache.providerKey, state.pacMods, cache.pacModsSha256))) {
     reasons.push('PAC modifiers changed');
   }
   return {
@@ -4323,7 +4404,9 @@ async function applyCookedPacAndPersistForOperation(params, operation) {
     );
   }
 
-  const stale = await getCookedPacStaleness(state);
+  const refreshId = operation.workflow.effective && operation.workflow.effective.id || null;
+  const restoreEffective = operation.startupRestore && Boolean(refreshId);
+  const stale = await getCookedPacStaleness(state, restoreEffective);
   if (!ifPacApplyOperationIsFresh(operation)) {
     return createPacApplyStaleResult();
   }
@@ -4376,7 +4459,6 @@ async function applyCookedPacAndPersistForOperation(params, operation) {
   const fingerprint = createPacApplyFingerprint(state);
   let latestProxyControl = control;
   let candidate = null;
-  const refreshId = operation.workflow.effective && operation.workflow.effective.id || null;
 
   try {
     const cookedArtifact = await mv3PacArtifacts.getCookedPacArtifact({
@@ -4394,8 +4476,7 @@ async function applyCookedPacAndPersistForOperation(params, operation) {
     if (!ifPacApplyOperationIsFresh(operation)) {
       return createPacApplyStaleResult();
     }
-    candidate = await mv3Effective.prepare(state, state.savedRevision, refreshId,
-        operation.startupRestore && Boolean(refreshId));
+    candidate = await mv3Effective.prepare(state, state.savedRevision, refreshId, restoreEffective);
     await mv3ProxySettings.applyPacScript({
       cookedPacData: cookedArtifact.cookedPacData,
       beforeSet: async () => {
@@ -4822,6 +4903,15 @@ async function downloadPacAndPersist(params = {}, workflow = null) {
   const providerKey = params.providerKey === undefined ?
     state.currentPacProviderKey :
     params.providerKey;
+  if (providerKey === 'antizapret-local') {
+    const cache = state.localAntizapretCache;
+    if (!cache || !cache.artifactRef || cache.providerKey !== providerKey) {
+      return createPacDownloadFailure('ANTIZAPRET_LOCAL_FILE_REQUIRED', 'Import a trusted PAC file first.',
+          {providerKey});
+    }
+    const nextState = await savePacWorkflowStatePatch(currentWorkflow, {pacCache: cache});
+    return nextState ? {ok: true, status: 'already_cached', providerKey} : createPacApplyStaleResult();
+  }
   if (!providerKey) {
     const failure = createPacDownloadFailure(
         'PROVIDER_NOT_SELECTED',
@@ -5169,7 +5259,9 @@ async function cookPacAndPersist(params = {}, workflow = null) {
     return nextState ? failure : createPacApplyStaleResult();
   }
 
-  if (!rawArtifact || !rawArtifact.rawPacData) {
+  if (!rawArtifact || !rawArtifact.rawPacData ||
+      providerKey === 'antizapret-local' &&
+      await mv3Hash.sha256Hex(rawArtifact.rawPacData) !== state.pacCache.rawPacSha256) {
     const failure = createPacCookFailure(
         'PAC_ARTIFACT_READ_FAILED',
         'Raw PAC artifact is missing. Download PAC again.',

@@ -75,6 +75,19 @@ function createHarness(fetchImpl, options = {}) {
 
 describe('Firefox fixed HTTPS provider source', function() {
 
+  it('checks the source and reports HTTP status without staging an artifact', async function() {
+
+    const valid = createHarness();
+    Assert.deepEqual(await valid.updater.check(), {ok: true});
+    Assert.deepEqual(valid.staged, []);
+    const denied = createHarness((url) => response(url, pac(), {status: 403}));
+    Assert.deepEqual(await denied.updater.check(), {
+      ok: false, status: 'REJECTED', code: 'SOURCE_HTTP_REJECTED', httpStatus: 403,
+    });
+    Assert.deepEqual(denied.staged, []);
+
+  });
+
   it('generates the same artifact as the pinned offline generator without evaluating PAC', async function() {
 
     const bytes = pac({tail: 'throw new Error("must never execute");'});

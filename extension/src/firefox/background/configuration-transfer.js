@@ -11,6 +11,18 @@
 
 })(typeof globalThis === 'object' ? globalThis : this, function(Format, Settings) {
 
+  function supportSettings(settings) {
+
+    return {source: ['manual', 'anticensority', 'antifilter', 'antizapret-local'].includes(settings.source) ? settings.source : 'unknown',
+      providerProxies: settings.flags.useProviderProxies,
+      useProxyRulesForAntifilter: settings.flags.useProxyRulesForAntifilter === true,
+      proxyAuthentication: true,
+      ownProxiesOnlyForOwnSites: settings.flags.ownProxiesOnlyForOwnSites,
+      replaceDirectWithProxy: settings.flags.replaceDirectWithProxy,
+      noDirect: settings.flags.noDirect};
+
+  }
+
   function fromSettings(settings) {
 
     const profile = (value, kind, index) => ({name: `${kind}-${index + 1}`, kind,
@@ -77,7 +89,7 @@
       ownProxiesOnlyForOwnSites: config.routing.ownProxiesOnlyForOwnSites,
       replaceDirectWithProxy: config.routing.replaceDirectWithProxy,
       noDirect: config.routing.noDirect};
-    if (config.source.kind === 'builtin' && ['anticensority', 'manual', 'antifilter'].includes(config.source.id)) {
+    if (config.source.kind === 'builtin' && ['anticensority', 'manual', 'antifilter', 'antizapret-local'].includes(config.source.id)) {
       settings.source = config.source.id;
     } else {
       unsupported.push('source');
@@ -88,6 +100,6 @@
 
   }
 
-  return Object.freeze({fromSettings, toSettings});
+  return Object.freeze({fromSettings, toSettings, supportSettings});
 
 });

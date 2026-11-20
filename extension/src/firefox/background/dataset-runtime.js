@@ -11,7 +11,9 @@
     root.mv3ProviderDatasetState;
   const providerLookup = typeof module === 'object' && module.exports ?
     require('./provider-lookup') : root.rucbFirefoxProviderLookup;
-  const api = factory(routing, datasetState, providerLookup);
+  const antizapret = typeof module === 'object' && module.exports ?
+    require('./antizapret-local') : root.rucbFirefoxLocalAntizapret;
+  const api = factory(routing, datasetState, providerLookup, antizapret);
   if (typeof module === 'object' && module.exports) {
     module.exports = api;
     return;
@@ -19,7 +21,7 @@
   root.rucbFirefoxDatasetRuntime = api;
 
 })(typeof globalThis === 'object' ? globalThis : this,
-    function(Routing, DatasetState, ProviderLookup) {
+    function(Routing, DatasetState, ProviderLookup, Antizapret) {
 
       const STATES = Object.freeze({
         OFF: 'OFF',
@@ -126,6 +128,7 @@
         let failureCode = null;
         let selected = null;
         let lookupIndex = null;
+        let localLookup = null;
         let initialization;
 
         async function initializeUnchecked() {
@@ -139,6 +142,19 @@
             }
             lookupIndex = Object.freeze({lookup: () => ({kind: ProviderLookup.KINDS.MISS})});
             selected = Object.freeze(Object.assign({source: 'BUILTIN_MANUAL'}, MANUAL_IDENTITY));
+            state = STATES.READY;
+            return snapshot();
+          }
+          if (providerKey === Antizapret.IDENTITY.providerKey) {
+            if (!Antizapret.isIdentity(options.datasetIdentity) || typeof options.loadAntizapret !== 'function') {
+              throw runtimeError('SELECTED_DATASET_UNAVAILABLE');
+            }
+            try {
+              localLookup = await options.loadAntizapret(options.datasetIdentity);
+            } catch (_error) {
+              throw runtimeError('SELECTED_DATASET_UNAVAILABLE');
+            }
+            selected = Object.freeze(Object.assign({source: 'LOCAL_SNAPSHOT'}, options.datasetIdentity));
             state = STATES.READY;
             return snapshot();
           }
@@ -231,9 +247,19 @@
 
         }
 
+        function classifyLocal(value) {
+          if (value === Antizapret.RESULTS.PROXY) {
+            return {kind: ProviderLookup.KINDS.PROVIDER_PROXY};
+          }
+          if (value === Antizapret.RESULTS.DIRECT) {
+            return {kind: ProviderLookup.KINDS.PROVIDER_DIRECT};
+          }
+          return {kind: ProviderLookup.KINDS.FAILURE, code: 'ANTIZAPRET_DNS_UNAVAILABLE'};
+        }
+
         function routingInputForRequest(details) {
 
-          if (state !== STATES.READY || !lookupIndex) {
+          if (state !== STATES.READY || (!lookupIndex && !localLookup)) {
             throw runtimeError('PROVIDER_DATASET_NOT_READY');
           }
           const baseInput = typeof baseInputForRequest === 'function' ?
@@ -243,14 +269,27 @@
             throw runtimeError('INVALID_ROUTING_BASE_INPUT');
           }
           const hostname = requestHostname(details, baseInput);
-          const provider = providerDecision(
-              resolveProvider(hostname),
-              baseInput,
+          function withResolution(resolution) {
+            const provider = providerDecision(resolution, baseInput);
+            const input = Object.assign({}, baseInput, {hostname, provider});
+            delete input.providerCandidates;
+            delete input.providerFallback;
+            return input;
+          }
+          if (!localLookup) return withResolution(resolveProvider(hostname));
+          if (baseInput.flags && baseInput.flags.useProviderProxies === false) {
+            return withResolution(classifyLocal(Antizapret.RESULTS.DIRECT));
+          }
+          const classified = localLookup.classifyHost(hostname);
+          const immediate = withResolution(classifyLocal(classified));
+          if (classified || Routing.decideRoute(immediate).source !== 'PROVIDER_DATASET' ||
+              typeof options.resolveAntizapretDns !== 'function') return immediate;
+          return Promise.resolve(options.resolveAntizapretDns(hostname)).then(
+              (addresses) => withResolution(classifyLocal(
+                  localLookup.classifyAddresses(addresses),
+              )),
+              () => immediate,
           );
-          const input = Object.assign({}, baseInput, {hostname, provider});
-          delete input.providerCandidates;
-          delete input.providerFallback;
-          return input;
 
         }
 

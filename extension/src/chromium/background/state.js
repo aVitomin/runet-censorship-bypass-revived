@@ -120,6 +120,7 @@
       warnings: Object.freeze([]),
       artifactRef: null,
     }),
+    localAntizapretCache: null,
     proxyApply: Object.freeze({
       status: 'idle',
       providerKey: null,
@@ -970,6 +971,8 @@
       notificationPrefs: normalizeNotificationPrefs(source.notificationPrefs),
       pacDownload: normalizePacDownload(source.pacDownload),
       pacCache,
+      localAntizapretCache: isObject(source.localAntizapretCache) ?
+        normalizePacCache(source.localAntizapretCache) : null,
       pacCook: normalizePacCook(source.pacCook),
       cookedPacCache,
       proxyApply: normalizeProxyApply(source.proxyApply),
@@ -1145,7 +1148,9 @@
       if (!canCollect()) return {status: 'busy', deleted: 0};
       // The Effective queue is held by the caller; this queue also prevents a
       // Saved reference or legacy inline migration from changing during sweep.
-      const refs = [state.pacCache, state.cookedPacCache, ...retainedCaches]
+      const refs = [
+        state.pacCache, state.cookedPacCache, state.localAntizapretCache, ...retainedCaches,
+      ]
           .map((cache) => cache && cache.artifactRef).filter(Boolean);
       return mv3PacArtifacts.collectUnreferenced(refs, canCollect);
     });
@@ -1273,6 +1278,8 @@
 
     return JSON.stringify({
       provider: state.currentPacProviderKey,
+      localAntizapretSha256: state.currentPacProviderKey === 'antizapret-local' &&
+        state.localAntizapretCache && state.localAntizapretCache.rawPacSha256,
       sources: state.customPacProviders,
       pacMods: state.pacMods,
       authEnabled: state.proxyAuth.enabled,

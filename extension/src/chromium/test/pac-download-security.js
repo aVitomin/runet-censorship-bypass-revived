@@ -439,6 +439,28 @@ Mocha.describe('Chromium PAC download redirect validation', function() {
 
   });
 
+  Mocha.it('checks the documented Antizapret address without redirects or credentials', async function() {
+    const provider = global.mv3Providers.getProviderByKey('Антизапрет');
+    const url = provider.urls[0];
+    Chai.expect(url).to.equal('https://p.thenewone.lol:8443/proxy.pac');
+    const refused = createResponse(url, {status: 403});
+    const changedAddress = createResponse('https://redirect.example/proxy.pac');
+    const success = createResponse(url);
+    await withResponses([refused, changedAddress, success], async function(calls) {
+      const denied = await global.mv3PacDownload.checkPac(provider);
+      Chai.expect(denied.httpStatus).to.equal(403);
+      const redirected = await global.mv3PacDownload.checkPac(provider);
+      Chai.expect(redirected.error.code).to.equal('PAC_RESPONSE_URL_REJECTED');
+      Chai.expect((await global.mv3PacDownload.checkPac(provider)).ok).to.equal(true);
+      Chai.expect(calls.map((call) => call.url)).to.deep.equal([url, url, url]);
+      for (const call of calls) {
+        Chai.expect(call.options).to.include({
+          redirect: 'error', credentials: 'omit', referrerPolicy: 'no-referrer',
+        });
+      }
+    });
+  });
+
   Mocha.it('accepts an HTTPS to HTTPS redirect', async function() {
 
     const requestedUrl = 'https://origin.example/proxy.pac';

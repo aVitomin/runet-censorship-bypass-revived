@@ -131,8 +131,12 @@ an enabled incomplete profile can be applied. Existing active settings continue
 until a separate successful Apply.
 
 Export for support is a different file: export time, browser/extension version,
-language, platform and limited active/pending/source-availability status. It
-contains no configuration, site rules, proxy/source addresses, usernames,
+language, platform and limited active/pending/source-availability status. New
+reports also distinguish Saved and verified Effective settings using only a
+fixed source identifier and six boolean routing flags. Custom sources are
+identified only as custom, without their names or URLs. Effective settings are
+absent when control is off or unverified. The report contains no importable
+configuration, site rules, proxy/source addresses, usernames,
 passwords, cookies, browsing history, raw network logs or applied-generation
 identifiers. It cannot be imported as settings. Inspect the file and your
 accompanying message before sharing; sanitization does not make your own text

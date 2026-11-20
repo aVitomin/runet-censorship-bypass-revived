@@ -40,8 +40,8 @@ in the live submission form.
 ## Description — English
 
 Runet Censorship Bypass — Revived is an independent Anticensority fork.
-Choose Auto, Proxy or Direct for websites in Firefox. The extension
-controls browser routing and provides no VPN or proxy service.
+Choose Auto, Proxy or Direct for websites in Firefox. Proxy connections use
+your own proxy or a separately running local service.
 
 - Set rules for one host or a domain and its subdomains.
 - Use Anticensority data, the optional Antifilter list, or Only my rules and connections.
@@ -54,24 +54,32 @@ controls browser routing and provides no VPN or proxy service.
 - Find site rules with search and switch settings sections without losing unsaved edits.
 - Choose a light, dark or system appearance shared by Options and the popup.
 
-Anticensority proxy routes need a suitable local service running separately.
-Own proxies can be used for explicit Proxy rules. Auto follows the selected
+To get started with Anticensority, run a compatible local service such as
+Tor Browser or Tor. Anticensority proxy routes use that service, and you can
+configure your own proxies for explicit Proxy rules. Auto follows the selected
 source and rules; it can use a proxy. Explicit Direct takes priority over Proxy.
 Updates do not turn routing on, apply pending settings or switch a manual source.
 The popup asks before including other saved changes; unsaved Options edits are
 not included. Enable private-window access before applying: Firefox requires it
-for the browser-wide proxy setting.
+for the browser-wide proxy setting. Save changes, select Apply, then reload a
+site covered by the source or your rule. Check its mode in the popup and confirm
+that the page loads.
 
 Antifilter supplies an exact-host list, not proxy servers. It uses your selected
 Proxy connections only after explicit consent. Old or unknown source dates show
 a warning without switching routing off.
 
-Settings and optional proxy credentials stay in your browser profile. There is
-no developer telemetry or cloud synchronization. Routing-data downloads and
-connection checks make network requests. Proxies receive destination information
-and traffic visible to their protocol, plus matching credentials when needed.
-Settings exports omit credentials but retain site rules and proxy addresses;
-keep them private. Review support reports before sharing.
+Settings and configured proxy credentials are stored in your browser profile.
+The extension has no developer telemetry or cloud synchronization. When a
+request goes through a proxy, the proxy sees the destination and the traffic
+its protocol exposes. If a matching proxy requests authentication for an
+authorized route, Firefox can send the configured proxy credentials to that
+proxy. An HTTPS proxy protects the connection to the proxy with TLS. For a
+normally tunneled HTTPS site, the proxy sees the destination while the browser's
+TLS connection to the site protects page content. Source servers receive
+download requests and connection metadata such as IP address. A connection
+check contacts the site being checked. Settings exports omit credentials and
+still include site rules and proxy addresses. Review support reports before sharing.
 
 Firefox parses fixed Anticensority and Antifilter HTTPS downloads as static data without
 executing downloaded PAC JavaScript. The data is validated but has no author's
@@ -86,8 +94,8 @@ and does not route other applications. SOCKS authentication depends on Firefox.
 ## Полное описание — русский
 
 «Обход блокировок Рунета — Revived» — независимый форк Anticensority.
-Выбирайте «Авто», «Прокси» или «Напрямую» для сайтов в Firefox. Расширение
-управляет маршрутами браузера; VPN или прокси-сервер в комплект не входят.
+Выбирайте «Авто», «Прокси» или «Напрямую» для сайтов в Firefox. Для
+прокси-маршрутов используется ваш прокси или отдельно запущенная локальная служба.
 
 - Правила для одного хоста или домена с поддоменами.
 - База Anticensority, дополнительный список Antifilter или режим «Только мои правила и подключения».
@@ -100,25 +108,33 @@ and does not route other applications. SOCKS authentication depends on Firefox.
 - Поиск правил и переключение разделов настроек с сохранением несохранённых правок.
 - Светлая, тёмная или системная тема для настроек и панели расширения.
 
-Прокси-маршрутам Anticensority нужна подходящая отдельно запущенная локальная
-служба. Собственные прокси можно использовать для явных правил «Прокси».
+Чтобы начать с Anticensority, запустите совместимую локальную службу, например
+Tor Browser или Tor. Прокси-маршруты Anticensority используют эту службу.
+Для явных правил «Прокси» можно настроить собственный прокси.
 «Авто» следует источнику и правилам, поэтому может использовать прокси.
 Явное «Напрямую» приоритетнее «Прокси». Обновления не включают маршрутизацию,
 не применяют отложенные настройки и не переключают ручной источник. Панель
 спрашивает перед применением других сохранённых изменений; несохранённые правки
 в применение не входят. Перед включением разрешите работу в приватных окнах:
-это требование Firefox к общей настройке прокси.
+это требование Firefox к общей настройке прокси. Сохраните изменения, нажмите
+«Применить» и перезагрузите сайт из списка источника или своего правила.
+Проверьте режим сайта в панели расширения и убедитесь, что страница загружается.
 
 Antifilter предоставляет список точных имён сайтов, без прокси-серверов. Он
 использует выбранные вами подключения для правил «Прокси» с явного разрешения.
 Предупреждение о старой или неизвестной дате базы не отключает маршрутизацию.
 
 Настройки и учётные данные прокси хранятся в профиле браузера. Телеметрии
-разработчика и облачной синхронизации нет. Загрузка базы и проверки подключений
-выполняют сетевые запросы. Прокси получают адреса назначения, видимую им часть
-трафика и при необходимости подходящие учётные данные. Экспорт исключает
-учётные данные, но сохраняет правила сайтов и адреса прокси: храните его
-приватно. Отчёт для поддержки нужно просмотреть перед отправкой.
+разработчика и облачной синхронизации нет. Прокси видит адрес назначения и
+доступную его протоколу часть трафика. Если прокси, соответствующий применённому
+маршруту, запрашивает аутентификацию, Firefox может передать ему настроенные
+учётные данные. HTTPS-прокси защищает соединение с прокси с помощью TLS.
+При обычном туннелировании HTTPS прокси видит адрес назначения, а соединение
+браузера с сайтом по TLS защищает содержимое страницы. Серверы источников
+получают запросы загрузки и данные подключения, например IP-адрес. Проверка
+соединения обращается к проверяемому сайту. Файл настроек содержит правила
+сайтов и адреса прокси. Учётные данные из него исключены. Отчёт для поддержки
+нужно просмотреть перед отправкой.
 
 Firefox обрабатывает данные с закреплённых HTTPS-источников Anticensority и Antifilter
 без исполнения скачанного PAC-кода. Данные проходят проверки, но не имеют
@@ -129,6 +145,20 @@ Firefox обрабатывает данные с закреплённых HTTPS-
 [Руководство](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/user/USER_GUIDE_1_0_2.md) ·
 [Помощь](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/SUPPORT.md) ·
 [Приватность](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/release/PRIVACY_1_0.md)
+
+## First-use copy for an unreleased build
+
+Use in the listing after verifying the release with the setup guide in Overview.
+See the [first-use guide draft](../development/release-drafts/FIRST_USE.md).
+
+**English.** Open the setup guide in Options → Overview for the source, connection
+and private-window steps. Once routing is active, reload the site and check
+its mode in the toolbar popup.
+
+**Русский.** Откройте мастер настройки на вкладке «Обзор».
+Там описано, как выбрать источник, настроить подключение и разрешить работу
+в приватных окнах. После включения маршрутизации перезагрузите сайт и проверьте
+его режим в панели расширения.
 
 ## Maintainer attachments — not part of description
 

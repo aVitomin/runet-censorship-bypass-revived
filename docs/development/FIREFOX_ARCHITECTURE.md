@@ -11,6 +11,8 @@ A clean install remains `OFF`. The manifest requests `proxy`, `webRequest`,
 synchronously before asynchronous initialization. The 12-hour source-update alarm
 does not enable routing while OFF. See [Provider dataset](FIREFOX_PROVIDER_DATASET.md)
 for the packaged baseline, source formats and trust boundaries.
+The next Firefox build also requests `dns` for the
+[Antizapret source](FIREFOX_PROVIDER_DATASET.md#antizapret-in-the-next-firefox-build).
 
 ## Routing semantics
 
@@ -44,10 +46,17 @@ Firefox DNS/timeout options remain transfer limitations. See the
 ## Proxy floor and ownership
 
 The active global fail-closed floor is manual SOCKS5 at
-`127.0.0.1:<persisted-high-port>`, with `proxyDNS: true`, empty HTTP/SSL/auto-config/
+`127.0.0.1:<persisted-high-port>`, with empty HTTP/SSL/auto-config/
 passthrough fields and `httpProxyAll: false`. Zero and low ports are invalid.
 Only proxy-control generates the port with `crypto.getRandomValues`; callers
 cannot choose the floor or assert ownership.
+
+The floor normally uses `proxyDNS: true`. Antizapret in the next build uses
+`proxyDNS: false` for Firefox DNS and includes that value in ownership checks.
+An active source switch that changes this setting is a guarded transition.
+An unresolved transition or loss of the Antizapret floor keeps the session
+blocked until an explicit Turn off. The floor does not define the DNS setting
+of each configured proxy candidate.
 
 `RANDOM_LOOPBACK_UNVERIFIED_V1` explicitly means WebExtensions cannot prove that
 the endpoint has no listener. The port is not probed or retried by network behavior.
@@ -129,9 +138,9 @@ descriptor-bound product configuration, credentials and redacted settings.
 Apply refuses to read Saved while that marker exists; recovery uses the separately
 committed Effective snapshot. After a crash, reconciliation accepts only an exact
 completed commit; partial or mismatched state stays fail-closed. New configuration
-must never be paired with old credentials. Settings RPC accepts only Anticensority
-or manual source selection, not caller-supplied dataset identity/trust, and cannot
-promote staged data through a settings write.
+must never be paired with old credentials. The settings RPC accepts supported
+source keys. The backend derives dataset identities and their trust from verified
+data. A settings write cannot promote staged data to Effective.
 
 Schema-v1 `firefoxMv3ProductRoutingConfig` holds non-secret source/dataset identity,
 routing descriptor and canonical routing inputs. `configurationSha256` hashes

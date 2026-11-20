@@ -158,12 +158,14 @@
 
   }
 
-  async function makeRecord(state) {
+  async function makeRecord(state, restorePrevious = false) {
 
     const cache = state.cookedPacCache;
     if (!cache.artifactRef || cache.providerKey !== state.currentPacProviderKey ||
-        cache.sourceRawPacSha256 !== state.pacCache.rawPacSha256 ||
-        cache.pacModsSha256 !== await mv3PacCook.hashPacMods(state.pacMods)) throw failure();
+        cache.sourceRawPacSha256 !== state.pacCache.rawPacSha256) throw failure();
+    if (cache.pacModsSha256 !== await mv3PacCook.hashPacMods(state.pacMods) &&
+        !(restorePrevious && await mv3PacCook.matchesPreviousPacMods(
+            cache.providerKey, state.pacMods, cache.pacModsSha256))) throw failure();
     const artifact = await mv3PacArtifacts.getCookedPacArtifact({
       providerKey: cache.providerKey, sha256: cache.cookedPacSha256,
     });
@@ -256,7 +258,8 @@
 
   async function prepare(state, expectedRevision, refreshId = null, restore = false) {
 
-    let candidate = await makeRecord(state);
+    // An upgrade may restore exactly what was active, leaving Saved pending.
+    let candidate = await makeRecord(state, restore && Boolean(refreshId));
     if (expectedRevision !== undefined && expectedRevision !== candidate.savedRevision) throw failure('SAVED_REVISION_CHANGED');
     return enqueue(async () => {
       const store = await read() || empty();

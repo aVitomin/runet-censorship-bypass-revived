@@ -92,6 +92,15 @@ Normalize rules/candidates, generate the wrapper and store the cooked artifact.
 Own-proxy credentials are excluded. An explicit Proxy branch requires a usable
 candidate and contains no provider fallback or intentional `DIRECT`.
 
+When provider proxies are disabled, skip the provider's `FindProxyForURL` call:
+its result cannot affect routing, but evaluating it can still trigger DNS and
+delay requests. Keep explicit rules, whitelist, onion routing, broad own proxies
+and Direct replacement/removal unchanged. This skips per-request evaluation,
+not parsing or top-level initialization of the PAC.
+Cook semantics version 5 invalidates previous cooked-cache identities. The next
+Cook rebuilds the wrapper even if the source and settings are unchanged; Apply
+remains a separate operation and OFF stays OFF.
+
 ### Apply and workflow freshness
 
 Before `chrome.proxy.settings.set`, validate provider, raw/cooked hashes,
@@ -230,6 +239,16 @@ Popup exposes protection/current-site controls and status; Options has seven
 sections, Draft/Apply, diagnostics, maintenance and portable configuration.
 Action A/P/D/OFF/EXT/busy/warning is derived for the active tab. Pages use
 `textContent`/DOM APIs and redacted RPC, not background globals or remote scripts.
+
+Support exports add optional `diagnostics.settings.saved` and `.effective`
+summaries to transfer schema 1; existing reports remain readable. Each summary
+allows only a fixed source identifier and six boolean routing flags. Custom
+Chromium sources are reported as `custom`, never their key, name or URL.
+Effective summaries use the verified snapshot from the same export operation;
+they are `null` when control is off or unavailable, never substituted with Saved.
+No rules, connection details, credentials, revisions or identities are included.
+The extended summaries are support-only and cannot be imported as settings.
+Export reads existing state without applying settings or downloading a provider.
 
 Shared `ui-theme.js`/`ui-theme.css` provide light/dark/system themes for both
 targets. Default is system. The preference lives only in extension-page

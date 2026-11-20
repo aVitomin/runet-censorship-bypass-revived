@@ -54,7 +54,7 @@
 
       }
 
-      function randomFloorIdentity(generatePort) {
+      function randomFloorIdentity(generatePort, proxyDNS = true) {
 
         let port;
         try {
@@ -72,7 +72,7 @@
           ssl: '',
           socks: `127.0.0.1:${port}`,
           socksVersion: 5,
-          proxyDNS: true,
+          proxyDNS: proxyDNS !== false,
           passthrough: '',
           autoConfigUrl: '',
         });
@@ -259,13 +259,13 @@
 
         }
 
-        async function acquireRandomFloorNow() {
+        async function acquireRandomFloorNow(proxyDNS) {
 
           const privateAccess = await checkPrivateAccessNow();
           if (!privateAccess.ok) {
             return privateAccess;
           }
-          const floorIdentity = randomFloorIdentity(generatePort);
+          const floorIdentity = randomFloorIdentity(generatePort, proxyDNS);
           if (!floorIdentity) {
             return errorResult(ERRORS.FLOOR_GENERATION_FAILED);
           }
@@ -296,6 +296,26 @@
             durableState,
           };
 
+        }
+
+        async function updateOwnedFloorDnsNow(value) {
+          const desired = canonicalizeFloorIdentity(value);
+          if (!desired) return errorResult(ERRORS.INVALID_FLOOR_IDENTITY);
+          const result = await readLiveSettings();
+          if (!result.ok) return result;
+          if (isExactOwnedFloor(result.live, desired)) return {ok: true};
+          const alternate = Object.assign({}, desired, {proxyDNS: !desired.proxyDNS});
+          if (!isExactOwnedFloor(result.live, alternate)) {
+            return errorResult(ERRORS.OWNERSHIP_MISMATCH);
+          }
+          try {
+            if (await proxySettings.set({value: desired}) !== true) {
+              return errorResult(ERRORS.PROXY_SET_FAILED);
+            }
+          } catch (_error) {
+            return errorResult(ERRORS.PROXY_SET_FAILED);
+          }
+          return inspectOwnedFloorNow(desired);
         }
 
         async function clearFloorNow() {
@@ -347,10 +367,13 @@
         }
 
         return Object.freeze({
-          acquireRandomFloor() {
+          acquireRandomFloor(proxyDNS = true) {
 
-            return enqueue(acquireRandomFloorNow);
+            return enqueue(() => acquireRandomFloorNow(proxyDNS));
 
+          },
+          updateOwnedFloorDns(value) {
+            return enqueue(() => updateOwnedFloorDnsNow(value));
           },
           clearFloor() {
 
