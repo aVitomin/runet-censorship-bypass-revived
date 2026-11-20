@@ -1,14 +1,14 @@
 # Установка, обновление и удаление
 
-**Firefox 1.1.0 доступен в Firefox Add-ons. Chrome Web Store пока предлагает 1.0.3.**
+**Версия 1.1.0 доступна в Chrome Web Store и Firefox Add-ons.**
 Для ручной установки доступны **Chromium ZIP 1.1.0** и подписанный Firefox XPI **1.1.0**.
-Версии в магазинах проверены 20 ноября 2026.
+Версии в магазинах проверены 21 ноября 2026.
 
 ## Установить из магазина
 
 | Браузер | Версия | Где установить |
 | --- | --- | --- |
-| Chrome, Brave и совместимые Chromium-браузеры | **1.0.3** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
+| Chrome, Brave и совместимые Chromium-браузеры | **1.1.0** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
 | Firefox **140+** | **1.1.0** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 1. Откройте магазин в нужном браузере, нажмите кнопку установки и подтвердите разрешения.
@@ -136,7 +136,7 @@ Chromium-версии на магазинную могут создать отд
 
 ## English summary
 
-Install **Chromium 1.0.3** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.1.0** from
+Install **Chromium 1.1.0** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.1.0** from
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/). Firefox requires **140+** and private-window
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
