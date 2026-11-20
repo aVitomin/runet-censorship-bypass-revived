@@ -5,7 +5,12 @@ security and official store-guidance links used by this publication set.
 This dated record does not establish current URL availability.
 Historical/upstream attribution in `docs/legacy/` is not rewritten.
 
-## Current store check — 2026-11-08, 12:30 UTC
+## Store check — 2026-11-20
+
+Firefox Add-ons publishes [1.1.0](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) with release notes in English and Russian. The signed XPI is mirrored in [GitHub Release v1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0).
+Chrome Web Store still serves 1.0.3 through its update service. The 1.1.0 submission uses the [direct privacy-policy URL](https://raw.githubusercontent.com/aVitomin/runet-censorship-bypass-revived/refs/heads/main/docs/release/PRIVACY_1_0.md) because the dashboard rejected the GitHub page URL.
+
+## Previous store check — 2026-11-08, 12:30 UTC
 
 Chrome Web Store and Firefox Add-ons both publicly offer **1.0.3**. Chrome
 reports November 8, 2026 as its update date. Store IDs and install URLs are unchanged.
