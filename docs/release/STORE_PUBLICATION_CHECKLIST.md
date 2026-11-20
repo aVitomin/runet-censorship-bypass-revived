@@ -1,4 +1,4 @@
-# Store publication checklist — 1.0.x
+# Store publication checklist
 
 **Publication checklist.** Firefox Add-ons and locally installed desktop packages
 can ship independently of Chrome Web Store. Store submissions may proceed in parallel; review in one store does not block
@@ -6,13 +6,18 @@ the other channels. This document grants no permission to bump
 versions, sign, tag, create releases, upload or submit store packages. Obtain
 separate maintainer authorization for those actions.
 
-The maintained source and manifests identify `1.0.3`. Its Chromium ZIP is
-published alongside the signed Firefox XPI. Chrome Web Store and Firefox Add-ons
-both offer 1.0.3.
 The [release record](../development/releases/1.0.3.md) binds source, trusted-main
 CI and canonical artifacts. Publication status remains independent per channel.
 
 ## Current channel status
+
+Checked on 2026-11-20.
+
+- [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) offers Firefox **1.1.0**, Mozilla file **5283665**. Windows Firefox 159.0.1 passed a signature-enforced update from 1.0.3 and restart with routing settings preserved.
+- Chrome Web Store serves **1.0.3** through its public update service. **1.1.0** was submitted for review.
+- [GitHub Release v1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0) offers the Chromium ZIP and signed Firefox XPI. Both downloads were verified against their SHA-256 values.
+
+## Previous channel status — 1.0.3
 
 Last confirmed on 2026-11-08 at 12:30 UTC; this is not a live store-status feed.
 
@@ -65,8 +70,8 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
   behavior. Distinguish local settings from proxy/source/check transmissions;
   preserve sensitive-export warnings and no-password/support-export claims.
 - [ ] Verify the version's privacy notice on main is reachable without sign-in
-  and matches the submitted package before entering this canonical store URL:
-  `https://github.com/aVitomin/runet-censorship-bypass-revived/blob/main/docs/release/PRIVACY_1_0.md`.
+  and matches the submitted package before entering the current Chrome store URL:
+  `https://raw.githubusercontent.com/aVitomin/runet-censorship-bypass-revived/refs/heads/main/docs/release/PRIVACY_1_0.md`.
   Recheck the URL at submission time; repository link validation alone does not
   establish public availability.
 - [ ] Recheck repository, documentation, support, privacy and security links

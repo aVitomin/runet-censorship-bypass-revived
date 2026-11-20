@@ -57,6 +57,8 @@ require Firefox 154 or Chromium 156 specifically:
 | Signed Firefox 1.0.2 → temporary unsigned 1.0.3 | Windows Firefox 159.0 | OFF, Effective and pending Saved preserved; candidate reinstalled after restart, not a permanent signed update |
 | Signed Firefox 1.0.2 → 1.0.3 | Windows Firefox 159.0.1 | Signature-enforced permanent update/restart without reinstall; OFF, Effective and pending Saved preserved |
 
+| Signed Firefox 1.0.3 → 1.1.0 | Windows Firefox 159.0.1 | Permanent signature-enforced update and restart. OFF, applied and pending settings persisted. |
+
 These records do not prove store automatic delivery or comprehensive routing/UI
 coverage. Chromium 108 and Firefox 140 were not individually launched; Linux
 remains untested. The [ESR/Linux procedure](qa/FIREFOX_ESR_153.md) is a reproducible
