@@ -1,8 +1,8 @@
 # Установка, обновление и удаление
 
 **Версия 1.0.3 доступна в Chrome Web Store и Firefox Add-ons.**
-Для ручной установки доступны Chromium ZIP и подписанный Firefox XPI **1.0.3**.
-Публичные версии проверены 8 ноября 2026.
+Для ручной установки доступны **Chromium ZIP 1.1.0** и подписанный Firefox XPI **1.0.3**.
+Версии в магазинах проверены 8 ноября 2026.
 
 ## Установить из магазина
 
@@ -36,8 +36,8 @@
 
 ## Ручная установка Chromium: ZIP
 
-1. Скачайте [готовый ZIP 1.0.3](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.0.3/runet-censorship-bypass-mv3-1.0.3-34ab51b.zip).
-   SHA-256 указан ниже и в [описании релиза](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.0.3).
+1. Скачайте [готовый ZIP 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-chromium-1.1.0-f8aa606.zip).
+   SHA-256 указан ниже и в [описании релиза](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0).
 2. Проверьте SHA-256 и полностью распакуйте ZIP в постоянную папку.
 3. Откройте `chrome://extensions`, `brave://extensions` или `edge://extensions`.
 4. Включите **Режим разработчика → Загрузить распакованное расширение**.
@@ -52,13 +52,13 @@
 SHA-256 ZIP:
 
 ```text
-ef7ecd3f90295857aea08abe66bca9ad1a4e6d6e75a9861c15fbe0986553419e
+48168f5ddd5dae48a334917babb73c1ca6947f4e9f68b19dfd8d2d05774fb17d
 ```
 
 Пример проверки в Windows:
 
 ```powershell
-Get-FileHash .\runet-censorship-bypass-mv3-1.0.3-34ab51b.zip -Algorithm SHA256
+Get-FileHash .\runet-censorship-bypass-chromium-1.1.0-f8aa606.zip -Algorithm SHA256
 ```
 
 Если сумма отличается, не устанавливайте файл.
@@ -141,7 +141,7 @@ Install **Chromium 1.0.3** from [Chrome Web Store](https://chromewebstore.google
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
 
-**Chromium 1.0.3** is also available as a manual ZIP; **Firefox 1.0.3** as a
+**Chromium 1.1.0** is also available as a manual ZIP; **Firefox 1.0.3** as a
 Mozilla-signed XPI. Versions **1.0.1–1.0.3** target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR releases on a compatible base. These are API-based compatibility
 estimates, not test results for every version or fork. Required MV3 and proxy
