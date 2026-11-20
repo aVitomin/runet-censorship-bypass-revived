@@ -11,6 +11,96 @@
   const providerUpdateControlApi = root.rucbFirefoxProviderUpdateControl;
   const productConfigApi = root.rucbFirefoxProductConfig;
   const productionProviderApi = root.rucbFirefoxProductionProvider;
+  const antizapret = root.rucbFirefoxLocalAntizapret;
+  let verifiedAntizapret;
+  let antizapretBackend;
+  const antizapretLookups = new Map();
+  const antizapretStore = () => {
+    if (!antizapretBackend) {
+      antizapretBackend = datasetStoreApi.createIndexedDbBackend(root.indexedDB, {
+        databaseName: 'rucb-firefox-antizapret-v1',
+      });
+    }
+    return antizapretBackend;
+  };
+  const antizapretIdentity = (hash) => ({
+    providerKey: antizapret.IDENTITY.providerKey,
+    datasetVersion: `pac-${hash.slice(0, 24)}`,
+    artifactSha256: hash,
+  });
+  const loadAntizapret = async (identity = antizapret.IDENTITY) => {
+    if (!antizapret.isIdentity(identity)) throw new Error('ANTIZAPRET_INVALID_IDENTITY');
+    if (identity.datasetVersion !== antizapret.IDENTITY.datasetVersion) {
+      if (antizapretLookups.has(identity.artifactSha256)) {
+        return antizapretLookups.get(identity.artifactSha256);
+      }
+      const record = await antizapretStore().readArtifact(identity.artifactSha256);
+      const bytes = record && record.artifactBytes;
+      if (!(bytes instanceof Uint8Array) || bytes.length > antizapret.MAX_BYTES ||
+          await sha256(bytes) !== identity.artifactSha256) throw new Error('ANTIZAPRET_RULES_UNAVAILABLE');
+      const rules = JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(bytes));
+      const lookup = antizapret.createLookup(rules);
+      if (antizapretLookups.size >= 2) {
+        antizapretLookups.delete(antizapretLookups.keys().next().value);
+      }
+      antizapretLookups.set(identity.artifactSha256, lookup);
+      return lookup;
+    }
+    if (!verifiedAntizapret) {
+      verifiedAntizapret = antizapret.load(readPackagedAsset, sha256).catch((error) => {
+        verifiedAntizapret = null;
+        throw error;
+      });
+    }
+    return verifiedAntizapret;
+  };
+
+  async function latestAntizapret() {
+    let pointers;
+    try {
+      pointers = await antizapretStore().readPointers(antizapret.IDENTITY.providerKey);
+    } catch (_error) {
+      // Older local QA builds can still use their digest-pinned packaged snapshot.
+    }
+    const hash = pointers && pointers.activeArtifactSha256;
+    const identity = typeof hash === 'string' && /^[a-f0-9]{64}$/.test(hash) ?
+      antizapretIdentity(hash) : antizapret.IDENTITY;
+    await loadAntizapret(identity);
+    return identity;
+  }
+
+  async function stageAntizapret(text) {
+    const pacBytes = new TextEncoder().encode(text);
+    if (!pacBytes.length || pacBytes.length > antizapret.MAX_BYTES) throw new Error('ANTIZAPRET_INVALID_PAC');
+    const rules = antizapret.parsePac(text);
+    const artifactBytes = new TextEncoder().encode(JSON.stringify(rules));
+    if (artifactBytes.length > antizapret.MAX_BYTES) throw new Error('ANTIZAPRET_INVALID_PAC');
+    const artifactSha256 = await sha256(artifactBytes);
+    const providerKey = antizapret.IDENTITY.providerKey;
+    const store = antizapretStore();
+    const previous = await store.readPointers(providerKey);
+    const previousHash = previous && previous.activeArtifactSha256;
+    const saved = await settingsController.get();
+    const savedIdentity = saved.settings.source === providerKey ?
+      await readRoutingIdentity(true) : null;
+    await store.commit({artifactSha256, providerKey, artifactBytes}, {
+      schemaVersion: datasetStoreApi.LEGACY_POINTER_SCHEMA_VERSION,
+      providerKey,
+      activeArtifactSha256: artifactSha256,
+      previousLkgArtifactSha256: previousHash && previousHash !== artifactSha256 ?
+        previousHash : previous && previous.previousLkgArtifactSha256 || null,
+      packagedBaselineArtifactSha256: null,
+    });
+    if (savedIdentity && savedIdentity.artifactSha256 !== artifactSha256) {
+      await settingsController.replace(
+          saved.revision, saved.settings, antizapretIdentity(artifactSha256),
+      );
+    }
+    availableSources.add(providerKey);
+    invalidateOptionsStatus();
+    await collectUnusedProviderDatasets(true);
+    return {ok: true, result: {code: 'staged'}};
+  }
   const datasetPromotionApi = root.rucbFirefoxDatasetPromotion;
   const settingsControlApi = root.rucbFirefoxSettingsControl;
   const transfer = root.rucbConfigurationTransfer;
@@ -140,6 +230,8 @@
       activationController.currentRuntimeState() : routing.STATES.INITIALIZING,
     routingInputForRequest: (details) =>
       activationController.routingInputForRequest(details),
+    antizapretSession: () => activationController && activationController.antizapretSession(),
+    verifyAntizapretSession: (session) => activationController.verifyAntizapretSession(session),
     credentialResolverForRequest: () =>
       activationController.credentialResolverForRequest(),
   });
@@ -163,6 +255,13 @@
   });
   activationController = activationApi.createController({
     proxyControl,
+    createDatasetRuntime: (options) => root.rucbFirefoxDatasetRuntime.createRuntime(
+        Object.assign({}, options, {
+          loadAntizapret,
+          resolveAntizapretDns: (hostname) =>
+            antizapret.resolveDns(hostname, browser.dns),
+        }),
+    ),
     recoveryFactory,
     routingAdapter,
     proxyAuth,
@@ -174,6 +273,15 @@
     activationSnapshot: () => activationController.snapshot(),
     async currentProviderDatasetIdentity(providerKey = productionProviderApi.PROVIDER_KEY) {
 
+      if (providerKey === 'antizapret-local') {
+        try {
+          const identity = await latestAntizapret();
+          availableSources.add(providerKey);
+          return identity;
+        } catch (_error) {
+          return null;
+        }
+      }
       const loaded = await createProductionDatasetStore().loadVerifications(
           providerKey, {firstUsableOnly: true},
       );
@@ -186,6 +294,16 @@
     },
     async datasetIdentityAvailable(identity) {
 
+      if (identity.providerKey === 'antizapret-local') {
+        try {
+          if (!antizapret.isIdentity(identity)) return false;
+          await loadAntizapret(identity);
+          availableSources.add(identity.providerKey);
+          return true;
+        } catch (_error) {
+          return false;
+        }
+      }
       const stored = await createProductionDatasetStore().loadVerifications(
           identity.providerKey,
       );
@@ -271,10 +389,10 @@
       return promotionControllers.get(await selectedSource()).install();
     },
   };
-  async function readRoutingIdentity() {
+  async function readRoutingIdentity(savedOnly = false) {
 
     const activation = activationController.snapshot();
-    const effective = activation && activation.durableIntent === offState.ON ?
+    const effective = !savedOnly && activation && activation.durableIntent === offState.ON ?
       await productConfigApi.readEffectiveRecords(browser.storage.local) : null;
     if (effective) return effective[productConfigApi.CONFIG_STORAGE_KEY].datasetIdentity;
     const stored = await browser.storage.local.get(
@@ -352,6 +470,39 @@
   for (const method of ['check', 'publicStatus', 'markInstalled']) {
     providerUpdateController[method] = async (...args) =>
       updateControllers.get(await selectedSource())[method](...args);
+  }
+
+  async function checkRoutingSource(source) {
+    if (source === 'manual') return {code: 'manual'};
+    if (source === 'antizapret-local') {
+      try {
+        await latestAntizapret();
+        return {code: 'ready'};
+      } catch (_error) {
+        return {code: 'unavailable'};
+      }
+    }
+    let result;
+    if (source === 'antifilter') {
+      const store = root.rucbDomainCandidateStore.createStore({sha256});
+      try {
+        result = await root.rucbAntifilterSource.createUpdater({store, sha256})
+            .check({mode: 'QUARANTINE_INVALID_V1'});
+      } finally {
+        store.close();
+      }
+    } else {
+      result = await root.rucbFirefoxProviderSourceUpdater.createUpdater({
+        fetchImpl: root.fetch.bind(root), sha256, store: createProductionDatasetStore(),
+      }).check();
+    }
+    if (result.ok) return {code: 'ready'};
+    const {code, httpStatus} = result;
+    if (Number.isInteger(httpStatus) && httpStatus >= 400 && httpStatus <= 599) return {code: 'http', httpStatus};
+    if (code.includes('TIMEOUT')) return {code: 'timeout'};
+    if (code.includes('BUSY')) return {code: 'busy'};
+    if (code.includes('FETCH_FAILED')) return {code: 'network'};
+    return {code: 'invalid'};
   }
 
   async function prepareAntifilter() {
@@ -727,7 +878,7 @@
 
   }
 
-  async function collectUnusedProviderDatasets() {
+  async function collectUnusedProviderDatasets(onlyAntizapret = false) {
 
     try {
       const keys = [productConfigApi.CONFIG_STORAGE_KEY,
@@ -768,7 +919,9 @@
       }
       // The live routing runtime holds the verified parsed dataset in memory;
       // durable ON/generation identities cover recovery after event-page restart.
-      await createProductionDatasetStore().collectGarbage([...protectedHashes]);
+      const hashes = [...protectedHashes];
+      if (antizapretBackend) await antizapretBackend.collectGarbage(hashes).catch(() => undefined);
+      if (!onlyAntizapret) await createProductionDatasetStore().collectGarbage(hashes);
     } catch (_error) {
       // Collection is best effort after the authoritative state transition.
     }
@@ -784,14 +937,12 @@
     }
     let prepared;
     try {
-      if (message.expectedRevision !== undefined) {
+      const revision = message.expectedRevision === undefined ? null : message.expectedRevision;
+      if (revision !== null) {
         const saved = await settingsController.get();
-        if (saved.revision !== message.expectedRevision) {
-          return errorResponse('SAVED_REVISION_CHANGED');
-        }
+        if (saved.revision !== revision) return errorResponse('SAVED_REVISION_CHANGED');
       }
-      prepared = await activationFactory(message.expectedRevision === undefined ?
-        null : message.expectedRevision);
+      prepared = await activationFactory(revision);
     } catch (error) {
       return errorResponse(safeApplyErrorCode(error));
     }
@@ -1084,6 +1235,38 @@
             }
           },
       ));
+    }
+    if (type === 'firefox.provider.source.check') {
+      if (Object.keys(message).length !== 2 ||
+          !['manual', 'anticensority', 'antifilter', 'antizapret-local'].includes(message.source)) {
+        return errorResponse('INVALID_RPC_REQUEST');
+      }
+      try {
+        return {ok: true, result: await checkRoutingSource(message.source)};
+      } catch (_error) {
+        return errorResponse('SOURCE_CHECK_FAILED');
+      }
+    }
+    if (type === 'firefox.antizapret.fetch' || type === 'firefox.antizapret.import') {
+      const fetching = type === 'firefox.antizapret.fetch';
+      if (fetching ? !exactRpcRequest(message, type) : Object.keys(message).length !== 2 ||
+          typeof message.text !== 'string' || message.text.length > antizapret.MAX_BYTES) {
+        return errorResponse('INVALID_RPC_REQUEST');
+      }
+      return enqueueRpcControlOperation(async () => {
+        let text;
+        try {
+          text = fetching ? await antizapret.download(root.fetch.bind(root)) : message.text;
+        } catch (error) {
+          return errorResponse(error && error.code === 'ANTIZAPRET_HTTP_403' ?
+            'ANTIZAPRET_HTTP_403' : 'ANTIZAPRET_DOWNLOAD_FAILED');
+        }
+        try {
+          return await stageAntizapret(text);
+        } catch (_error) {
+          return errorResponse('ANTIZAPRET_IMPORT_FAILED');
+        }
+      });
     }
     if (type === 'firefox.configuration.get') {
       if (!exactRpcRequest(message, type)) return errorResponse('INVALID_RPC_REQUEST');

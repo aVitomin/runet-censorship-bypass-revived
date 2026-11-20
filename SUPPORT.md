@@ -1,8 +1,36 @@
 # Помощь и сообщения об ошибках
 
 [Установка](docs/user/INSTALLATION.md) ·
-[Руководство 1.0](docs/user/USER_GUIDE_1_0.md) ·
+[Руководство](docs/user/USER_GUIDE_1_0_2.md) ·
 [Создать обращение](https://github.com/aVitomin/runet-censorship-bypass-revived/issues/new/choose)
+
+## Первый запуск
+
+- **Chromium.** В настройках откройте **Источник правил** и выберите
+  **Antizapret**, если сервис доступен на вашем подключении. При включённых
+  прокси источника подходящие сайты могут открываться через прокси Antizapret.
+- **Firefox.** Разрешите работу расширения в приватных окнах. Для
+  прокси-маршрутов **Anticensority** запустите совместимую локальную службу,
+  например Tor Browser или Tor.
+- **В обоих браузерах.** Для **Antifilter** или собственного правила **Прокси**
+  включите своё подключение. Для Antifilter разрешите использовать это
+  подключение для сайтов из списка. В Firefox также загрузите список.
+  Сохраните изменения и нажмите **Применить**. После включения откройте или
+  перезагрузите нужный сайт, проверьте его режим в панели расширения и убедитесь,
+  что страница загружается.
+
+## Что получает прокси
+
+Прокси видит адрес назначения и доступную его протоколу часть трафика.
+При обычном туннелировании HTTPS соединение браузера с сайтом по TLS защищает
+содержимое страницы. HTTPS-прокси также защищает соединение браузера с самим
+прокси. Если подходящий прокси запрашивает аутентификацию для применённого
+маршрута, браузер может передать ему настроенные учётные данные.
+
+Загрузка правил обращается к серверу источника и передаёт обычные данные
+подключения, включая видимый серверу IP-адрес. Проверка соединения обращается
+к проверяемому сайту. Телеметрии разработчика и облачной синхронизации нет.
+[Подробнее о приватности](docs/release/PRIVACY_1_0.md).
 
 ## Сначала проверьте
 
@@ -76,6 +104,35 @@
 Уязвимости отправляйте приватно по [политике безопасности](SECURITY.md).
 
 ## English
+
+### First use
+
+- **Chromium.** Open **Routing source** in Options and choose **Antizapret** if
+  its service is available on your connection. With source proxies enabled,
+  matching sites can use Antizapret proxies.
+- **Firefox.** Allow the extension to run in private windows. For
+  **Anticensority** proxy routes, run a compatible local service such as
+  Tor Browser or Tor.
+- **Both browsers.** Enable your own connection for **Antifilter** or for an
+  explicit **Proxy** rule. For Antifilter, also allow use of that connection for
+  listed sites. In Firefox, download the list as well. Save changes and select
+  **Apply**. Once routing is on, open or reload the site, check its mode in the
+  popup and confirm the page loads.
+
+### What the proxy receives
+
+The proxy sees the destination and the traffic its protocol exposes. For a
+normally tunneled HTTPS site, TLS between the browser and the site protects
+page content. An HTTPS proxy also protects the connection from the browser to
+the proxy. If a matching proxy requests authentication for an applied route,
+the browser can send the configured proxy credentials to that proxy.
+
+Routing-data downloads contact the source server, which sees ordinary
+connection metadata including the IP address visible to it. A connection check
+contacts the site being checked. The extension has no developer telemetry or
+cloud synchronization. [Privacy notice](docs/release/PRIVACY_1_0.md).
+
+### Troubleshooting
 
 Check the extension status, your proxy/local service, and whether saved changes
 were applied. Auto follows the selected source and rules; it can use a proxy.

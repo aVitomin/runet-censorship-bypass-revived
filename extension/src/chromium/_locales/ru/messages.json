@@ -1,4 +1,64 @@
 {
+  "optionsLocalAntizapretTitle": {
+    "message": "Антизапрет (локальный файл)"
+  },
+  "optionsLocalAntizapretImport": {
+    "message": "Импортировать доверенный PAC-файл Антизапрета"
+  },
+  "optionsLocalAntizapretHelp": {
+    "message": "Если онлайн-источник недоступен, импортируйте доверенный PAC-файл Антизапрета. Для публичных доменов, включая сайты вне списка, используются настроенные вами прокси. Правила «Напрямую» продолжают действовать. Если Chromium не сможет выполнить сценарий маршрутизации, он может подключиться напрямую."
+  },
+  "optionsLocalAntizapretSaved": {
+    "message": "Файл импортирован, источник сохранён. Настройте прокси и нажмите «Применить»."
+  },
+  "optionsLocalAntizapretInvalid": {
+    "message": "Выберите PAC-файл Антизапрета поддерживаемого формата размером до 2 МБ."
+  },
+  "optionsLocalAntizapretProxyRequired": {
+    "message": "Включите настроенный прокси для импортированных правил Антизапрета."
+  },
+  "optionsLocalAntizapretFileRequired": {
+    "message": "Сначала импортируйте PAC-файл Антизапрета в разделе «Источники правил»."
+  },
+  "optionsLocalAntizapretUpdate": {
+    "message": "Чтобы обновить источник, импортируйте свежий PAC-файл в разделе «Источники правил»."
+  },
+  "sourceCheckButton": {
+    "message": "Проверить источник"
+  },
+  "sourceCheckChecking": {
+    "message": "Проверяем источник…"
+  },
+  "sourceCheck_ready": {
+    "message": "Источник ответил, данные прошли проверку. Действующие правила не изменились."
+  },
+  "sourceCheck_manual": {
+    "message": "Источник использует локальные правила и ничего не скачивает."
+  },
+  "sourceCheck_http": {
+    "message": "Источник ответил HTTP $CODE$. Проверьте подключение или VPN и повторите попытку.",
+    "placeholders": {
+      "code": {"content": "$1"}
+    }
+  },
+  "sourceCheck_timeout": {
+    "message": "Источник не ответил вовремя. Повторите проверку."
+  },
+  "sourceCheck_busy": {
+    "message": "Источник уже проверяется или обновляется. Повторите попытку чуть позже."
+  },
+  "sourceCheck_network": {
+    "message": "Не удалось подключиться к источнику. Проверьте подключение или VPN."
+  },
+  "sourceCheck_invalid": {
+    "message": "Данные или адрес источника не прошли проверку."
+  },
+  "sourceCheck_unavailable": {
+    "message": "Сначала выберите доступный источник."
+  },
+  "sourceCheck_failed": {
+    "message": "Не удалось завершить проверку источника."
+  },
   "providerLifecycleControlHelp": {
     "message": "Проверьте состояние защиты выше. Само по себе обновление данных маршрутизации не означает, что маршрутизация активна."
   },
@@ -595,10 +655,10 @@
     "message": "Прокси расширения включён — Маршрут для текущей страницы недоступен"
   },
   "providerAntizapretDescription": {
-    "message": "Автоматически направляет сайты по правилам встроенного источника Antizapret."
+    "message": "Использует прокси Antizapret для сайтов из его базы. Доступность сервиса зависит от вашей сети."
   },
   "providerAnticensorityDescription": {
-    "message": "Использует альтернативный встроенный источник правил."
+    "message": "Использует правила Anticensority. Для маршрутов через прокси запустите совместимую локальную службу, например Tor."
   },
   "providerOnlyOwnSitesLabel": {
     "message": "Только мои правила и подключения"
@@ -1324,8 +1384,71 @@
   "optionsGoToRoutingSources": {
     "message": "Выбрать источник"
   },
+  "optionsSetupProgressSource": {
+    "message": "1. Источник"
+  },
+  "optionsSetupProgressReview": {
+    "message": "2. Применение"
+  },
+  "optionsSetupProgressVerify": {
+    "message": "3. Проверка"
+  },
+  "optionsSetupReviewTitle": {
+    "message": "Проверьте и примените"
+  },
+  "optionsSetupVerifyTitle": {
+    "message": "Проверьте нужный сайт"
+  },
+  "optionsSetupSaveSourceContinue": {
+    "message": "Сохранить источник и продолжить"
+  },
+  "optionsSetupSiteOpened": {
+    "message": "По вашей проверке сайт открылся"
+  },
+  "optionsSetupSiteFailed": {
+    "message": "По вашей проверке сайт не открылся"
+  },
+  "optionsSetupSiteFailureHelp": {
+    "message": "Проверьте режим сайта в панели расширения и доступность выбранного источника или прокси."
+  },
+  "optionsSetupMarkOpened": {
+    "message": "Сайт открылся"
+  },
+  "optionsSetupMarkFailed": {
+    "message": "Сайт не открылся"
+  },
+  "optionsSetupSiteUnchecked": {
+    "message": "Маршрутизация применена · Сайт не проверен"
+  },
+  "optionsSetupProxyPrivacyTitle": {
+    "message": "Какие данные получает прокси"
+  },
+  "optionsSetupProxyPrivacy": {
+    "message": "При запросе через прокси он видит адрес назначения и доступную его протоколу часть трафика. При обычном HTTPS-туннелировании TLS защищает содержимое страницы. Прокси также может получить учётные данные, которые вы настроили для него."
+  },
+  "optionsSetupSkip": {
+    "message": "Настроить позже"
+  },
+  "optionsSetupResume": {
+    "message": "Продолжить настройку"
+  },
+  "optionsSetupBack": {
+    "message": "Изменить источник"
+  },
+  "optionsSetupFinish": {
+    "message": "Вернуться к обзору"
+  },
   "optionsSetupTitle": {
     "message": "Настройте маршрутизацию"
+  },
+  "optionsSetupAntizapretUnavailable": {
+    "message": "Не удалось загрузить Antizapret. PAC может быть доступен только с российского IP. Проверьте подключение или VPN и повторите попытку либо выберите другой источник."
+  },
+  "optionsAntizapretNativeSetup": {
+    "message": "Настроить Antizapret отдельно в браузере"
+  },
+  "optionsSetupSourceUnavailable": {
+    "message": "Не удалось загрузить правила источника. Проверьте подключение, повторите попытку или выберите другой источник."
   },
   "optionsSetupIntro": {
     "message": "Для начала достаточно трёх коротких шагов. Маршрутизация браузера изменится только после применения."
@@ -1337,7 +1460,40 @@
     "message": "Выберите источник правил"
   },
   "optionsSetupSourceHelp": {
-    "message": "Выберите, как маршрутизировать сайты в режиме Auto."
+    "message": "Выберите источник, который подходит для вашего подключения."
+  },
+  "optionsSetupSourceSettings": {
+    "message": "Все настройки источников"
+  },
+  "optionsSetupSourceAntizapret": {
+    "message": "Свой прокси не нужен, если сервис доступен из вашей сети."
+  },
+  "optionsSetupSourceAnticensority": {
+    "message": "Для маршрутов через прокси нужна совместимая локальная служба, например Tor."
+  },
+  "optionsSetupSourceAntifilter": {
+    "message": "Предоставляет список сайтов. Подключение к прокси настраиваете вы."
+  },
+  "optionsSetupSourceManual": {
+    "message": "Задавайте маршрут для каждого сайта. Для режима «Напрямую» прокси не нужен."
+  },
+  "optionsSetupChooseAntizapret": {
+    "message": "Выбрать Antizapret"
+  },
+  "optionsSetupSourceProxyOn": {
+    "message": "Прокси источника включены"
+  },
+  "optionsSetupAntizapretProxyHelp": {
+    "message": "Antizapret предоставляет прокси для сайтов из своей базы. Для начала свой прокси добавлять не нужно."
+  },
+  "optionsSetupAntizapretProxyOffHelp": {
+    "message": "Чтобы пользоваться прокси Antizapret, включите прокси источника в разделе «Прокси-подключения» и сохраните изменения. Если оставите их выключенными, настройте своё подключение и правила для него."
+  },
+  "optionsSetupAnticensorityProxyHelp": {
+    "message": "Маршруты Anticensority обычно используют локальную службу, например Tor. Запустите её или настройте своё подключение и правила для него."
+  },
+  "optionsSetupVerifyHelp": {
+    "message": "Вернитесь на вкладку нужного сайта и обновите её. Откройте панель расширения и проверьте режим. Чтобы его изменить, выберите режим и нажмите «Применить»."
   },
   "optionsSetupSourceNotSelected": {
     "message": "Не выбрано"
@@ -1382,7 +1538,7 @@
     "message": "Настроить прокси-подключения"
   },
   "optionsSetupApplyTitle": {
-    "message": "Примените маршрутизацию"
+    "message": "Примените и проверьте"
   },
   "optionsSetupApplyHelp": {
     "message": "Сохранённые настройки влияют на браузер только после применения."

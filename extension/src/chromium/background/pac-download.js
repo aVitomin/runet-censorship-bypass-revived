@@ -154,13 +154,18 @@
 
   }
 
-  async function fetchWithDeadline(url, cache) {
+  async function fetchWithDeadline(url, cache, exactAddress) {
 
     const deadline = createDownloadDeadline();
     const options = {
       headers: createHeaders(cache),
       cache: 'no-cache',
     };
+    if (exactAddress) {
+      Object.assign(options, {
+        redirect: 'error', credentials: 'omit', referrerPolicy: 'no-referrer',
+      });
+    }
     if (deadline.signal) {
       options.signal = deadline.signal;
     }
@@ -378,6 +383,8 @@
     const providerKey = provider.key;
     const ifCustom = isCustomProvider(provider);
     const ifTrustedData = isTrustedBuiltInDataUrl(provider, url);
+    const exactAddress = providerKey === 'Антизапрет' &&
+      url === 'https://p.thenewone.lol:8443/proxy.pac';
     const failureUrl = ifCustom || ifTrustedData ? null : url;
     const reusableCache = hasReusableRawArtifact(providerKey, url, cache) ?
       cache :
@@ -392,15 +399,18 @@
     let accepted = null;
     let deadline = null;
     try {
-      const download = await fetchWithDeadline(url, reusableCache);
+      const download = await fetchWithDeadline(url, reusableCache, exactAddress);
       const response = download.response;
       deadline = download.deadline;
 
       if (!ifTrustedData) {
-        const responseUrlError = validateDownloadUrl(
-            response && response.url,
-            true,
-        );
+        const responseUrlError = exactAddress && response &&
+          (response.url !== url || response.redirected) ?
+          createError('PAC_RESPONSE_URL_REJECTED', 'PAC response URL is not allowed.') :
+          validateDownloadUrl(
+              response && response.url,
+              true,
+          );
         if (responseUrlError) {
           cancelResponseBody(response, deadline);
           return createFailure(providerKey, null, responseUrlError);
@@ -566,6 +576,8 @@
   exports.mv3PacDownload = Object.freeze({
     MAX_PAC_BYTES,
     downloadPac,
+    // A user-initiated check reports the primary address and never updates the shared cache.
+    checkPac: (provider) => downloadUrl(provider, provider.urls[0], null),
   });
 
 })(self);

@@ -72,11 +72,46 @@
     return pac;
   }
 
-  async function download() {
+  function createLocalAntizapretPac(rawData, proxyCandidates) {
+    const dataset = JSON.parse(rawData);
+    if (!dataset || !/^[a-f0-9]{64}$/.test(dataset.sourceSha256) ||
+        !Array.isArray(dataset.addresses) || !Array.isArray(dataset.subnets) ||
+        !dataset.addresses.every((value) =>
+          Number.isInteger(value) && value >= 0 && value <= 0xffffffff) ||
+        dataset.subnets.length > 4096 || !dataset.subnets.every((pair) =>
+      Array.isArray(pair) && pair.length === 2 && pair.every((value) =>
+        Number.isInteger(value) && value >= 0 && value <= 0xffffffff))) {
+      fail('ANTIZAPRET_INVALID_PAC');
+    }
+    const route = validateCandidates(proxyCandidates);
+    // Public hostnames keep the configured proxy even when the provider data
+    // has no match. A DNS observation cannot authorize the actual connection.
+    return [
+      '// Generated from imported Antizapret data; provider code is not included.',
+      `var azLocalAddresses = new Set(${JSON.stringify(dataset.addresses)});`,
+      `var azLocalSubnets = ${JSON.stringify(dataset.subnets)};`,
+      'function FindProxyForURL(url, host) {',
+      '  if (/^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$/.test(host)) {',
+      '    var bytes = host.split(".").map(Number);',
+      '    if (bytes.every(function(byte) { return byte <= 255; })) {',
+      '      var ip = bytes.reduce(function(value, byte) { return value * 256 + byte; }, 0);',
+      '      if (!azLocalAddresses.has(ip) && !azLocalSubnets.some(function(pair) {',
+      '        return (ip & pair[1]) === (pair[0] & pair[1]);',
+      '      })) return "DIRECT";',
+      '    }',
+      '  }',
+      `  return ${JSON.stringify(route)};`,
+      '}',
+    ].join('\n');
+  }
+
+  async function download(checkOnly = false) {
     const store = rucbDomainCandidateStore.createStore();
     try {
-      const result = await rucbAntifilterSource.createUpdater({store})
-          .fetchAndStage({mode: 'QUARANTINE_INVALID_V1'});
+      const updater = rucbAntifilterSource.createUpdater({store});
+      const options = {mode: 'QUARANTINE_INVALID_V1'};
+      if (checkOnly) return await updater.check(options);
+      const result = await updater.fetchAndStage(options);
       if (!result.ok) throw Object.assign(new Error(result.code), {code: result.code});
       const candidate = await store.loadCandidate();
       if (!candidate || candidate.candidate.envelope.artifactSha256 !== result.artifactSha256) {
@@ -97,6 +132,8 @@
     }
   }
 
-  exports.mv3DomainProviderPac = Object.freeze({createProviderPac, download});
+  exports.mv3DomainProviderPac = Object.freeze({
+    createProviderPac, createLocalAntizapretPac, download,
+  });
 
 })(self);

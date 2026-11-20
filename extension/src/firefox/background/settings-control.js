@@ -95,7 +95,9 @@
         SETTINGS_CREDENTIAL_STALE: 'SETTINGS_CREDENTIAL_STALE',
         SETTINGS_DATASET_BINDING_FAILED: 'SETTINGS_DATASET_BINDING_FAILED',
         ANTIFILTER_PREPARATION_REQUIRED: 'ANTIFILTER_PREPARATION_REQUIRED',
+        ANTIZAPRET_PREPARATION_REQUIRED: 'ANTIZAPRET_PREPARATION_REQUIRED',
         ANTIFILTER_PROXY_REQUIRED: 'ANTIFILTER_PROXY_REQUIRED',
+        ANTIZAPRET_PROXY_REQUIRED: 'ANTIZAPRET_PROXY_REQUIRED',
         SETTINGS_MALFORMED: 'SETTINGS_MALFORMED',
         SETTINGS_MUTATION_REQUIRES_OFF: 'SETTINGS_MUTATION_REQUIRES_OFF',
         SETTINGS_REVISION_CONFLICT: 'SETTINGS_REVISION_CONFLICT',
@@ -324,7 +326,7 @@
           value = Object.assign({source: 'anticensority'}, value);
         }
         if (!hasExactKeys(value, SETTINGS_KEYS) ||
-            !['anticensority', 'manual', 'antifilter'].includes(value.source) ||
+            !['anticensority', 'manual', 'antifilter', 'antizapret-local'].includes(value.source) ||
             !Array.isArray(value.ownProxies) ||
             value.ownProxies.length > MAX_PUBLIC_PROXIES) {
           throw settingsError(ERRORS.SETTINGS_MALFORMED);
@@ -486,12 +488,14 @@
         const sanitizedSettings = Object.assign({}, settings, {
           ownProxies: sanitizedOwn,
         });
-        if (settings.source === 'antifilter') {
+        if (['antifilter', 'antizapret-local'].includes(settings.source)) {
           base.providerCandidates = ['own', 'localTor', 'torBrowser', 'warp']
               .flatMap((key) => configured[key]);
-          if (!settings.flags.useProxyRulesForAntifilter || !settings.flags.useProviderProxies ||
+          if ((settings.source === 'antifilter' && !settings.flags.useProxyRulesForAntifilter) ||
+              !settings.flags.useProviderProxies ||
               !base.providerCandidates.length || base.providerCandidates.length > 32) {
-            throw settingsError(ERRORS.ANTIFILTER_PROXY_REQUIRED);
+            throw settingsError(settings.source === 'antifilter' ? ERRORS.ANTIFILTER_PROXY_REQUIRED :
+              ERRORS.ANTIZAPRET_PROXY_REQUIRED);
           }
           base.providerFallback = 'FAIL_CLOSED';
         }
@@ -690,7 +694,7 @@
             throw settingsError(ERRORS.SETTINGS_STATE_UNAVAILABLE);
           }
           const config = verified.config;
-          if (![ProductionProvider.PROVIDER_KEY, 'manual', 'antifilter'].includes(config.providerKey)) {
+          if (![ProductionProvider.PROVIDER_KEY, 'manual', 'antifilter', 'antizapret-local'].includes(config.providerKey)) {
             throw settingsError(ERRORS.SETTINGS_DATASET_BINDING_FAILED);
           }
           // Saved configuration is editable even when its provider data is
@@ -787,7 +791,7 @@
 
         }
 
-        async function replaceUnchecked(expectedRevision, proposed) {
+        async function replaceUnchecked(expectedRevision, proposed, antizapretIdentity = null) {
 
           const activation = activationSnapshot();
           if (!activation || !['OFF', 'READY'].includes(activation.runtimeState)) {
@@ -819,6 +823,18 @@
           let datasetIdentity = current.config.datasetIdentity;
           if (settings.source === 'manual') {
             datasetIdentity = DatasetRuntime.MANUAL_IDENTITY;
+          } else if (settings.source === 'antizapret-local' && antizapretIdentity) {
+            if (antizapretIdentity.providerKey !== settings.source ||
+                !(await datasetIdentityAvailable(antizapretIdentity))) {
+              throw settingsError(ERRORS.ANTIZAPRET_PREPARATION_REQUIRED);
+            }
+            datasetIdentity = antizapretIdentity;
+          } else if (settings.source === 'antizapret-local' && current.config.providerKey !== settings.source) {
+            const latest = await options.currentProviderDatasetIdentity(settings.source);
+            if (latest) datasetIdentity = latest;
+            else if (current.config.providerKey !== settings.source) {
+              throw settingsError(ERRORS.ANTIZAPRET_PREPARATION_REQUIRED);
+            }
           } else if (current.config.providerKey !== settings.source) {
             datasetIdentity = typeof options.currentProviderDatasetIdentity === 'function' ?
               await options.currentProviderDatasetIdentity(settings.source) :
@@ -890,8 +906,8 @@
           getEffective: () => enqueue(async () => getUnchecked(
               await ProductConfig.readEffectiveRecords(storageArea),
           )),
-          replace: (expectedRevision, settings) =>
-            enqueue(() => replaceUnchecked(expectedRevision, settings)),
+          replace: (expectedRevision, settings, antizapretIdentity) =>
+            enqueue(() => replaceUnchecked(expectedRevision, settings, antizapretIdentity)),
         });
 
       }

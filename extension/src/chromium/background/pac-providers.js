@@ -21,6 +21,7 @@
       label: 'Antizapret',
       description: 'Main PAC script from the Antizapret project.',
       urls: Object.freeze([
+        'https://p.thenewone.lol:8443/proxy.pac',
         'https://e.cen.rodeo:8443/proxy.pac',
         'https://antizapret.prostovpn.org:8443/proxy.pac',
         'https://antizapret.prostovpn.org:18443/proxy.pac',
@@ -37,6 +38,13 @@
         'https://raw.githubusercontent.com/anticensority/generated-pac-scripts/master/anticensority.pac',
       ]),
       order: 1,
+    },
+    {
+      key: 'antizapret-local',
+      label: 'Antizapret (local file)',
+      description: 'Imported Antizapret data routed using user-managed proxies.',
+      urls: Object.freeze([]),
+      order: 3,
     },
     {
       key: 'onlyOwnSites',

@@ -83,7 +83,8 @@
 
   function isUpdateDue(periodicUpdate, providerKey, now = Date.now()) {
 
-    if (!periodicUpdate || periodicUpdate.enabled !== true || !providerKey) {
+    if (!periodicUpdate || periodicUpdate.enabled !== true || !providerKey ||
+        providerKey === 'antizapret-local') {
       return false;
     }
     const dueAt = getDueAt(periodicUpdate, providerKey);

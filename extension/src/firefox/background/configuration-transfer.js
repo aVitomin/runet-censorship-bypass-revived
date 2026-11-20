@@ -13,7 +13,7 @@
 
   function supportSettings(settings) {
 
-    return {source: ['manual', 'anticensority', 'antifilter'].includes(settings.source) ? settings.source : 'unknown',
+    return {source: ['manual', 'anticensority', 'antifilter', 'antizapret-local'].includes(settings.source) ? settings.source : 'unknown',
       providerProxies: settings.flags.useProviderProxies,
       useProxyRulesForAntifilter: settings.flags.useProxyRulesForAntifilter === true,
       proxyAuthentication: true,
@@ -89,7 +89,7 @@
       ownProxiesOnlyForOwnSites: config.routing.ownProxiesOnlyForOwnSites,
       replaceDirectWithProxy: config.routing.replaceDirectWithProxy,
       noDirect: config.routing.noDirect};
-    if (config.source.kind === 'builtin' && ['anticensority', 'manual', 'antifilter'].includes(config.source.id)) {
+    if (config.source.kind === 'builtin' && ['anticensority', 'manual', 'antifilter', 'antizapret-local'].includes(config.source.id)) {
       settings.source = config.source.id;
     } else {
       unsupported.push('source');

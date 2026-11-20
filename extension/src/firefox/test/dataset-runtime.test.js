@@ -4,6 +4,7 @@ const Assert = require('node:assert');
 const Routing = require('../../shared/routing-contract');
 const Adapter = require('../background/routing-adapter');
 const Runtime = require('../background/dataset-runtime');
+const Antizapret = require('../background/antizapret-local');
 const Store = require('../background/dataset-store');
 const {compactArtifact} = require('../../tooling/test-support/domain-dataset');
 const {
@@ -14,6 +15,73 @@ const {
   payload,
   sha256,
 } = require('./dataset-test-helpers');
+
+describe('Firefox local Antizapret routing', function() {
+  const sample = [
+    '// ProstoVPN.AntiZapret PAC-host File',
+    'domains = {"test":{3:3}};',
+    'var d_ipaddr = "1".split(" ");',
+    'var special = [["192.0.2.0", "255.255.255.0"]];',
+    'var domains_lzp = "bad";',
+    'var mask_lzp = "!==";',
+    'var patterns = {\'!A\': \'foo\'};',
+    'var patterns = {\'AA\': \'!\'};',
+    '  fbtw = ["known.test"];',
+    'if (/\\.(co)\\.[^.]+$/.test(host)) {}',
+    'throw new Error("This PAC is input data and must never execute");',
+  ].join('\n');
+
+  it('extracts only bounded data from a supported PAC and rejects broken layouts', function() {
+    const rules = Antizapret.parsePac(sample);
+    const lookup = Antizapret.createLookup(rules);
+    Assert.strictEqual(lookup.classifyHost('bad.test'), Antizapret.RESULTS.PROXY);
+    Assert.strictEqual(lookup.classifyHost('known.test'), Antizapret.RESULTS.PROXY);
+    Assert.strictEqual(lookup.classifyHost('0.0.0.1'), Antizapret.RESULTS.PROXY);
+    Assert.strictEqual(lookup.classifyHost('192.0.2.1'), Antizapret.RESULTS.PROXY);
+    Assert.throws(() => Antizapret.parsePac(sample.replace('{3:3}', '{3:6}')));
+    Assert.throws(() => Antizapret.parsePac(sample.replace('"!==";', '"AQ==";')));
+    Assert.throws(() => Antizapret.parsePac('<html>Forbidden</html>'));
+  });
+
+  it('downloads only the fixed HTTPS response without credentials or redirects', async function() {
+    const response = (patch = {}) => Object.assign({
+      url: Antizapret.SOURCE_URL, status: 200, ok: true, redirected: false,
+      headers: new Headers(), body: new Response(sample).body,
+    }, patch);
+    const text = await Antizapret.download(async (url, options) => {
+      Assert.strictEqual(url, Antizapret.SOURCE_URL);
+      Assert.strictEqual(options.credentials, 'omit');
+      Assert.strictEqual(options.redirect, 'error');
+      return response();
+    });
+    Assert.strictEqual(text, sample);
+    await Assert.rejects(Antizapret.download(async () => response({status: 403, ok: false})),
+        {code: 'ANTIZAPRET_HTTP_403'});
+    await Assert.rejects(Antizapret.download(async () => response({redirected: true})));
+    await Assert.rejects(Antizapret.download(async () => response({
+      headers: new Headers({'content-length': String(Antizapret.MAX_BYTES + 1)}),
+    })));
+  });
+
+  it('does not infer Direct for a domain from a DNS address answer', async function() {
+    const bytes = Buffer.from(JSON.stringify({
+      suffixLabels: [], short: [], ipv4: [0xc0000201], patterns: {}, domains: {},
+    }));
+    const lookup = await Antizapret.load(
+        async () => bytes, async () => Antizapret.IDENTITY.artifactSha256,
+    );
+
+    Assert.strictEqual(lookup.classifyHost('face.be'), null);
+    Assert.strictEqual(lookup.classifyHost('192.0.2.1'), Antizapret.RESULTS.PROXY);
+    Assert.strictEqual(lookup.classifyHost('192.0.2.2'), Antizapret.RESULTS.DIRECT);
+    Assert.strictEqual(lookup.classifyHost('localhost'), Antizapret.RESULTS.DIRECT);
+    Assert.strictEqual(lookup.classifyHost('printer.local'), Antizapret.RESULTS.BLOCK);
+    Assert.strictEqual(lookup.classifyAddresses(['192.0.2.2']), Antizapret.RESULTS.PROXY);
+    Assert.strictEqual(lookup.classifyAddresses(['192.0.2.2', '2001:db8::1']), Antizapret.RESULTS.PROXY);
+    Assert.strictEqual(lookup.classifyAddresses(['192.0.2.2', 'bad-address']), Antizapret.RESULTS.BLOCK);
+    Assert.strictEqual(lookup.classifyAddresses([]), Antizapret.RESULTS.BLOCK);
+  });
+});
 
 function candidate(id, port = 8080) {
 

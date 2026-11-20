@@ -31,6 +31,8 @@
     'datasetIdentity',
     'routingDescriptor',
   ]);
+  const BLOCKED_ON_KEYS = Object.freeze([...ON_STATE_KEYS, 'controlLossBlocked']);
+  const TRANSITION_ON_KEYS = Object.freeze([...ON_STATE_KEYS, 'floorTransition']);
   const FLOOR_KEYS = Object.freeze([
     'proxyType',
     'http',
@@ -75,7 +77,7 @@
         value.proxyType !== 'manual' ||
         value.http !== '' || value.httpProxyAll !== false ||
         value.ssl !== '' || value.socksVersion !== 5 ||
-        value.proxyDNS !== true || value.passthrough !== '' ||
+        typeof value.proxyDNS !== 'boolean' || value.passthrough !== '' ||
         value.autoConfigUrl !== '' || typeof value.socks !== 'string') {
       return null;
     }
@@ -92,7 +94,7 @@
       ssl: '',
       socks: `127.0.0.1:${port}`,
       socksVersion: 5,
-      proxyDNS: true,
+      proxyDNS: value.proxyDNS,
       passthrough: '',
       autoConfigUrl: '',
     };
@@ -168,7 +170,7 @@
         providerKey !== datasetIdentity.providerKey) {
       throw new TypeError('INVALID_FIREFOX_ON_STATE');
     }
-    return {
+    const state = {
       schemaVersion: SCHEMA_VERSION,
       intent: ON,
       floorIdentity,
@@ -176,6 +178,13 @@
       datasetIdentity,
       routingDescriptor,
     };
+    if (value.controlLossBlocked === true && providerKey === 'antizapret-local') {
+      state.controlLossBlocked = true;
+    }
+    if (value.floorTransition === true && !state.controlLossBlocked) {
+      state.floorTransition = true;
+    }
+    return state;
 
   }
 
@@ -198,7 +207,10 @@
 
   function isCanonicalOnState(value) {
 
-    if (!hasExactKeys(value, ON_STATE_KEYS) ||
+    const blocked = value && value.controlLossBlocked === true && value.providerKey === 'antizapret-local';
+    const keys = blocked ? BLOCKED_ON_KEYS :
+      value && value.floorTransition === true ? TRANSITION_ON_KEYS : ON_STATE_KEYS;
+    if (!hasExactKeys(value, keys) ||
         value.schemaVersion !== SCHEMA_VERSION || value.intent !== ON) {
       return false;
     }

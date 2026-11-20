@@ -6,7 +6,7 @@
   else root.rucbRoutingDataStatus = api;
 })(globalThis, function() {
 
-  const SOURCES = ['none', 'manual', 'antifilter', 'anticensority', 'antizapret', 'custom'];
+  const SOURCES = ['none', 'manual', 'antifilter', 'anticensority', 'antizapret', 'antizapret-local', 'custom'];
   const RESULTS = ['UNCHANGED', 'APPLIED', 'PREPARED', 'DEFERRED', 'FAILED', 'UNAVAILABLE'];
   const KEYS = ['source', 'sourceUpdatedAt', 'lastCheckedAt', 'canCheck', 'updating', 'active'];
   const OLD_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
@@ -51,7 +51,8 @@
       append('p', t('routingDataUnavailable'), 'routing-data-note');
       return;
     }
-    append('p', t(`routingDataSource_${status.source}`), 'routing-data-source');
+    append('p', t(status.source === 'antizapret-local' ?
+      'optionsLocalAntizapretTitle' : `routingDataSource_${status.source}`), 'routing-data-source');
     const locale = doc.documentElement && doc.documentElement.lang || undefined;
     const date = (value) => value ? new Date(value).toLocaleString(locale) :
       t('routingDataUnknown');
@@ -76,8 +77,11 @@
     button.disabled = !status.canCheck || pending || status.updating;
     button.dataset.focusKey = 'routing-data-check';
     button.onclick = onCheck;
-    if (!status.canCheck) append('p', t(['none', 'manual'].includes(status.source) ?
-      'routingDataNoSource' : 'routingDataUnavailable'), 'routing-data-note');
+    if (!status.canCheck) {
+      const help = status.source === 'antizapret-local' ? 'optionsLocalAntizapretUpdate' :
+        ['none', 'manual'].includes(status.source) ? 'routingDataNoSource' : 'routingDataUnavailable';
+      append('p', t(help), 'routing-data-note');
+    }
     if (RESULTS.includes(result)) {
       const message = append('p', t(`routingDataResult_${result}`),
           result === 'FAILED' ? 'routing-data-error' : 'routing-data-note');

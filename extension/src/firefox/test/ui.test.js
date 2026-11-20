@@ -76,6 +76,73 @@ function settingsResult(revision = 0, patch = null) {
 
 }
 
+describe('Firefox first-run Options', function() {
+  const configuration = {savedRevision: 0, effectiveId: null, active: false, pending: false,
+    applying: false, blocked: false, reason: null, pendingCategories: []};
+  const state = {capabilities: capabilities(), configuration, editable: true, revision: 0,
+    settings: settingsResult().settings};
+  const review = {source: 'anticensority', sourceEnabled: true, localServiceReady: true};
+  const withState = (changes) => Object.assign({}, state, changes);
+  const withConfiguration = (changes) => Object.assign({}, configuration, changes);
+
+  it('offers the first-run flow only with a pristine Saved configuration', function() {
+    Assert.equal(Options.showFirstRun(state), true);
+    Assert.equal(Options.showFirstRun(withState({revision: 1})), false);
+    Assert.equal(Options.showFirstRun(withState({
+      configuration: withConfiguration({effectiveId: 'existing'})})), false);
+    Assert.equal(Options.showFirstRun(withState({
+      configuration: withConfiguration({active: true})})), false);
+  });
+
+  it('exposes one recovery action before Save or Apply and keeps manual independent of the list', function() {
+    for (const privateWindowAccess of ['UNKNOWN', 'DENIED']) {
+      Assert.equal(Options.firstRunReview(withState({
+        capabilities: capabilities({privateWindowAccess})}), review), 'permission');
+    }
+    Assert.equal(Options.firstRunReview(withState({pending: true}), review), 'waiting');
+    Assert.equal(Options.firstRunReview(withState({dirty: true, stale: true}), review), 'conflict');
+    Assert.equal(Options.firstRunReview(state,
+        Object.assign({}, review, {localServiceReady: false})), 'localService');
+    Assert.equal(Options.firstRunReview(withState({dirty: true}), review), 'save');
+    const unavailable = withState({capabilities: capabilities({providerDatasetAvailable: false})});
+    Assert.equal(Options.firstRunReview(unavailable, review), 'repairSource');
+    const manual = Object.assign({}, unavailable, {
+      settings: Object.assign({}, state.settings, {source: 'manual'}),
+    });
+    Assert.equal(Options.firstRunReview(manual, {source: 'manual'}), 'apply');
+    Assert.equal(Options.firstRunReview(Object.assign({}, manual, {
+      configuration: withConfiguration({active: true, pending: true}),
+    }), {source: 'manual'}), 'apply');
+    Assert.equal(Options.firstRunReview(Object.assign({}, manual, {
+      configuration: withConfiguration({active: true}),
+    }), {source: 'manual'}), 'verify');
+  });
+
+  it('requires the Antifilter list, proxy, consent and an explicit Save in order', function() {
+    const draft = withState({dirty: true});
+    const antifilter = {source: 'antifilter'};
+    Assert.equal(Options.firstRunReview(draft, antifilter), 'prepare');
+    antifilter.antifilterPrepared = true;
+    Assert.equal(Options.firstRunReview(draft, antifilter), 'connections');
+    antifilter.hasProxyConnection = true;
+    Assert.equal(Options.firstRunReview(draft, antifilter), 'consent');
+    antifilter.antifilterConsent = true;
+    Assert.equal(Options.firstRunReview(draft, antifilter), 'save');
+  });
+
+  it('offers Antizapret preparation before connection setup and Save', function() {
+    const draft = withState({dirty: true});
+    const setup = {source: 'antizapret-local'};
+    Assert.equal(Options.firstRunReview(draft, setup), 'prepareAntizapret');
+    setup.antizapretPrepared = true;
+    Assert.equal(Options.firstRunReview(draft, setup), 'connections');
+    setup.hasProxyConnection = true;
+    Assert.equal(Options.firstRunReview(draft, setup), 'enableSource');
+    setup.sourceEnabled = true;
+    Assert.equal(Options.firstRunReview(draft, setup), 'save');
+  });
+});
+
 function siteState(overrides = {}) {
 
   return Object.assign({
@@ -1165,7 +1232,17 @@ describe('Firefox production UI controllers', function() {
       mode: 'AUTO', scope: 'DOMAIN',
     }), false);
     Assert.strictEqual(Popup.isDraftDirty(site, {
+      mode: 'AUTO', scope: 'HOST',
+    }), false);
+    Assert.strictEqual(Popup.isDraftDirty(site, {
       mode: 'DIRECT', scope: 'HOST',
+    }), true);
+    const direct = Object.assign({}, site, {route: {mode: 'DIRECT', scope: 'HOST'}});
+    Assert.strictEqual(Popup.isDraftDirty(direct, {
+      mode: 'DIRECT', scope: 'DOMAIN',
+    }), true);
+    Assert.strictEqual(Popup.isDraftDirty(direct, {
+      mode: 'AUTO', scope: 'HOST',
     }), true);
 
   });

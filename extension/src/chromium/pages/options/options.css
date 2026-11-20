@@ -439,12 +439,41 @@ ul:last-child {
 
 .setup-card {
   display: grid;
-  gap: var(--ui-space-2);
+  gap: var(--ui-space-1-5);
   border-left: 4px solid var(--ui-color-accent);
 }
 
-.setup-header,
-.setup-step-header,
+.setup-progress,
+.setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-1);
+}
+
+.setup-progress {
+  list-style: none;
+  margin: 0 0 var(--ui-space-1);
+  padding: 0;
+}
+
+.setup-progress [aria-current="step"] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.setup-card .source-choice:has(:checked) {
+  border-color: var(--ui-color-accent);
+}
+
+.setup-card .source-choice-group {
+  margin: 0;
+}
+
+.setup-card .source-choice {
+  padding: var(--ui-space-1);
+}
+
 .source-choice-header {
   display: flex;
   flex-wrap: wrap;
@@ -453,70 +482,8 @@ ul:last-child {
   justify-content: space-between;
 }
 
-.setup-header > :first-child,
-.setup-step-header > :first-child,
 .source-choice-header > :first-child {
   min-width: 0;
-}
-
-.setup-steps {
-  display: grid;
-  gap: var(--ui-space-1);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.setup-step {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--ui-space-1-5);
-  padding: var(--ui-space-1-5);
-  border: 1px solid var(--ui-color-divider);
-  border-radius: var(--ui-radius-medium);
-  background: var(--ui-color-surface);
-}
-
-.setup-step-marker {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--ui-color-border);
-  border-radius: var(--ui-radius-pill);
-  place-items: center;
-  color: var(--ui-color-text-secondary);
-  font-weight: var(--ui-font-weight-bold);
-}
-
-.setup-step.complete .setup-step-marker {
-  border-color: var(--ui-color-success);
-  color: var(--ui-color-success);
-  background: var(--ui-color-success-surface);
-}
-
-.setup-step.current .setup-step-marker {
-  border-color: var(--ui-color-accent);
-  color: var(--ui-color-accent);
-  background: var(--ui-color-accent-surface);
-}
-
-.setup-step-body {
-  min-width: 0;
-}
-
-.setup-step-header h4 {
-  margin: 0;
-  font-size: var(--ui-font-size-body);
-}
-
-.setup-step-status {
-  color: var(--ui-color-text-muted);
-  font-size: var(--ui-font-size-caption);
-  font-weight: var(--ui-font-weight-medium);
-}
-
-.setup-step-status.complete {
-  color: var(--ui-color-success);
 }
 
 .setup-step-action {
@@ -980,7 +947,6 @@ details.disclosure[open] > summary {
 
   .options-nav a[aria-current="page"],
   .setup-card,
-  .setup-step,
   .source-choice,
   .status-banner,
   .status-card,

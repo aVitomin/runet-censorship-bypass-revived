@@ -146,7 +146,7 @@
     if (!store || typeof store.begin !== 'function' || !Number.isSafeInteger(timeoutMs) ||
         timeoutMs < 1 || timeoutMs > LIMITS.timeoutMs) throw error('ANTIFILTER_UPDATER_INVALID');
 
-    async function fetchAndStage({mode = 'STRICT', signal} = {}) {
+    async function fetchAndStage({mode = 'STRICT', signal} = {}, checkOnly = false) {
       if (!['STRICT', 'QUARANTINE_INVALID_V1'].includes(mode)) {
         return {ok: false, code: 'ANTIFILTER_POLICY_INVALID'};
       }
@@ -176,15 +176,23 @@
         check();
         session = await store.begin();
         check();
-        response = await wait(fetchImpl(SOURCE_URL, {method: 'GET', redirect: 'manual',
+        const fetchSource = () => wait(fetchImpl(SOURCE_URL, {method: 'GET', redirect: 'manual',
           credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer',
           signal: controller.signal}));
+        try {
+          response = await fetchSource();
+        } catch (failure) {
+          if (checkOnly && !reason) throw error('ANTIFILTER_FETCH_FAILED');
+          throw failure;
+        }
         check();
         // There is only one approved address. No redirect is needed or followed,
         // including opaque redirects, even if Location points back to the source.
         safeUrl(response.url);
         if (response.redirected || response.type === 'opaqueredirect' || response.status !== 200) {
-          throw error('ANTIFILTER_HTTP_REJECTED');
+          const failure = error('ANTIFILTER_HTTP_REJECTED');
+          if (checkOnly) failure.httpStatus = response.status;
+          throw failure;
         }
         const header = name => response.headers && response.headers.get(name);
         const length = header('content-length');
@@ -248,13 +256,16 @@
         const candidate = {envelope, artifactBytes, receipt};
         checkContinuity(candidate, session.floor);
         check();
+        if (checkOnly) return {ok: true};
         const result = await session.stage(candidate, controller.signal);
         return {ok: true, status: 'PREPARED_INACTIVE', activationEligible: false,
           receipt, artifactSha256, unchanged: result.unchanged};
       } catch (failure) {
         const code = reason || (failure && /^ANTIFILTER_[A-Z_]+$/.test(failure.code) && failure.code) ||
           'ANTIFILTER_PREPARATION_FAILED';
-        return {ok: false, status: 'REJECTED', code};
+        const rejection = {ok: false, status: 'REJECTED', code};
+        if (checkOnly && Number.isInteger(failure && failure.httpStatus)) rejection.httpStatus = failure.httpStatus;
+        return rejection;
       } finally {
         clearTimeout(timer);
         if (signal) signal.removeEventListener('abort', externalAbort);
@@ -273,7 +284,8 @@
         }
       }
     }
-    return Object.freeze({fetchAndStage});
+    return Object.freeze({fetchAndStage: (options) => fetchAndStage(options),
+      check: (options) => fetchAndStage(options, true)});
   }
   return Object.freeze({SOURCE_ID, SOURCE_URL, LIMITS, validateReceipt, validateBinding,
     checkContinuity, sha256Bytes, verifyCandidate, serializeCandidate, deserializeCandidate, createUpdater});

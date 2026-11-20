@@ -669,6 +669,12 @@ describe('Chromium popup UI', () => {
         expect(findAll(harness.root, (node) =>
           node.dataset.area === 'global-status',
         )).to.have.length(1);
+        const sitePanel = findAll(harness.root, (node) =>
+          node.dataset.area === 'global-status',
+        )[0];
+        expect(sitePanel.textContent).to.include('audit.example');
+        expect(getRadios(sitePanel, 'site-mode')).to.have.length(3);
+        expect(findButton(sitePanel, 'Turn off extension proxy')).to.exist;
 
         const radios = getRadios(harness.root, 'site-mode');
         expect(radios).to.have.length(3);
@@ -938,9 +944,10 @@ describe('Chromium popup UI', () => {
         expect(openSetup).to.exist;
         expect(findButton(setup.root, 'Apply')).to.equal(null);
         expect(getRadios(setup.root, 'site-mode')).to.have.length(0);
-        expect(findAll(setup.root, (node) =>
+        const details = findAll(setup.root, (node) =>
           node.dataset.area === 'details',
-        )).to.have.length(0);
+        )[0];
+        expect(details.open).to.equal(false);
 
         await openSetup.onclick();
         await flushUi();

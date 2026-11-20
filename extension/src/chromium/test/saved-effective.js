@@ -1,6 +1,7 @@
 'use strict';
 
 const Assert = require('node:assert/strict');
+const Vm = require('node:vm');
 const {createRuntimeHarness, CHANGED_RAW_PAC} = require('./runtime-performance-harness');
 
 function proxy(password = 'synthetic-A') {
@@ -47,6 +48,60 @@ async function effective(h) {
 }
 
 describe('Chromium Saved and Effective generations', function() {
+  it('imports Antizapret as data and applies only the displayed Saved revision', async function() {
+    const h = await active();
+    const before = await effective(h);
+    const downloads = h.counts.pacDownloads;
+    const writes = h.counts.proxySettingsWrites;
+    const text = [
+      '// ProstoVPN.AntiZapret PAC-host File',
+      'domains = {"test":{3:3}};',
+      'var d_ipaddr = "1".split(" ");',
+      'var special = [["192.0.2.0", "255.255.255.0"]];',
+      'var domains_lzp = "bad";',
+      'var mask_lzp = "!==";',
+      'var patterns = {\'!A\': \'foo\'};',
+      'var patterns = {\'AA\': \'!\'};',
+      '  fbtw = ["known.test"];',
+      'if (/\\.(co)\\.[^.]+$/.test(host)) {}',
+      'throw new Error("synthetic input code");',
+    ].join('\n');
+    const imported = await h.callRpc('importLocalAntizapret', {
+      text, expectedRevision: h.getState().savedRevision,
+    });
+    const saved = h.getState();
+    Assert.equal(saved.currentPacProviderKey, 'antizapret-local');
+    Assert.ok(saved.localAntizapretCache.artifactRef);
+    Assert.equal((await effective(h)).id, before.id);
+    Assert.equal(h.counts.proxySettingsWrites, writes);
+    Assert.equal(h.counts.pacDownloads, downloads);
+    Assert.equal((await h.callRpc('checkRoutingSource', {providerKey: 'antizapret-local'})).code, 'manual');
+    const invalid = await h.callRpcRaw('importLocalAntizapret', {
+      text: '<html>Forbidden</html>', expectedRevision: imported.savedRevision,
+    });
+    Assert.equal(invalid.error.code, 'ANTIZAPRET_INVALID_PAC');
+    Assert.equal(h.getState().savedRevision, imported.savedRevision);
+    const applied = await h.callRpc('applySavedConfiguration', {
+      expectedRevision: imported.savedRevision, expectedEffectiveId: before.id,
+    });
+    Assert.equal(applied.ok, true);
+    const next = await effective(h);
+    Assert.equal(next.pacCache.artifactRef, saved.localAntizapretCache.artifactRef);
+    const cooked = h.getProxyDetails().value.pacScript.data;
+    Assert.doesNotMatch(cooked, /input code|known\.test|synthetic-A/);
+    const pac = Vm.createContext({});
+    Vm.runInContext(cooked, pac);
+    const route = pac.FindProxyForURL;
+    Assert.equal(route('https://ordinary.example/', 'ordinary.example'), 'HTTPS proxy.example:8443');
+    Assert.equal(route('https://192.0.2.10/', '192.0.2.10'), 'HTTPS proxy.example:8443');
+    Assert.equal(route('https://198.51.100.1/', '198.51.100.1'), 'DIRECT');
+    const popup = await h.callRpc('getPopupState', {tabUrl: ''});
+    Assert.equal(popup.routingData.source, 'antizapret-local');
+    Assert.equal(popup.routingData.canCheck, false);
+    start(h, 'imported-pac');
+    Assert.equal((await challenge(h, 'imported-pac')).authCredentials.password, 'synthetic-A');
+  });
+
   it('popup routing update uses Effective source and credentials without applying pending Saved', async function() {
     const h = await active();
     const before = await effective(h);
@@ -524,6 +579,47 @@ describe('Chromium Saved and Effective generations', function() {
     start(restored, 'restored');
     Assert.equal((await challenge(restored, 'restored')).authCredentials.password, 'synthetic-A');
     Assert.equal(restored.counts.proxySettingsClears, 0);
+
+  });
+
+  it('restores a retained v4 PAC without accepting it for an ordinary Apply', async function() {
+
+    const h = await active();
+    const before = await effective(h);
+    const live = h.getProxyDetails();
+    await save(h);
+    const storage = h.getLocalStorage();
+    const saved = storage[h.context.mv3State.STORAGE_KEY];
+    const journal = storage[h.context.mv3Effective.STORAGE_KEY];
+    const retained = journal.records.find((record) => record.id === before.id);
+    const v4 = await h.context.mv3PacCook.hashPacMods(retained.config.pacMods, 4);
+    Assert.notEqual(v4, retained.cookedPacCache.pacModsSha256);
+    Assert.equal(v4, await h.context.mv3PacCook.hashPacMods(saved.pacMods, 4));
+    const artifact = await h.context.mv3PacArtifacts.getCookedPacArtifact({
+      providerKey: retained.cookedPacCache.providerKey,
+      sha256: retained.cookedPacCache.cookedPacSha256,
+    });
+    const v4Artifact = Object.assign({}, artifact, {pacModsSha256: v4});
+    retained.cookedPacCache.pacModsSha256 = v4;
+    saved.cookedPacCache.pacModsSha256 = v4;
+    saved.pacCook.pacModsSha256 = v4;
+    const restored = await createRuntimeHarness({initialLocalStorage: storage,
+      pacMods: saved.pacMods, initialProxyDetails: {
+        levelOfControl: 'controllable_by_this_extension', value: {mode: 'system'},
+      }, onCookedArtifactRead(context) {
+        return context.mv3PacArtifacts.putCookedPacArtifact(v4Artifact);
+      }});
+    Assert.equal((await effective(restored)).id, before.id);
+    Assert.equal(restored.getProxyDetails().value.pacScript.data, live.value.pacScript.data);
+    Assert.equal((await restored.callRpc('getConfigurationStatus')).pending, true);
+    Assert.equal(restored.getState().savedRevision, saved.savedRevision);
+    start(restored, 'restored-v4');
+    Assert.equal((await challenge(restored, 'restored-v4')).authCredentials.password, 'synthetic-A');
+    const writes = restored.counts.proxySettingsWrites;
+    const ordinary = await restored.callRpc('applyCookedPac');
+    Assert.equal(ordinary.error.code, 'COOKED_PAC_STALE');
+    Assert.equal(restored.counts.proxySettingsWrites, writes);
+    Assert.equal((await effective(restored)).id, before.id);
 
   });
 

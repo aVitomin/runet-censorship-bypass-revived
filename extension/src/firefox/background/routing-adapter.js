@@ -28,6 +28,7 @@
   const ALLOW = Object.freeze({cancel: false});
   const CANCEL = Object.freeze({cancel: true});
   const DEFAULT_ROUTE = Object.freeze({type: 'direct'});
+  const BLOCKED_ROUTE = Object.freeze([Object.freeze({type: 'http', host: '127.0.0.1', port: 9}), null]);
   const DEGRADATION_CODES = Object.freeze({
     PROXY_DIRECT_FALLBACK_STRIPPED: 'PROXY_DIRECT_FALLBACK_STRIPPED',
   });
@@ -225,6 +226,8 @@
     const decideRoute = options.decideRoute || Routing.decideRoute;
     const routingInputForRequest = options.routingInputForRequest;
     const credentialResolverForRequest = options.credentialResolverForRequest;
+    const antizapretSession = options.antizapretSession || (() => null);
+    const strictRequests = new Map();
     let authorizations = options.authorizations || new Map();
     let requestAuthContexts = options.requestAuthContexts || new Map();
 
@@ -301,11 +304,38 @@
 
     }
 
+    async function onAntizapretProxyRequest(details, session) {
+      const requestId = details.requestId;
+      clearAuthorization(requestId);
+      if (!isRequestId(requestId) || (strictRequests.size >= MAX_AUTHORIZATIONS &&
+          !strictRequests.has(requestId))) return BLOCKED_ROUTE;
+      const attempt = {session, url: details.url, authorized: false};
+      strictRequests.set(requestId, attempt);
+      try {
+        const input = await session.datasetRuntime.routingInputForRequest(details);
+        const converted = convertDecisionDetails(decideRoute(input));
+        if (!converted || !await options.verifyAntizapretSession(session) ||
+            strictRequests.get(requestId) !== attempt ||
+            antizapretSession() !== session) return BLOCKED_ROUTE;
+        if (!authorize(requestId, converted.callbackBudget, converted.authCandidates,
+            session.resolveCredentials, requestOrigin(details))) return BLOCKED_ROUTE;
+        attempt.authorized = true;
+        return converted.proxyResult;
+      } catch (_error) {
+        return BLOCKED_ROUTE;
+      }
+    }
+
     function onProxyRequest(details) {
 
       const requestId = details && details.requestId;
       try {
         const runtimeState = currentRuntimeState();
+        const session = antizapretSession();
+        if (session && runtimeState === STATES.READY) {
+          return onAntizapretProxyRequest(details, session);
+        }
+        if (strictRequests.has(requestId)) return BLOCKED_ROUTE;
         if (runtimeState === STATES.OFF) {
           return undefined;
         }
@@ -361,7 +391,7 @@
       try {
         const runtimeState = currentRuntimeState();
         if (runtimeState === STATES.OFF) {
-          return ALLOW;
+          return strictRequests.has(details && details.requestId) ? CANCEL : ALLOW;
         }
         if (runtimeState !== STATES.READY) {
           return CANCEL;
@@ -369,6 +399,10 @@
         const requestId = details.requestId;
         const context = requestAuthContexts.get(requestId);
         const selectedRoute = routeForRequest(context, details);
+        const strict = strictRequests.get(requestId);
+        if ((strict && (!strict.authorized || strict.session !== antizapretSession() ||
+              strict.url !== details.url || !selectedRoute)) ||
+            (!strict && antizapretSession())) return CANCEL;
         if (context) context.selected = selectedRoute;
         const originAuth = context && context.originAuthentication;
         const origin = originAuth && requestOrigin(details);
@@ -512,7 +546,11 @@
 
     function onRequestTerminal(details) {
 
-      clearAuthorization(details && details.requestId);
+      const requestId = details && details.requestId;
+      const strict = strictRequests.get(requestId);
+      if (strict && strict.url !== details.url) return;
+      strictRequests.delete(requestId);
+      clearAuthorization(requestId);
 
     }
 

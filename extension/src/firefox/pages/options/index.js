@@ -46,6 +46,12 @@
     'SETTINGS_REVISION_CONFLICT',
     'STALE_REVISION',
   ]);
+  const SETUP_SOURCES = Object.freeze([
+    ['anticensority', 'optionsAnticensoritySource', 'quickStartAnticensority'],
+    ['antifilter', 'antifilterSourceLabel', 'setupAntifilterHelp'],
+    ['manual', 'optionsManualSource', 'setupManualHelp'],
+    ['antizapret-local', 'optionsAntizapretLocalSource', 'optionsAntizapretLocalHelp'],
+  ]);
   const NAV_ITEMS = Object.freeze([
     ['overview', 'optionsNavOverview'],
     ['automatic-routing', 'optionsNavAutomaticRouting'],
@@ -105,7 +111,7 @@
         value.flags, 'useProxyRulesForAntifilter') ? [...FLAG_KEYS, 'useProxyRulesForAntifilter'] : FLAG_KEYS;
     if (!Ui.hasExactKeys(value, SETTINGS_KEYS) ||
         value.schemaVersion !== 1 ||
-        !['anticensority', 'manual', 'antifilter'].includes(value.source) ||
+        !['anticensority', 'manual', 'antifilter', 'antizapret-local'].includes(value.source) ||
         !Ui.hasExactKeys(value.rules, RULE_KEYS) ||
         RULE_KEYS.some((key) => !Array.isArray(value.rules[key]) ||
           value.rules[key].some((rule) => typeof rule !== 'string')) ||
@@ -213,6 +219,47 @@
     return capabilities.runtimeState === 'READY' ||
       capabilities.durableIntent === 'OFF' &&
       capabilities.runtimeState === 'OFF' && capabilities.recoveryStatus === 'OFF';
+
+  }
+
+  function showFirstRun(state) {
+
+    const {configuration, revision} = state;
+    return revision === 0 && configuration && !configuration.active &&
+      !configuration.effectiveId && configuration.savedRevision === 0;
+
+  }
+
+  function canApplySaved(state) {
+
+    const {capabilities, configuration} = state;
+    return !state.pending && !state.dirty && !state.stale && state.editable &&
+      !configuration.applying &&
+      capabilities.privateWindowAccess === 'GRANTED' &&
+      capabilities.activationSupported &&
+      (state.settings.source === 'manual' || capabilities.providerDatasetAvailable);
+
+  }
+
+  function firstRunReview(state, setup) {
+
+    const {capabilities, configuration} = state;
+    if (state.pending || configuration.applying) return 'waiting';
+    if (capabilities.privateWindowAccess !== 'GRANTED') return 'permission';
+    if (!state.editable || configuration.blocked || !capabilities.activationSupported) return 'reload';
+    if (state.stale) return 'conflict';
+    if (setup.source === 'antifilter') {
+      if (!setup.antifilterPrepared) return 'prepare';
+      if (!setup.hasProxyConnection) return 'connections';
+      if (!setup.antifilterConsent) return 'consent';
+    }
+    if (setup.source === 'antizapret-local' && !setup.antizapretPrepared) return 'prepareAntizapret';
+    if (setup.source === 'antizapret-local' && !setup.hasProxyConnection) return 'connections';
+    if (['anticensority', 'antizapret-local'].includes(setup.source) && !setup.sourceEnabled) return 'enableSource';
+    if (setup.source === 'anticensority' && !setup.localServiceReady) return 'localService';
+    if (state.dirty) return 'save';
+    if (configuration.active && !configuration.pending) return 'verify';
+    return canApplySaved(state) ? 'apply' : 'repairSource';
 
   }
 
@@ -693,8 +740,11 @@
 
   function userErrorKey(code) {
 
+    if (code === 'SELECTED_DATASET_UNAVAILABLE') return 'setupRepairSource';
     if (code === 'ANTIFILTER_PROXY_REQUIRED') return 'antifilterProxyRequired';
+    if (code === 'ANTIZAPRET_PROXY_REQUIRED') return 'optionsAntizapretLocalHelp';
     if (code === 'ANTIFILTER_PREPARATION_REQUIRED') return 'antifilterPreparationRequired';
+    if (code === 'ANTIZAPRET_PREPARATION_REQUIRED') return 'antizapretPreparationRequired';
     if (code === 'REQUIRED_CREDENTIAL_MISSING') return 'transferCredentialsRequired';
     if (code === 'SAVED_REVISION_CHANGED') return 'unifiedConflict';
     if (code === 'PRIVATE_ACCESS_REQUIRED') return 'popupErrorPrivateAccess';
@@ -736,6 +786,16 @@
     let ruleRows = [];
     let refreshView = null;
     let ruleSearch = '';
+    let setupVisible = null;
+    let setupStep = 'choose';
+    let setupSource = null;
+    let localServiceReady = false;
+    let antifilterPrepared = false;
+    let antizapretPrepared = false;
+    let antizapretBusy = false;
+    let antizapretResult = '';
+    let siteResult = null;
+    let seenEffectiveId = null;
     const openProxyEditors = new Set();
     const view = document.defaultView;
 
@@ -743,6 +803,8 @@
 
       const requested = view ? view.location.hash.slice(1) : '';
       const selected = NAV_ITEMS.some(([id]) => id === requested) ? requested : 'overview';
+      const actions = root.querySelector('.form-actions');
+      if (actions) actions.hidden = setupVisible && selected === 'overview';
       root.querySelectorAll('.section[id]').forEach((section) => {
         section.hidden = section.id !== selected;
       });
@@ -1343,6 +1405,7 @@
         retry.addEventListener('click', () => controller.load());
         return;
       }
+      if (setupVisible === null) setupVisible = showFirstRun(state);
       let disabled = !state.editable || state.pending;
       const layout = Ui.append(root, 'div', 'options-layout');
       const nav = Ui.append(layout, 'nav', 'options-nav card');
@@ -1419,19 +1482,23 @@
         }
       }, true);
 
-      const overview = Ui.append(form, 'section', 'card section');
+      const overview = Ui.append(content, 'section', 'card section');
+      content.insertBefore(overview, form);
       overview.id = 'overview';
+      Ui.appendText(overview, 'p', t('optionsSectionEyebrow'), 'eyebrow');
+      Ui.appendText(overview, 'h2', t('optionsNavOverview'));
+      const firstRun = Ui.append(overview, 'article', 'subsection first-run');
+      const overviewStatus = Ui.append(overview, 'div', 'overview-status');
+
       function renderOverview() {
 
-        Ui.clear(overview);
-        Ui.appendText(overview, 'p', t('optionsSectionEyebrow'), 'eyebrow');
-        Ui.appendText(overview, 'h2', t('optionsNavOverview'));
-        const overviewFacts = Ui.append(overview, 'dl', 'overview-facts');
+        Ui.clear(overviewStatus);
+        const overviewFacts = Ui.append(overviewStatus, 'dl', 'overview-facts');
         const overviewRows = [
-          ['optionsProtectionState', state.capabilities.runtimeState === 'READY' ?
+          ['optionsProtectionState', state.configuration.active ?
             'popupStateActive' : state.capabilities.runtimeState ===
               'INITIALIZING' ? 'popupStateInitializing' :
-                state.capabilities.runtimeState === 'FAILED' ?
+                state.configuration.blocked ?
                   'popupStateBlocked' : 'popupStateOff'],
           ['popupDataset', state.capabilities.providerDatasetAvailable ?
             'valueAvailable' : 'valueUnavailable'],
@@ -1444,19 +1511,15 @@
           Ui.appendText(row, 'dt', t(labelKey), 'muted');
           Ui.appendText(row, 'dd', t(valueKey));
         }
-        Ui.renderPrivateAccessOnboarding(overview, state.capabilities, {
-          checkAgain: () => controller.checkPrivateAccess(),
-          pending: state.pending,
-          translate: t,
-        });
-        Ui.appendText(
-            overview, 'p', t('permissionRestrictedSitesInfo'),
-            'permission-separate-note',
-        );
+        if (!setupVisible) {
+          Ui.renderPrivateAccessOnboarding(overviewStatus, state.capabilities, {
+            checkAgain: () => controller.checkPrivateAccess(),
+            pending: state.pending,
+            translate: t,
+          });
+        }
 
       }
-      renderOverview();
-
       const automatic = Ui.append(form, 'section', 'card section');
       automatic.id = 'automatic-routing';
       Ui.appendText(automatic, 'p', t('optionsSectionEyebrow'), 'eyebrow');
@@ -1464,6 +1527,9 @@
       Ui.appendText(
           automatic, 'p', t('optionsAutomaticSourceHelp'), 'muted',
       );
+      const nativeHelp = Ui.append(automatic, 'details', 'proxy-editor');
+      Ui.appendText(nativeHelp, 'summary', t('optionsAntizapretNativeSetup'));
+      Ui.appendText(nativeHelp, 'p', t('optionsAntizapretNativeHelp'), 'muted');
       const sourceCard = Ui.append(automatic, 'div', 'source-card');
       const sourceLabel = Ui.append(sourceCard, 'label', 'field');
       Ui.appendText(sourceLabel, 'span', t('optionsSourceLabel'));
@@ -1471,13 +1537,36 @@
       sourceSelect.name = 'source';
       for (const [value, label] of [
         ['anticensority', 'optionsAnticensoritySource'], ['manual', 'optionsManualSource'],
-        ['antifilter', 'antifilterSourceLabel'],
+        ['antifilter', 'antifilterSourceLabel'], ['antizapret-local', 'optionsAntizapretLocalSource'],
       ]) {
         const option = Ui.append(sourceSelect, 'option');
         option.value = value;
         option.textContent = t(label);
       }
       sourceSelect.value = draft.source;
+      const checkSource = Ui.appendText(automatic, 'button', t('sourceCheckButton'), 'secondary');
+      checkSource.type = 'button';
+      const sourceCheckStatus = Ui.appendText(automatic, 'p', '', 'muted');
+      sourceCheckStatus.setAttribute('role', 'status');
+      sourceSelect.addEventListener('change', () => {
+        sourceCheckStatus.textContent = '';
+      });
+      checkSource.addEventListener('click', async () => {
+        const source = sourceSelect.value;
+        checkSource.disabled = true;
+        sourceCheckStatus.textContent = t('sourceCheckChecking');
+        try {
+          const result = await transferRpc.call({type: 'firefox.provider.source.check', source});
+          if (sourceSelect.value === source) {
+            sourceCheckStatus.textContent = t(`sourceCheck_${result.code}`,
+                result.code === 'http' ? [String(result.httpStatus)] : []);
+          }
+        } catch (_error) {
+          if (sourceSelect.value === source) sourceCheckStatus.textContent = t('sourceCheck_failed');
+        } finally {
+          checkSource.disabled = false;
+        }
+      });
       const manualHelp = Ui.appendText(automatic, 'p', t('optionsManualSourceHelp'), 'muted');
       const antifilterHelp = Ui.appendText(automatic, 'p', t('antifilterSourceHelp'), 'muted');
       const prepareAntifilter = Ui.append(automatic, 'button', 'secondary');
@@ -1492,7 +1581,53 @@
           `pill ${state.capabilities.providerDatasetAvailable ?
             'success' : 'warning'}`,
       );
+      const antizapretHelp = Ui.appendText(automatic, 'p', t('optionsAntizapretLocalHelp'), 'muted');
+      const antizapretActions = Ui.append(automatic, 'div');
+      const fetchAntizapret = Ui.appendText(antizapretActions, 'button', t('antizapretDownload'), 'secondary');
+      const importAntizapret = Ui.appendText(antizapretActions, 'button', t('antizapretImport'), 'secondary');
+      fetchAntizapret.type = importAntizapret.type = 'button';
+      const pacFile = Ui.append(antizapretActions, 'input');
+      pacFile.type = 'file';
+      pacFile.accept = '.pac,application/x-ns-proxy-autoconfig';
+      pacFile.hidden = true;
+      const antizapretStatus = Ui.appendText(antizapretActions, 'p', '', 'muted');
+      antizapretStatus.setAttribute('role', 'status');
+      function renderAntizapretStatus() {
+        const label = antizapretBusy ? 'sourceCheckChecking' : antizapretResult;
+        antizapretStatus.textContent = label ? t(label) : '';
+        fetchAntizapret.disabled = importAntizapret.disabled = antizapretBusy;
+        renderFirstRun();
+      }
+      async function prepareAntizapret(file) {
+        if (antizapretBusy) return;
+        antizapretBusy = true;
+        renderAntizapretStatus();
+        try {
+          if (file && (!file.size || file.size > 2 * 1024 * 1024)) throw new Error('PAC_SIZE');
+          const message = file ? {type: 'firefox.antizapret.import', text: await file.text()} :
+            {type: 'firefox.antizapret.fetch'};
+          await transferRpc.call(message);
+          antizapretPrepared = true;
+          antizapretResult = 'antizapretStaged';
+        } catch (error) {
+          antizapretResult = file ? 'antizapretImportFailed' :
+            Ui.safeErrorCode(error) === 'ANTIZAPRET_HTTP_403' ?
+              'antizapretDownloadForbidden' : 'antizapretDownloadFailed';
+        } finally {
+          antizapretBusy = false;
+          renderAntizapretStatus();
+        }
+      }
+      fetchAntizapret.addEventListener('click', () => prepareAntizapret(null));
+      importAntizapret.addEventListener('click', () => pacFile.click());
+      pacFile.addEventListener('change', () => {
+        const file = pacFile.files[0];
+        pacFile.value = '';
+        if (file) prepareAntizapret(file);
+      });
       const renderSourceHints = () => {
+        antizapretHelp.hidden = sourceSelect.value !== 'antizapret-local';
+        antizapretActions.hidden = antizapretHelp.hidden;
         manualHelp.hidden = sourceSelect.value !== 'manual';
         antifilterHelp.hidden = sourceSelect.value !== 'antifilter';
         prepareAntifilter.hidden = sourceSelect.value !== 'antifilter';
@@ -1799,6 +1934,7 @@
       Ui.appendText(about, 'p', t('optionsSectionEyebrow'), 'eyebrow');
       Ui.appendText(about, 'h2', t('optionsNavAbout'));
       Ui.appendText(about, 'p', t('optionsAboutHelp'), 'muted');
+      Ui.appendText(about, 'p', t('permissionRestrictedSitesInfo'), 'muted');
       const manifest = browserApi.runtime.getManifest();
       Ui.appendText(
           about, 'p', t('optionsVersion', [manifest.version]),
@@ -1806,6 +1942,241 @@
       );
 
       const actions = Ui.append(form, 'div', 'form-actions');
+
+      function renderFirstRun(focus = false) {
+
+        const current = controller.snapshot();
+        const configuration = current.configuration;
+        const focusedAction = firstRun.contains(document.activeElement) &&
+          document.activeElement.dataset.setupAction;
+        Ui.clear(firstRun);
+        const currentSection = view && view.location.hash.slice(1);
+        actions.hidden = setupVisible &&
+          (currentSection === 'overview' || !NAV_ITEMS.some(([id]) => id === currentSection));
+        overviewStatus.hidden = setupVisible && setupStep !== 'verify';
+        if (!setupVisible) {
+          const start = Ui.appendText(firstRun, 'button', t('setupOpen'));
+          start.type = 'button';
+          start.disabled = current.pending;
+          start.addEventListener('click', () => {
+            setupVisible = true;
+            renderFirstRun(true);
+            renderOverview();
+          });
+          if (focus || focusedAction) start.focus();
+          return;
+        }
+
+        if (setupStep === 'verify' && (!configuration.active || configuration.pending || current.dirty)) {
+          setupStep = 'review';
+        }
+        overviewStatus.hidden = setupStep !== 'verify';
+        const steps = Ui.append(firstRun, 'ol', 'setup-steps');
+        for (const [step, label] of [
+          ['choose', 'optionsSourceLabel'], ['review', 'unifiedApply'], ['verify', 'setupVerify'],
+        ]) {
+          const item = Ui.appendText(steps, 'li', t(label));
+          if (step === setupStep) item.setAttribute('aria-current', 'step');
+        }
+        const title = Ui.appendText(firstRun, 'h3', t(
+            setupStep === 'choose' ? 'setupChoose' : setupStep === 'review' ?
+              'setupReview' : 'setupVerify',
+        ));
+        title.tabIndex = -1;
+        const setupActions = document.createElement('div');
+        setupActions.className = 'inline-actions';
+        function button(key, handler, primary = false) {
+          const control = Ui.appendText(setupActions, 'button', t(key), primary ? 'primary' : '');
+          control.type = 'button';
+          control.dataset.setupAction = key;
+          control.disabled = current.pending;
+          control.addEventListener('click', handler);
+          return control;
+        }
+        function changeStep(step) {
+          setupStep = step;
+          renderFirstRun(true);
+        }
+        function close() {
+          setupVisible = false;
+          renderOverview();
+          renderFirstRun(true);
+        }
+
+        function showSetupPermission() {
+          const permission = Ui.renderPrivateAccessOnboarding(firstRun, current.capabilities, {
+            checkAgain: () => controller.load(),
+            pending: current.pending,
+            translate: t,
+          });
+          permission.check.classList.add('primary');
+          permission.check.dataset.setupAction = 'permissionCheckAgain';
+        }
+
+        if (setupStep === 'choose' && showFirstRun(current) &&
+            current.capabilities.privateWindowAccess !== 'GRANTED') {
+          showSetupPermission();
+          button('setupLater', close);
+        } else if (setupStep === 'choose') {
+          Ui.appendText(firstRun, 'p', t('setupChooseHelp'));
+          const choices = Ui.append(firstRun, 'fieldset', 'setup-choices');
+          Ui.appendText(choices, 'legend', t('optionsSourceLabel'));
+          const next = button('setupNext', () => {
+            if (sourceSelect.value !== setupSource) {
+              localServiceReady = false;
+              sourceSelect.value = setupSource;
+              sourceSelect.dispatchEvent(new view.Event('change', {bubbles: true}));
+            }
+            changeStep('review');
+          }, true);
+          next.disabled = current.pending || !setupSource;
+          for (const [source, titleKey, helpKey] of SETUP_SOURCES) {
+            const label = Ui.append(choices, 'label', 'setup-choice');
+            const input = Ui.append(label, 'input');
+            input.type = 'radio';
+            input.name = 'first-run-source';
+            input.value = source;
+            input.checked = setupSource === source;
+            input.disabled = current.pending;
+            input.addEventListener('change', () => {
+              setupSource = source;
+              next.disabled = false;
+            });
+            const copy = Ui.append(label, 'span');
+            Ui.appendText(copy, 'strong', t(titleKey));
+            Ui.appendText(copy, 'span', t(helpKey), 'muted');
+          }
+          button('setupLater', close);
+        } else if (setupStep === 'review') {
+          setupSource = sourceSelect.value;
+          const [, sourceTitle, sourceHelp] =
+            SETUP_SOURCES.find(([source]) => source === setupSource);
+          Ui.appendText(firstRun, 'p', t(sourceTitle), 'setup-source');
+          Ui.appendText(firstRun, 'p', t(sourceHelp));
+          const privacy = Ui.append(firstRun, 'details', 'proxy-editor');
+          Ui.appendText(privacy, 'summary', t('setupProxyPrivacyTitle'));
+          Ui.appendText(privacy, 'p', t('setupProxyPrivacy'));
+          if (!current.pending && (current.errorCode || localError)) {
+            const key = current.providerOperationFailed ? providerUpdateView(current).help :
+              userErrorKey(localError || current.errorCode);
+            Ui.appendText(firstRun, 'p', t(key), 'status error').setAttribute('role', 'alert');
+            if (current.notice === 'APPLY_FAILED_SAFE') {
+              Ui.appendText(firstRun, 'p', t('unifiedApplyFailed'), 'status warning');
+            }
+          }
+          const hasProxyConnection = form.querySelector('[data-kind="own"] [name="enabled"]:checked, ' +
+            '[data-kind="localTor"] [name="useForProxyRules"]:checked, ' +
+            '[data-kind="torBrowser"] [name="useForProxyRules"]:checked') ||
+            (form.elements.warpUseForProxyRules.checked && form.querySelector('[data-kind="warp"]'));
+          const sourceEnabled = form.elements.useProviderProxies.checked;
+          const stage = firstRunReview(current, {
+            source: setupSource, localServiceReady, sourceEnabled, hasProxyConnection,
+            antizapretPrepared: antizapretPrepared ||
+              (current.settings.source === 'antizapret-local' && current.capabilities.providerDatasetAvailable),
+            antifilterPrepared: current.errorCode !== 'ANTIFILTER_PREPARATION_REQUIRED' &&
+              (antifilterPrepared || current.notice === 'ANTIFILTER_PREPARED' ||
+                (current.settings.source === 'antifilter' && current.capabilities.providerDatasetAvailable)),
+            antifilterConsent: sourceEnabled && form.elements.useProxyRulesForAntifilter.checked,
+          });
+          const suggest = (text, action, handler) => {
+            Ui.appendText(firstRun, 'p', t(text), 'status');
+            button(action, handler, true);
+          };
+          if (stage === 'permission') {
+            showSetupPermission();
+          } else if (stage === 'waiting') {
+            Ui.appendText(firstRun, 'p', t(current.applying || configuration.applying ?
+              'unifiedApplying' : 'setupWaiting'), 'status').setAttribute('role', 'status');
+          } else if (stage === 'reload') {
+            suggest('setupBlocked', 'actionRetry', () => controller.load());
+          } else if (stage === 'conflict') {
+            suggest('unifiedConflict', 'unifiedDiscard', () => {
+              draftFields = null;
+              renderedRevision = null;
+              localError = null;
+              controller.discard();
+            });
+          } else if (stage === 'prepare') {
+            suggest('antifilterPreparationRequired', 'antifilterPrepare', async () => {
+              if (await controller.prepareAntifilter()) {
+                antifilterPrepared = true;
+                renderFirstRun(true);
+              }
+            });
+          } else if (stage === 'prepareAntizapret') {
+            const label = antizapretBusy ? 'sourceCheckChecking' :
+              antizapretResult || 'antizapretPreparationRequired';
+            Ui.appendText(firstRun, 'p', t(label), 'status').setAttribute('role', 'status');
+            const download = button('antizapretDownload', () => prepareAntizapret(null), true);
+            const importPac = button('antizapretImport', () => pacFile.click());
+            download.disabled = importPac.disabled = antizapretBusy;
+          } else if (stage === 'connections') {
+            suggest('setupNeedProxy', 'optionsNavProxyConnections', () => navigateTo('proxy-connections'));
+            button('optionsNavAdvanced', () => navigateTo('advanced'));
+          } else if (stage === 'consent') {
+            suggest('antifilterProxyRequired', 'optionsNavAutomaticRouting', () => navigateTo('automatic-routing'));
+          } else if (stage === 'enableSource') {
+            suggest('setupEnableSource', 'optionsNavAutomaticRouting', () => navigateTo('automatic-routing'));
+          } else if (stage === 'localService') {
+            suggest('setupStartService', 'setupServiceReady', () => {
+              localServiceReady = true;
+              renderFirstRun(true);
+            });
+          } else if (stage === 'save') {
+            suggest('setupSaveHelp', 'actionSave', () => form.requestSubmit());
+          } else if (stage === 'repairSource') {
+            suggest('setupRepairSource', 'optionsNavAutomaticRouting', () => navigateTo('automatic-routing'));
+            button('optionsNavMaintenance', () => navigateTo('maintenance'));
+          } else if (stage === 'verify') {
+            button('setupVerify', () => changeStep('verify'), true);
+          } else {
+            suggest('setupApplyHelp', 'unifiedApply', async () => {
+              if (await controller.applySaved()) {
+                const applied = controller.snapshot().configuration;
+                if (applied.active && !applied.pending &&
+                    applied.savedRevision === current.revision) {
+                  changeStep('verify');
+                }
+              }
+            });
+            for (const category of configuration.pendingCategories) {
+              Ui.appendText(firstRun, 'p', t(`unifiedCategory_${category}`), 'pill warning');
+            }
+          }
+          if (setupSource === 'manual') button('optionsNavSiteRules', () => navigateTo('site-rules'));
+          button('setupBack', () => changeStep('choose'));
+          button('setupLater', close);
+        } else {
+          if (seenEffectiveId !== configuration.effectiveId) siteResult = null;
+          seenEffectiveId = configuration.effectiveId;
+          Ui.appendText(firstRun, 'p', t('setupApplied'), 'status success');
+          Ui.appendText(firstRun, 'p', t('setupVerifyHelp'));
+          Ui.appendText(firstRun, 'p', t(siteResult === 'opened' ? 'setupSiteConfirmed' :
+            siteResult === 'failed' ? 'setupSiteFailed' : 'setupSiteUnchecked'), 'status')
+              .setAttribute('role', 'status');
+          if (siteResult !== 'opened') {
+            button(siteResult === 'failed' ? 'setupCheckAgain' : 'setupSiteOpened', () => {
+              siteResult = siteResult === 'failed' ? null : 'opened';
+              renderFirstRun(true);
+            }, true);
+          }
+          if (!siteResult) {
+            button('setupSiteDidNotOpen', () => {
+              siteResult = 'failed';
+              renderFirstRun(true);
+            });
+          }
+          if (siteResult === 'failed') {
+            button('optionsNavProxyConnections', () => navigateTo('proxy-connections'));
+          }
+          button('setupFinish', close, siteResult === 'opened');
+        }
+        firstRun.appendChild(setupActions);
+        const replacement = focusedAction && firstRun.querySelector(`[data-setup-action="${focusedAction}"]`);
+        if (focus || (focusedAction && (!replacement || replacement.disabled))) title.focus();
+        else if (replacement) replacement.focus();
+
+      }
       let status;
       let updateConfigurationActions;
       function renderActions() {
@@ -1881,8 +2252,6 @@
         checkUpdate.disabled = state.pending || !update.updateConfigured;
         installUpdate.disabled = state.pending || !state.editable ||
           !update.updateConfigured || !update.updateAvailable;
-        apply.disabled = disabled || state.capabilities.privateWindowAccess !== 'GRANTED' ||
-          !state.capabilities.activationSupported || !state.capabilities.providerDatasetAvailable;
         download.disabled = state.pending;
         reload.disabled = state.pending;
         updateConfigurationActions = () => {
@@ -1894,10 +2263,10 @@
               configuration.blocked ? 'unifiedBlocked' : configuration.active ?
                 configuration.pending ? 'unifiedPending' : 'unifiedActive' : 'unifiedInactive');
           if (current.applying && configuration.active) configurationStatus.textContent += ` ${t('unifiedPreparing')}`;
-          apply.disabled = disabled || current.dirty || current.stale || configuration.applying ||
-            state.capabilities.privateWindowAccess !== 'GRANTED';
+          apply.disabled = !canApplySaved(current);
           apply.title = current.dirty ? t('unifiedSaveFirst') : '';
           save.disabled = disabled || current.stale || configuration.applying;
+          renderFirstRun();
 
         };
 
@@ -1932,6 +2301,7 @@
         updateConfigurationActions();
       });
       updateConfigurationActions();
+      renderOverview();
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
         localError = null;
@@ -1942,6 +2312,7 @@
           const invalid = form.querySelector(':invalid');
           if (invalid) invalid.reportValidity();
           status.textContent = t('optionsErrorValidation');
+          renderFirstRun();
           return;
         }
         await controller.save(draft);
@@ -2045,16 +2416,19 @@
     CANDIDATE_TYPES,
     NAV_ITEMS,
     appendDefinition,
+    canApplySaved,
     createController,
     credentialPayload,
     diagnosticsExport,
     editableFromCapabilities,
+    firstRunReview,
     mount,
     parseRuleLines,
     providerUpdateView,
     renderProviderUpdateStatus,
     ruleRowsFromRules,
     rulesFromRuleRows,
+    showFirstRun,
     userErrorKey,
     validateCandidate,
     validateProviderUpdateStatus,

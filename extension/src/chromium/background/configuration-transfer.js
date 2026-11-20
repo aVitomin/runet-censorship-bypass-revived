@@ -6,8 +6,8 @@
 
 })(self, function(Format, Mods) {
 
-  const PROVIDERS = {anticensority: 'Антицензорити', antizapret: 'Антизапрет',
-    manual: 'onlyOwnSites', antifilter: 'antifilter'};
+  const PROVIDERS = {'anticensority': 'Антицензорити', 'antizapret': 'Антизапрет',
+    'manual': 'onlyOwnSites', 'antifilter': 'antifilter', 'antizapret-local': 'antizapret-local'};
   const type = (value) => value === 'PROXY' ? 'HTTP' : value;
   const chromiumType = (value) => value === 'HTTP' ? 'PROXY' : value;
 
@@ -18,7 +18,7 @@
       PROVIDERS[key] === state.currentPacProviderKey);
     // Never export custom provider keys, labels, URLs or connection details.
     return {source: selected || (state.currentPacProviderKey ? 'custom' : 'none'),
-      providerProxies: mods.usePacScriptProxies,
+      providerProxies: selected !== 'antizapret-local' && mods.usePacScriptProxies,
       useProxyRulesForAntifilter: mods.useProxyRulesForAntifilter === true,
       proxyAuthentication: !state.proxyAuth || state.proxyAuth.enabled !== false,
       ownProxiesOnlyForOwnSites: mods.ownProxiesOnlyForOwnSites,

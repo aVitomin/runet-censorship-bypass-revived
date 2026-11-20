@@ -114,7 +114,7 @@
     if (!object(value)) fail();
     if (value.kind === 'builtin') {
       keys(value, ['kind', 'id']);
-      return {kind: 'builtin', id: choice(value.id, ['anticensority', 'antizapret', 'manual', 'antifilter'])};
+      return {kind: 'builtin', id: choice(value.id, ['anticensority', 'antizapret', 'manual', 'antifilter', 'antizapret-local'])};
     }
     if (value.kind === 'custom') {
       keys(value, ['kind', 'urls']);
@@ -198,7 +198,7 @@
   function validateSupportSettings(value) {
 
     keys(value, ['source'].concat(SUPPORT_FLAGS));
-    choice(value.source, ['none', 'manual', 'antizapret', 'anticensority', 'antifilter', 'custom', 'unknown']);
+    choice(value.source, ['none', 'manual', 'antizapret', 'anticensority', 'antifilter', 'custom', 'unknown', 'antizapret-local']);
     SUPPORT_FLAGS.forEach((key) => bool(value[key]));
 
   }

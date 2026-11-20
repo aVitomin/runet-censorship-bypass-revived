@@ -148,7 +148,8 @@
   function isDraftDirty(site, draft) {
 
     return Boolean(site && site.target.controllable && draft &&
-      (site.route.mode !== draft.mode || site.route.scope !== draft.scope));
+      (site.route.mode !== draft.mode ||
+        draft.mode !== 'AUTO' && site.route.scope !== draft.scope));
 
   }
 
@@ -457,31 +458,20 @@
 
     }
 
-    function renderRoute(parent, state, view) {
+    function renderRoute(card, state, editable) {
 
       const site = state.site;
-      const card = Ui.append(parent, 'section', 'card site-card');
-      Ui.appendText(card, 'p', t('popupCurrentSiteRouting'), 'eyebrow');
-      Ui.appendText(
-          card,
-          'h2',
-          site.target.controllable ? site.target.host :
-            t('popupCurrentTabUnavailable'),
-          'site-host',
-      );
       if (!site.target.controllable) {
         Ui.appendText(
             card, 'p', t('popupPageCannotBeControlledHelp'), 'muted',
         );
         return;
       }
-      const editable = ['OFF', 'ACTIVE', 'RECOVERED'].includes(view.kind) && !state.pending;
       const fieldset = Ui.append(card, 'fieldset', 'route-fieldset');
-      const legend = Ui.appendText(
+      Ui.appendText(
           fieldset, 'legend', t('popupSiteModeGroup', [site.target.host]),
           'sr-only',
       );
-      legend.id = 'site-mode-legend';
       const choices = Ui.append(fieldset, 'div', 'route-segments');
       for (const mode of MODES) {
         const label = Ui.append(choices, 'label', 'route-option');
@@ -494,41 +484,12 @@
         input.addEventListener('change', () => {
           if (input.checked) {
             draft.mode = mode;
-            render(state);
+            render(state, 'site-mode', mode);
           }
         });
         Ui.appendText(label, 'span', t(`popupMode${mode}`));
       }
       Ui.appendText(card, 'p', modeDescription(draft.mode), 'muted route-help');
-      if ((view.kind === 'ACTIVE' || view.kind === 'RECOVERED') &&
-          site.route.mode === 'PROXY') {
-        const health = state.operational.health;
-        const healthRow = Ui.append(card, 'div', 'health-row');
-        Ui.appendText(
-            healthRow,
-            'span',
-            healthText(health),
-            `pill ${health.status === 'OK' ? 'success' :
-              health.status === 'ERROR' ? 'error' : 'warning'}`,
-        );
-        const check = Ui.append(healthRow, 'button', 'link-button');
-        check.type = 'button';
-        check.textContent = t(health.status === 'ERROR' ?
-          'healthCheckAgain' : 'healthCheckAction');
-        check.disabled = state.pending;
-        check.addEventListener('click', () => controller.checkHealth());
-      }
-      if (draft.mode === 'PROXY' && !site.proxyCandidateAvailable) {
-        Ui.appendText(
-            card, 'p', t('popupProxyRouteNeedsMethod'),
-            'status warning proxy-warning',
-        );
-        const configure = Ui.append(card, 'button', 'link-button');
-        configure.type = 'button';
-        configure.textContent = t('popupConfigureProxyMethods');
-        configure.addEventListener('click', () =>
-          openSettings('proxy-connections'));
-      }
       if (draft.mode !== 'AUTO') {
         const scope = Ui.append(card, 'fieldset', 'scope-fieldset');
         Ui.appendText(scope, 'legend', t('popupScope'));
@@ -544,7 +505,7 @@
           input.addEventListener('change', () => {
             if (input.checked) {
               draft.scope = value;
-              render(state);
+              render(state, 'site-scope', value);
             }
           });
           Ui.appendText(label, 'span', t(value === 'HOST' ?
@@ -557,15 +518,42 @@
             card, 'p', t('popupRulePreview', [pattern]), 'pattern-preview',
         );
       }
-      if (isDraftDirty(site, draft)) {
-        Ui.appendText(
-            card, 'p', t('unifiedTransition', [t(`popupMode${site.route.mode}`), t(`popupMode${draft.mode}`)]), 'status warning',
-        );
-      }
+    }
+
+    function action(parent, label, callback, disabled, primary = false) {
+
+      const button = Ui.appendText(parent, 'button', t(label), primary ? 'primary' : '');
+      button.type = 'button';
+      button.disabled = disabled;
+      button.addEventListener('click', callback);
+      return button;
 
     }
 
-    function render(state) {
+    function renderDetails(state, health, showHealthAction, detailsOpen) {
+
+      const details = Ui.append(root, 'details', 'card facts-card');
+      details.open = detailsOpen;
+      Ui.appendText(details, 'summary', t('popupDetails'));
+      const facts = Ui.append(details, 'div', 'details-body');
+      if (health && showHealthAction) {
+        Ui.appendText(facts, 'p', healthText(health), 'muted');
+        action(facts, health.status === 'ERROR' ? 'healthCheckAgain' : 'healthCheckAction',
+            () => controller.checkHealth(), state.pending);
+      }
+      DataStatus.render(facts, {
+        status: state.routingData, pending: state.pending,
+        result: state.routingUpdateResult, translate: t,
+        onCheck: () => controller.refreshRoutingData(),
+      });
+      action(facts, 'resourcesTitle', () => {
+        browserApi.tabs.create({url: browserApi.runtime.getURL(`pages/resources/index.html#${resourceTab.id}`)});
+      }, !resourceTab || resourceTab.incognito !== false ||
+        !Number.isSafeInteger(resourceTab.id) || !state.site.target.controllable);
+
+    }
+
+    function render(state, focusName, focusValue) {
 
       if (state.site && state.site.target.controllable &&
           (!draft || state.notice === 'APPLIED' && renderedRevision !== state.site.revision)) {
@@ -575,13 +563,12 @@
         };
         renderedRevision = state.site.revision;
       }
+      const previousDetails = root.querySelector('details');
       Ui.clear(root);
       root.setAttribute('aria-busy', state.pending ? 'true' : 'false');
       document.title = t('popupTitle');
       const header = Ui.append(root, 'header', 'popup-header');
-      const heading = Ui.append(header, 'div');
-      Ui.appendText(heading, 'h1', t('extensionName'));
-      Ui.appendText(heading, 'p', t('popupSubtitle'), 'muted');
+      Ui.appendText(header, 'h1', t('popupCurrentSiteRouting'));
       const settings = Ui.append(header, 'button', 'settings-button');
       settings.type = 'button';
       settings.textContent = t('actionSettings');
@@ -604,23 +591,58 @@
         return;
       }
       const view = presentation(state.capabilities);
-      const card = Ui.append(root, 'section', 'card control-card');
-      const statusRow = Ui.append(card, 'div', 'status-row');
-      const configuration = state.configuration || {};
-      Ui.appendText(statusRow, 'h2', t(state.operation === 'ENABLE' ? 'unifiedApplying' :
-        configuration.blocked ? 'unifiedBlocked' : configuration.active ?
-          configuration.pending ? 'unifiedPending' : 'unifiedActive' : view.titleKey));
-      Ui.appendText(
-          statusRow, 'span', t(`popupPill${view.kind}`),
-          `pill ${view.tone}`,
-      );
-      Ui.appendText(card, 'p', t(view.helpKey), 'muted');
-      if (state.operation === 'ENABLE' && configuration.active) Ui.appendText(card, 'p', t('unifiedPreparing'), 'muted');
-      Ui.renderPrivateAccessOnboarding(card, state.capabilities, {
-        checkAgain: () => controller.checkPrivateAccess(),
-        pending: state.pending,
-        translate: t,
+      const configuration = state.configuration;
+      const ready = view.kind === 'ACTIVE' || view.kind === 'RECOVERED';
+      const canEdit = ready || view.kind === 'OFF';
+      const canApply = activationAllowed(state.capabilities);
+      const privateRequired = state.capabilities.privateWindowAccess !== 'GRANTED';
+      const dirty = isDraftDirty(state.site, draft);
+      const proxyUnavailable = state.site.target.controllable && draft.mode === 'PROXY' &&
+        !state.site.proxyCandidateAvailable;
+      const health = ready && state.site.route && state.site.route.mode === 'PROXY' ?
+        state.operational.health : null;
+      const savedPending = configuration.pending && canEdit;
+      const sourceUnavailable = !state.capabilities.providerDatasetAvailable;
+      const needsSetup = view.kind === 'OFF' && !configuration.effectiveId &&
+        configuration.savedRevision === 0 && !dirty;
+      const checkAtTop = health && !privateRequired && !proxyUnavailable &&
+        !savedPending && canApply && !dirty && configuration.active;
+      const card = Ui.append(root, 'section', 'card site-card');
+      Ui.appendText(card, 'h2', state.site.target.controllable ? state.site.target.host :
+        t('popupCurrentTabUnavailable'), 'site-host');
+      const statusKey = state.operation === 'ENABLE' || configuration.applying ? 'unifiedApplying' :
+        configuration.blocked && view.kind !== 'EXTERNAL' ? 'popupStateBlocked' : view.titleKey;
+      const tone = statusKey === 'unifiedApplying' ? 'warning' :
+        configuration.blocked ? 'error' : view.tone;
+      Ui.appendText(card, 'p', t(statusKey), `pill ${tone}`);
+      if (!canEdit || view.kind === 'RECOVERED') {
+        Ui.appendText(card, 'p', t(view.helpKey), 'muted');
+      }
+      if (statusKey === 'unifiedApplying' && configuration.active) {
+        Ui.appendText(card, 'p', t('unifiedPreparing'), 'muted');
+      }
+      renderRoute(card, state, canEdit && !state.pending);
+      const permissionNotice = Ui.renderPrivateAccessOnboarding(card, state.capabilities, {
+        checkAgain: () => controller.checkPrivateAccess(), pending: state.pending, translate: t,
       });
+      if (permissionNotice && view.kind !== 'EXTERNAL') permissionNotice.check.classList.add('primary');
+      if (canEdit && !privateRequired && sourceUnavailable) {
+        Ui.appendText(card, 'p', t('popupHelpDatasetMissing'), 'status warning');
+      }
+      if (dirty) {
+        const oldMode = t(`popupMode${state.site.route.mode}`);
+        const newMode = t(`popupMode${draft.mode}`);
+        const change = oldMode === newMode ? t('popupScopeNotApplied') :
+          t('unifiedTransition', [oldMode, newMode]);
+        Ui.appendText(card, 'p', change, 'status warning');
+      }
+      if (proxyUnavailable) {
+        Ui.appendText(card, 'p', t('popupProxyRouteNeedsMethod'), 'status warning');
+      }
+      if (savedPending) {
+        Ui.appendText(card, 'p', t('unifiedPopupPending'), 'status warning');
+      }
+      if (checkAtTop) Ui.appendText(card, 'p', healthText(health), 'muted');
       if (state.errorCode) {
         const error = Ui.appendText(
             card, 'p', t(state.notice === 'SITE_SAVED_NOT_APPLIED' ? 'unifiedSiteSaved' :
@@ -631,53 +653,41 @@
         error.setAttribute('role', 'alert');
       }
       const actions = Ui.append(card, 'div', 'actions');
-      if (['OFF', 'ACTIVE', 'RECOVERED'].includes(view.kind)) {
-        if (configuration.pending) {
-          Ui.appendText(card, 'p', t('unifiedPopupPending'), 'status warning');
-          const review = Ui.append(actions, 'button', 'primary');
-          review.type = 'button';
-          review.textContent = t('unifiedReview');
-          review.addEventListener('click', () => openSettings());
+      if (canEdit && !privateRequired) {
+        if (proxyUnavailable) {
+          action(actions, 'popupConfigureProxyMethods', () => openSettings('proxy-connections'), state.pending, true);
+        } else if (sourceUnavailable) {
+          action(actions, 'optionsNavAutomaticRouting',
+              () => openSettings('automatic-routing'), state.pending, true);
+        } else if (needsSetup) {
+          action(actions, 'setupOpen', () => openSettings('overview'), state.pending, true);
+        } else if (savedPending || !canApply) {
+          action(actions, 'unifiedReview', () => openSettings(), state.pending, true);
+          if (savedPending && canApply) {
+            action(actions, 'unifiedApplyAll', () => controller.apply(draft, true), state.pending);
+          }
+        } else if (dirty || !configuration.active) {
+          action(actions, configuration.active ? 'unifiedApply' : 'unifiedApplyOn',
+              () => controller.apply(draft, false), state.pending, true);
+        } else if (checkAtTop) {
+          action(actions, health.status === 'ERROR' ? 'healthCheckAgain' : 'healthCheckAction',
+              () => controller.checkHealth(), state.pending, true);
         }
-        const primary = Ui.append(actions, 'button', 'primary');
-        primary.type = 'button';
-        primary.textContent = t(configuration.pending ? 'unifiedApplyAll' :
-          configuration.active ? 'unifiedApply' : 'unifiedApplyOn');
-        if (configuration.pending) primary.className = '';
-        const proxyUnavailable = draft && draft.mode === 'PROXY' &&
-          !state.site.proxyCandidateAvailable;
-        primary.disabled = state.pending ||
-          !activationAllowed(state.capabilities) || proxyUnavailable;
-        primary.addEventListener('click', () => controller.apply(draft, configuration.pending === true));
       }
       if (view.action === 'DISABLE') {
-        const clear = Ui.append(actions, 'button');
-        clear.type = 'button';
-        clear.textContent = t('popupTurnOff');
-        clear.disabled = state.pending;
-        clear.addEventListener('click', () => controller.clear());
+        action(actions, 'popupTurnOff', () => controller.clear(), state.pending);
       }
-      renderRoute(root, state, view);
-      const facts = Ui.append(root, 'section', 'card facts-card');
-      DataStatus.render(facts, {
-        status: state.routingData, pending: state.pending,
-        result: state.routingUpdateResult, translate: t,
-        onCheck: () => controller.refreshRoutingData(),
-      });
-      const resourcesButton = Ui.appendText(facts, 'button', t('resourcesTitle'));
-      resourcesButton.type = 'button';
-      resourcesButton.disabled = !resourceTab || resourceTab.incognito !== false ||
-        !Number.isSafeInteger(resourceTab.id) || !state.site.target.controllable;
-      resourcesButton.addEventListener('click', () => {
-        browserApi.tabs.create({url: browserApi.runtime.getURL(`pages/resources/index.html#${resourceTab.id}`)});
-      });
+      renderDetails(state, health, !checkAtTop, Boolean(previousDetails && previousDetails.open));
       const live = Ui.appendText(
           root,
           'p',
-          state.pending ? t('popupOperationPending') : t(view.titleKey),
+          state.pending ? t('popupOperationPending') : t(statusKey),
           'sr-only',
       );
       live.setAttribute('aria-live', 'polite');
+      if (focusName) {
+        root.querySelector(`input[name="${focusName}"][value="${focusValue}"]`).focus();
+      }
 
     }
 

@@ -54,8 +54,15 @@ Chromium ZIP и подписанный Firefox XPI **1.0.3** доступны н
 
 1. Установите расширение из магазина своего браузера и закрепите его значок.
 2. В Firefox разрешите работу в приватных окнах: это нужно для общей настройки прокси.
-3. Откройте настройки, выберите источник и нужные подключения.
-4. Нажмите **Сохранить настройки**, затем **Применить**.
+3. Выберите источник в настройках. В Chromium **Antizapret** может использовать
+   прокси своего провайдера. В Firefox прокси-маршрутам **Anticensority** нужна
+   совместимая локальная служба, например запущенный Tor. Для **Antifilter**
+   в обоих браузерах подключите свой прокси или локальную службу и разрешите
+   использовать это подключение для сайтов из списка.
+4. Сохраните изменения и нажмите **Применить**. После включения маршрутизации
+   откройте или перезагрузите сайт, который входит в список источника или
+   совпадает с вашим правилом. Проверьте режим сайта в панели расширения и
+   убедитесь, что страница загружается.
 
 [Подробная установка, обновление и проверка файлов](docs/user/INSTALLATION.md).
 Архивы **Source code** предназначены для разработки.
@@ -146,6 +153,14 @@ Install from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdb
 Expected 1.0.1–1.0.3 minimums are desktop **Chromium 108+** and **Firefox 140+**, including
 ESR on a compatible base. See [installation](docs/user/INSTALLATION.md#english-summary),
 [the 1.0.2 guide](docs/user/USER_GUIDE_1_0_2.md#english-summary), and [help](SUPPORT.md#english).
+
+In Chromium, **Antizapret** can use its provider's proxies. In Firefox,
+**Anticensority** proxy routes require a compatible local service such as Tor.
+For **Antifilter** in either browser, set up a proxy or local service and allow
+the extension to use it for listed sites. Allow private-window access in
+Firefox, save changes and select **Apply**. Once routing is active, open or
+reload a site covered by the source or a site rule, check its mode in the popup
+and confirm that it loads.
 
 Support this independent fork: [donations](DONATE.md#english).
 

@@ -7,6 +7,7 @@
   // IndexedDB artifact storage supports provider PACs larger than storage.local.
   const MAX_PAC_BYTES = 16 * 1024 * 1024;
   const PAC_COOK_SEMANTICS_VERSION = 5;
+  const PREVIOUS_PAC_COOK_SEMANTICS_VERSION = 4;
   const COOK_START = '\n\n//%#@@@@@@ MV3_PAC_COOK_START @@@@@@#%';
   const COOK_END = '//%#@@@@@@ MV3_PAC_COOK_END @@@@@@#%';
 
@@ -76,7 +77,7 @@
 
   }
 
-  async function hashPacMods(pacMods) {
+  async function hashPacMods(pacMods, semanticsVersion = PAC_COOK_SEMANTICS_VERSION) {
 
     const normalized = normalizePacMods(pacMods);
     const pacEffectiveMods = Object.assign({}, normalized, {
@@ -90,9 +91,16 @@
       delete pacEffectiveMods.useProxyRulesForAntifilter;
     }
     return mv3Hash.sha256Hex(stableStringify({
-      pacCookSemanticsVersion: PAC_COOK_SEMANTICS_VERSION,
+      pacCookSemanticsVersion: semanticsVersion,
       pacMods: pacEffectiveMods,
     }));
+
+  }
+
+  async function matchesPreviousPacMods(providerKey, pacMods, digest) {
+
+    return providerKey !== 'antizapret-local' && digest ===
+      await hashPacMods(pacMods, PREVIOUS_PAC_COOK_SEMANTICS_VERSION);
 
   }
 
@@ -213,7 +221,7 @@
 
   }
 
-  function buildWrapper(mods) {
+  function buildWrapper(mods, useGeneratedSource = false) {
 
     const directReplacementList = getProxyListForDirectReplacement(mods);
     const onionProxyList = mv3PacMods.getOnionProxyCandidates(mods);
@@ -244,7 +252,7 @@
   const mv3BroadOwnProxyResult = ${JSON.stringify(broadOwnProxyResult)};
   const mv3DirectReplacement = ${JSON.stringify(directReplacement)};
   const mv3NoDirect = ${JSON.stringify(mods.noDirect)};
-  const mv3UsePacScriptProxies = ${JSON.stringify(mods.usePacScriptProxies)};
+  const mv3UsePacScriptProxies = ${JSON.stringify(useGeneratedSource || mods.usePacScriptProxies)};
 
   function mv3NormalizeHost(host) {
     let normalizedHost = String(host || "").trim().toLowerCase();
@@ -360,6 +368,20 @@ ${COOK_END}`;
     }
 
     const normalizedMods = normalizePacMods(pacMods);
+    const localAntizapret = providerKey === 'antizapret-local';
+    if (localAntizapret) {
+      const candidates = mv3PacMods.getProxyRuleCandidates(normalizedMods);
+      try {
+        if (!candidates.length || candidates.length > 32) {
+          return createFailure(providerKey, sourceRawPacSha256,
+              createError('ANTIZAPRET_LOCAL_PROXY_REQUIRED', 'Configure an own proxy first.'));
+        }
+        rawPacData = mv3DomainProviderPac.createLocalAntizapretPac(rawPacData, candidates);
+      } catch (_failure) {
+        return createFailure(providerKey, sourceRawPacSha256,
+            createError('ANTIZAPRET_INVALID_PAC', 'The imported PAC data is invalid.'));
+      }
+    }
     if (providerKey === 'antifilter') {
       try {
         const candidates = mv3PacMods.getProxyRuleCandidates(normalizedMods);
@@ -392,7 +414,7 @@ ${COOK_END}`;
       );
     }
     const basePac = stripPreviousCook(rawPacData);
-    const cookedPacData = `${basePac}${buildWrapper(normalizedMods)}`;
+    const cookedPacData = `${basePac}${buildWrapper(normalizedMods, localAntizapret)}`;
     const cookedError = validatePacText(cookedPacData, true);
     if (cookedError) {
       return createFailure(providerKey, sourceRawPacSha256, cookedError, warnings);
@@ -558,6 +580,7 @@ ${COOK_END}`;
     cookPac,
     getPacApplyModsIdentity,
     hashPacMods,
+    matchesPreviousPacMods,
     selfTest,
   });
 

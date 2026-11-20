@@ -69,6 +69,17 @@ function harness(options = {}) {
 }
 
 describe('Antifilter HTTPS download and source receipts', function() {
+  it('diagnoses response failures and releases scratch data without staging', async function() {
+    const valid = harness();
+    Assert.deepEqual(await valid.updater.check(), {ok: true});
+    Assert.equal(valid.state.stage, 0);
+    Assert.equal(valid.state.release, 1);
+    const denied = harness({response: {status: 403}});
+    Assert.equal((await denied.updater.check()).httpStatus, 403);
+    Assert.equal(denied.state.stage, 0);
+    const offline = harness({fetchError: true});
+    Assert.equal((await offline.updater.check()).code, 'ANTIFILTER_FETCH_FAILED');
+  });
   it('binds source metadata, exclusions and compact identity without asserting a signature', function() {
     const good = metadata();
     Assert.equal(Source.validateBinding(good.envelope, good.receipt).excludedRows, 34);

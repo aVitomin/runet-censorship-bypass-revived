@@ -7,7 +7,8 @@ const {createRuntimeHarness} = require('./runtime-performance-harness');
 
 const REVIEWED_RPC_METHODS = Object.freeze([
   'exportConfiguration', 'previewConfigurationImport', 'importConfiguration',
-  'getConfigurationStatus', 'applySavedConfiguration', 'applySiteConfiguration',
+  'getConfigurationStatus', 'importLocalAntizapret', 'checkRoutingSource',
+  'applySavedConfiguration', 'applySiteConfiguration',
   'getState', 'getPacProviders', 'getPacMods', 'setPacMods',
   'getPopupState', 'setCurrentSiteMode', 'updatePopupDraft',
   'applyPopupChanges', 'openOptionsPage', 'normalizePacMods',

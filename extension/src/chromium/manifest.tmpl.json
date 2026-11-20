@@ -27,7 +27,8 @@
     , "activeTab"
   ],
   "host_permissions": [
-      "https://e.cen.rodeo:8443/*"
+      "https://p.thenewone.lol:8443/*"
+    , "https://e.cen.rodeo:8443/*"
     , "https://antizapret.prostovpn.org/*"
     , "https://antizapret.prostovpn.org:8443/*"
     , "https://antizapret.prostovpn.org:18443/*"

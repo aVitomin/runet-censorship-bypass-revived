@@ -100,6 +100,7 @@ async function fixture(options = {}) {
 
           control.writes += 1;
           control.live = {levelOfControl: 'controlled_by_this_extension', value};
+          return true;
 
         },
         async clear() {
@@ -177,6 +178,53 @@ function challenge(test, requestId) {
 }
 
 describe('Firefox Saved and Effective generations', function() {
+
+  it('restores the previous owned DNS floor when Firefox restarts mid-transition', async function() {
+    const test = await activeFixture();
+    const previous = test.values[OffState.STORAGE_KEY];
+    test.values[OffState.STORAGE_KEY] = Object.assign({}, previous, {floorTransition: true});
+    test.control.live.value = Object.assign({}, previous.floorIdentity, {proxyDNS: false});
+
+    const reboot = await test.boot();
+    Assert.strictEqual(reboot.ready.ok, true);
+    Assert.deepStrictEqual(test.control.live.value, previous.floorIdentity);
+    Assert.deepStrictEqual(test.values[OffState.STORAGE_KEY], previous);
+    Assert.strictEqual(test.control.clears, 0);
+  });
+
+  it('keeps an interrupted DNS floor transition blocked under foreign proxy ownership', async function() {
+    const test = await activeFixture();
+    const previous = test.values[OffState.STORAGE_KEY];
+    test.values[OffState.STORAGE_KEY] = Object.assign({}, previous, {floorTransition: true});
+    test.control.live = {levelOfControl: 'controlled_by_other_extensions', value: {proxyType: 'none'}};
+
+    const reboot = await test.boot();
+    Assert.strictEqual(reboot.ready.ok, false);
+    Assert.strictEqual(test.values[OffState.STORAGE_KEY].floorTransition, true);
+    Assert.strictEqual(test.control.writes, 1);
+    Assert.strictEqual(test.control.clears, 0);
+    Assert.deepStrictEqual(reboot.adapter.onBeforeRequest({requestId: 'blocked-after-restart'}),
+        {cancel: true});
+  });
+
+  it('keeps the DNS transition blocked if proxy ownership changes at recovery commit', async function() {
+    const test = await activeFixture();
+    const previous = test.values[OffState.STORAGE_KEY];
+    test.values[OffState.STORAGE_KEY] = Object.assign({}, previous, {floorTransition: true});
+    test.control.afterWrite = (update) => {
+      const state = update[OffState.STORAGE_KEY];
+      if (state && state.intent === OffState.ON && !state.floorTransition) {
+        test.control.live = {levelOfControl: 'controlled_by_other_extensions', value: {proxyType: 'none'}};
+      }
+    };
+
+    const reboot = await test.boot();
+    Assert.strictEqual(reboot.ready.ok, false);
+    Assert.strictEqual(test.values[OffState.STORAGE_KEY].floorTransition, true);
+    Assert.strictEqual(test.control.clears, 0);
+    Assert.deepStrictEqual(reboot.adapter.onBeforeRequest({requestId: 'blocked-at-commit'}),
+        {cancel: true});
+  });
 
   it('applies and recovers manual routing and credentials with the provider database absent', async function() {
     const test = await fixture();

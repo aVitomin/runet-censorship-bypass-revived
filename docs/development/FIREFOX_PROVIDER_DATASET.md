@@ -246,6 +246,45 @@ the cross-store selection; active recovery uses durable ON as the commit decisio
 Ambiguity blocks recovery rather than selecting latest Saved. See
 [active installation and recovery](FIREFOX_ARCHITECTURE.md) for the transaction.
 
+## Antizapret in the next Firefox build
+
+Antizapret (`antizapret-local`) has a manual preparation path. **Download
+Antizapret rules** fetches the exact official HTTPS PAC URL
+`https://p.thenewone.lol:8443/proxy.pac`. The source sees ordinary connection
+metadata. The request omits website credentials and the referrer, rejects
+redirects and has a ten-second deadline and a two MiB response limit. If the
+server denies access from the user's network, **Import PAC file** accepts a
+supported Antizapret file through the local file picker. The import itself
+keeps the file in the browser.
+
+The parser validates the supported producer format and reads domain and IP
+tables as data. It never executes the PAC or adopts the provider's proxy
+addresses and fallback directives. The normalized artifact is stored locally
+by SHA-256 in IndexedDB. This digest identifies the bytes for local integrity
+checks. The official HTTPS endpoint and local import are distinct origins of
+input, and neither supplies an author's signature. The ordinary package ships
+the parser and starts without prepared Antizapret data. **Check source** reads
+local readiness. The 12-hour provider updater leaves Antizapret preparation to
+the download and import controls.
+
+Successful preparation keeps the verified candidate available for selecting
+Antizapret in Saved. If Antizapret is already selected in Saved, a new candidate
+can be applied without changing the other settings. Apply verifies the exact
+artifact, then updates Effective. Failed downloads and invalid imports leave
+active routing unchanged. Recovery reads the previously applied identity rather
+than selecting the latest prepared artifact.
+
+Firefox uses the user's configured proxy connections for Antizapret. An
+explicit **Direct** rule takes precedence. With source proxy use enabled, a
+public Auto hostname can use the proxy whether or not the hostname is in the
+snapshot. The `dns` permission lets the runtime use `browser.dns` when the
+tables do not provide a hostname decision. A valid DNS response can authorize
+the proxy but cannot authorize Direct because Firefox may use a different
+address for the connection. When that lookup fails or the configured proxy is
+unavailable, a protected request fails instead of changing to Direct. See the
+[proxy floor and ownership model](FIREFOX_ARCHITECTURE.md#proxy-floor-and-ownership)
+and the [first-use draft](release-drafts/FIRST_USE.md).
+
 ## Separate compact domain schema
 
 The common verifier also understands envelope schema 2 for `antifilter` only:
