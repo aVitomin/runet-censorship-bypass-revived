@@ -566,16 +566,39 @@ describe('Chromium popup UI', () => {
 
   }
 
-  it('requires explicit Apply all for pending Saved and sends only the site patch', async function() {
+  it('applies Saved without sending the untouched Effective site mode', async function() {
 
     const state = createPopupState({configuration: pendingConfiguration()});
     const harness = createPopupHarness({state});
     harness.start();
     await flushUi();
+    await findButton(harness.root, 'Apply all saved changes').onclick();
+    const mutations = harness.calls.filter((call) => call.method.startsWith('apply'));
+    expect(mutations).to.deep.equal([{method: 'applySavedConfiguration', params: {
+      tabUrl: 'https://audit.example/', expectedRevision: 5, expectedEffectiveId: 'generation-a',
+    }}]);
+
+  });
+
+  it('requires explicit Apply all for pending Saved and sends only the site patch', async function() {
+
+    const state = createPopupState({
+      configuration: pendingConfiguration(),
+      providers: [{key: 'antifilter', label: 'Antifilter', type: 'builtIn'}],
+      selectedProvider: 'antifilter',
+      routingData: {source: 'anticensority', sourceUpdatedAt: null, lastCheckedAt: null,
+        canCheck: true, updating: false, active: true},
+    });
+    const harness = createPopupHarness({state});
+    harness.start();
+    await flushUi();
+    expect(harness.root.textContent).to.include('Protection active');
+    expect(harness.root.textContent).to.include('Saved sourceAntifilter');
+    expect(harness.root.textContent).to.include('Active routing dataAnticensority');
     const direct = getRadios(harness.root, 'site-mode').find((input) => input.value === 'direct');
     direct.checked = true;
     direct.onchange();
-    expect(harness.root.textContent).to.include('Other saved settings have not been applied');
+    expect(harness.root.textContent).to.include('Saved settings are pending.');
     expect(findLink(harness.root, 'Review in Options')).to.exist;
     expect(harness.calls.some((entry) => entry.method === 'applySiteConfiguration')).to.equal(false);
     await findButton(harness.root, 'Apply all saved changes').onclick();
@@ -612,7 +635,7 @@ describe('Chromium popup UI', () => {
     const harness = createPopupHarness({rpcHandler(method) {
 
       if (method === 'getPopupState') return state;
-      if (method === 'applySiteConfiguration') {
+      if (method === 'applySavedConfiguration') {
         state = createPopupState({configuration:
           Object.assign(pendingConfiguration(), {savedRevision: 6})});
         const error = new Error('Settings changed elsewhere.');
@@ -625,7 +648,7 @@ describe('Chromium popup UI', () => {
     harness.start();
     await flushUi();
     await findButton(harness.root, 'Apply all saved changes').onclick();
-    expect(harness.calls.filter((entry) => entry.method === 'applySiteConfiguration')).to.have.length(1);
+    expect(harness.calls.filter((entry) => entry.method === 'applySavedConfiguration')).to.have.length(1);
     expect(harness.root.textContent).to.include('Settings changed elsewhere');
     expect(findButton(harness.root, 'Apply all saved changes')).to.exist;
 

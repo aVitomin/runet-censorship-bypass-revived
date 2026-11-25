@@ -20,7 +20,7 @@
 источник маршрутов, ваши прокси и отдельно запущенные Tor, Tor Browser или WARP.
 
 [Установка](docs/user/INSTALLATION.md) ·
-[Руководство 1.0.2](docs/user/USER_GUIDE_1_0_2.md) ·
+[Руководство пользователя](docs/user/GUIDE.md) ·
 [Помощь и сообщения об ошибках](SUPPORT.md) ·
 [Новости](https://github.com/aVitomin/runet-censorship-bypass-revived/issues/105) ·
 [Поддержать проект](DONATE.md) ·
@@ -83,7 +83,7 @@
 До применения продолжают действовать прежние настройки. Обновление базы
 не включает выключенную маршрутизацию и не применяет отложенные правки.
 
-[Подключения, источники, перенос настроек и обновления](docs/user/USER_GUIDE_1_0_2.md)
+[Подключения, источники, перенос настроек и обновления](docs/user/GUIDE.md)
 
 ## Интерфейс
 
@@ -115,7 +115,7 @@
 гарантирует доступность сайтов, анонимность или шифрование. Используйте
 доверенные источники и прокси.
 
-[Приватность 1.0](docs/release/PRIVACY_1_0.md) ·
+[Какие данные получает прокси и источник правил](docs/release/PRIVACY.md) ·
 [Сообщить об уязвимости приватно](SECURITY.md) ·
 [Вся документация](docs/README.md)
 
@@ -150,7 +150,7 @@ Install from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdb
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
 Expected 1.0.1–1.0.3 minimums are desktop **Chromium 108+** and **Firefox 140+**, including
 ESR on a compatible base. See [installation](docs/user/INSTALLATION.md#english-summary),
-[the 1.0.2 guide](docs/user/USER_GUIDE_1_0_2.md#english-summary), and [help](SUPPORT.md#english).
+[the user guide](docs/user/GUIDE.md#english-summary), and [help](SUPPORT.md#english).
 
 In Chromium, **Antizapret** can use its provider's proxies. In Firefox,
 **Anticensority** proxy routes require a compatible local service such as Tor.

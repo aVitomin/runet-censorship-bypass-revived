@@ -32,14 +32,15 @@ See [Firefox architecture](FIREFOX_ARCHITECTURE.md) and [Installation](../user/I
 | Feature | Firefox behavior | Status / limit |
 | --- | --- | --- |
 | Overview | Protection/source/private-access state shown separately | PARITY |
-| Sources | Anticensority, Antifilter or manual rules/connections | EQUIVALENT; Antifilter needs own connections and consent; manual needs no provider data |
+| Sources | Anticensority, Antifilter, Antizapret or manual rules/connections | EQUIVALENT; Antifilter needs own connections and consent; manual needs no provider data |
+| Antizapret | Download rules or import the supported PAC file, configure an own proxy, save and apply | Chromium can also use provider proxies. Firefox uses declarative rules and browser DNS for unresolved matches. |
 | Extra/custom PAC sources | Not exposed by this declarative-data runtime | MISSING; a product boundary, not inability of Firefox's native PAC API |
 | Site rules | Direct/Proxy/whitelist list, preserved order/overlaps, backend validation | PARITY |
 | Own proxies/order | HTTP/HTTPS/SOCKS4/SOCKS5, shared candidate order | EQUIVALENT; Firefox DNS/timeout options cause transfer warnings |
 | Proxy credentials | KEEP/SET/NONE; passwords never returned to page state | PARITY; request auth stays bound to Effective |
 | Tor/WARP | Three independent Tor scopes, two WARP scopes | EQUIVALENT; Chromium retains master enabled; WARP scope is list-wide, so mixed per-entry scopes cannot transfer |
 | Safe defaults | Provider and own-sites-only enabled; Direct replacement/noDirect disabled | PARITY; new Tor config is onion-only, localhost:9050 then :9150; existing Saved values preserved |
-| Import/export | Portable Saved plus separate support export | EQUIVALENT; Anticensority/Antifilter/manual transfer, unsupported custom/Antizapret and browser options disclosed; never auto-apply |
+| Import/export | Portable Saved plus separate support export | EQUIVALENT; Anticensority, Antifilter, manual and own-proxy Antizapret source identities transfer. Prepare Antizapret data on the receiving device. Firefox reports Chromium provider-proxy Antizapret and custom sources as unsupported; import never auto-applies |
 | Site resources | Bounded manual domain capture while one tool page is open | PARITY; selected exact Proxy rules are browser-wide Saved; Apply separate |
 | Maintenance/update | Data date, HTTPS refresh and deferred install | EQUIVALENT; permitted OFF/READY install keeps Effective user settings and pending Saved separate |
 | Periodic source refresh | Serialized no-input check/promotion, 12-hour alarm | EQUIVALENT; OFF stays OFF, blocked/manual keeps staged candidate; checks continue in manual mode |

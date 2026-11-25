@@ -1,13 +1,8 @@
 # Руководство 1.0.2
 
-**Доступная версия:** 1.0.3 в Chrome Web Store и Firefox Add-ons.
-Для ручной установки есть Chromium ZIP и подписанный Firefox XPI 1.0.3.
-Основные действия также применимы к 1.0.3: [изменения и новые подсказки](CHANGES_1_0_3.md).
-Это руководство описывает 1.0.2; для прежней версии 1.0.1 есть
-[отдельная редакция](USER_GUIDE_1_0.md).
-Сведения о доступности в магазинах:
-[Скачать доступную версию](INSTALLATION.md). Для подписанного Firefox 0.0.4.0
-есть [отдельное руководство](USER_GUIDE.md).
+[Актуальное руководство](GUIDE.md) · [Current guide](GUIDE.md#english-summary)
+
+Эта редакция описывает версии 1.0.2 и 1.0.3.
 
 ## Начать работу
 
@@ -197,12 +192,13 @@ HTTPS-адреса после проверки формата, размера, �
 
 ## English summary
 
+[Open the current user guide](GUIDE.md#english-summary).
+
 Version 1.0.2 separates **Save settings** from **Apply**. Auto follows your source
 and rules; Proxy requires suitable selected connections; Direct bypasses this
 extension's proxy routing. The extension provides no VPN or proxy service.
 Imports save settings without activating them. Updates preserve applied settings
 and keep inactive routing inactive. Antifilter is an optional exact-host list
 for separately configured connections. The popup shows source date and last
-successful check separately. Version 1.0.3 is available in Chrome Web Store and
-Firefox Add-ons. Chromium ZIP and signed Firefox XPI 1.0.3 are also available.
+successful check separately. This edition covers versions 1.0.2 and 1.0.3.
 Use the [installation page](INSTALLATION.md) for store links and manual downloads.

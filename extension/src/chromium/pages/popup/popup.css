@@ -15,8 +15,11 @@ html.zoomed-popup-surface {
   min-width: var(--popup-zoomed-min-width, 200px);
 }
 
-body {
+html.standalone-popup-page body {
   width: 392px;
+}
+
+body {
   max-width: 100vw;
   margin: 0;
   overflow-x: hidden;
@@ -175,6 +178,10 @@ main {
   flex: 0 1 auto;
 }
 
+.pending-note {
+  flex-basis: 100%;
+}
+
 .status-message {
   padding: var(--ui-space-1);
   border-left: 3px solid currentColor;
@@ -244,6 +251,7 @@ main {
 
 .route-label {
   display: grid;
+  height: 100%;
   grid-auto-flow: column;
   gap: var(--ui-space-0-5);
   min-height: var(--ui-control-height);

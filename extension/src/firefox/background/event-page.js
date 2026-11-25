@@ -709,6 +709,15 @@
 
   }
 
+  function effectiveConfigurationId(records) {
+
+    return records ? sha256(new TextEncoder().encode(JSON.stringify(
+        {routing: records[productConfigApi.CONFIG_STORAGE_KEY].routingDescriptor,
+          dataset: records[productConfigApi.CONFIG_STORAGE_KEY].datasetIdentity},
+    ))) : null;
+
+  }
+
   async function configurationStatus(snapshot = null) {
 
     const saved = snapshot ? snapshot.saved : await settingsController.get();
@@ -724,10 +733,7 @@
     const blocked = !active && (activation.runtimeState !== 'OFF' ||
       privateAccess !== 'GRANTED' ||
       ['not_controllable', 'controlled_by_other_extensions'].includes(live.levelOfControl));
-    const effectiveId = records ? await sha256(new TextEncoder().encode(JSON.stringify(
-        {routing: records[productConfigApi.CONFIG_STORAGE_KEY].routingDescriptor,
-          dataset: records[productConfigApi.CONFIG_STORAGE_KEY].datasetIdentity},
-    ))) : null;
+    const effectiveId = await effectiveConfigurationId(records);
     const pending = Boolean(effective && saved.revision !== effective.revision);
     const categories = [];
     if (pending) {
@@ -797,10 +803,11 @@
         siteController.get(message.tabUrl, routingSettings),
         operationalController.publicStatus(routingSettings),
         configurationStatus(snapshot),
-        popupRoutingDataStatus(snapshot),
+        popupRoutingDataMetadata(snapshot),
       ]);
       // Site controls and diagnostics describe Effective. Only the pending
       // summary exposes Saved; no settings, credentials or raw URL are returned.
+      routingData.active = configuration.active;
       return {ok: true, result: {capabilities, site, operational, configuration, routingData}};
     } catch (_error) {
       return errorResponse('SETTINGS_STATE_UNAVAILABLE');
@@ -808,7 +815,7 @@
 
   }
 
-  async function popupRoutingDataStatus(snapshot = null) {
+  async function popupRoutingDataMetadata(snapshot = null) {
 
     snapshot = snapshot || await verifiedConfigurationSnapshot();
     const source = (snapshot.effective || snapshot.saved).settings.source;
@@ -820,22 +827,20 @@
       lastCheckedAt: update ? update.lastSuccessfulCheckAt : null,
       canCheck: Boolean(controller && await controller.updateConfigured()),
       updating: Boolean(popupRoutingRefresh || update && update.status === 'CHECKING'),
-      active: Boolean(activationController.snapshot().active),
     };
 
   }
 
   async function refreshPopupRoutingData() {
 
-    const before = await popupRoutingDataStatus();
+    const before = await popupRoutingDataMetadata();
     if (!before.canCheck) return {ok: true, result: {status: 'UNAVAILABLE'}};
     const checked = await checkForProviderUpdate();
     if (!checked || checked.ok !== true) return {ok: true, result: {status: 'FAILED'}};
     const status = checked.result.status;
-    const after = await popupRoutingDataStatus();
     // Promotion is already serialized with Save/Apply/Clear by the existing
     // update path. A successful fetch alone is not an installed active update.
-    const outcome = status === 'INSTALLED' ? after.active ? 'APPLIED' : 'PREPARED' :
+    const outcome = status === 'INSTALLED' ? (await configurationStatus()).active ? 'APPLIED' : 'PREPARED' :
       status === 'UNCHANGED' && !checked.result.update.updateAvailable ? 'UNCHANGED' :
         'DEFERRED';
     return {ok: true, result: {status: outcome}};
@@ -941,6 +946,12 @@
       if (revision !== null) {
         const saved = await settingsController.get();
         if (saved.revision !== revision) return errorResponse('SAVED_REVISION_CHANGED');
+      }
+      if (message.expectedEffectiveId !== undefined) {
+        const records = await productConfigApi.readEffectiveRecords(browser.storage.local);
+        if (message.expectedEffectiveId !== await effectiveConfigurationId(records)) {
+          return errorResponse('SAVED_REVISION_CHANGED');
+        }
       }
       prepared = await activationFactory(revision);
     } catch (error) {
@@ -1216,8 +1227,11 @@
       return enqueueRpcControlOperation(() => getPopupState(message));
     }
     if (type === 'firefox.activation.apply') {
-      const revisionRequest = message && Object.keys(message).length === 2 &&
-        Number.isSafeInteger(message.expectedRevision) && message.expectedRevision >= 0;
+      const keys = Object.keys(message);
+      const revisionRequest = Number.isSafeInteger(message.expectedRevision) &&
+        message.expectedRevision >= 0 && (keys.length === 2 ||
+          keys.length === 3 && (message.expectedEffectiveId === null ||
+            typeof message.expectedEffectiveId === 'string'));
       if (!exactRpcRequest(message, type) && !revisionRequest) {
         return errorResponse('INVALID_RPC_REQUEST');
       }

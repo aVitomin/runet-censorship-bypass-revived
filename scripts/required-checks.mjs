@@ -8,6 +8,25 @@ const PROJECT = `.\\${TOOLING_ROOT.replaceAll('/', '\\')}`;
 const npm = (script) => `npm --prefix ${PROJECT} run ${script}`;
 const POLICY_TESTS = 'node --test .\\scripts\\*.test.mjs';
 
+// Inputs outside browser source directories, including files read by their verification suites.
+const inputTargets = new Map([
+  ['LICENSE', 'both'],
+  ['.gitattributes', 'both'],
+  [`${TOOLING_ROOT}/.gitattributes`, 'both'],
+  [`${TOOLING_ROOT}/gulpfile.js`, 'both'],
+  [`${TOOLING_ROOT}/build-cleanup.js`, 'both'],
+  [`${TOOLING_ROOT}/src/templates-data.js`, 'both'],
+  [`${TOOLING_ROOT}/src/tooling/distribution-notices.js`, 'both'],
+  [`${TOOLING_ROOT}/src/tooling/package-source.js`, 'firefox'],
+  [`${TOOLING_ROOT}/src/tooling/firefox-provider/generate-provider-dataset.js`, 'firefox'],
+  [`${SOURCES.sharedAssets}/brand/icon-512.png`, 'chromium'],
+  [`${TOOLING_ROOT}/assets/licenses/MPL-2.0.txt`, 'both'],
+  [`${TOOLING_ROOT}/assets/licenses/CHROMIUM-BSD-3-CLAUSE.txt`, 'chromium'],
+  [`${TOOLING_ROOT}/assets/licenses/EMOJI-MIT.txt`, 'chromium'],
+  [`${TOOLING_ROOT}/assets/notices/chromium.txt`, 'chromium'],
+  [`${TOOLING_ROOT}/assets/notices/firefox.txt`, 'firefox'],
+]);
+
 function guidance(path) {
   return /(?:^|\/)AGENTS\.md$/u.test(path) ||
     isWithin(path, '.agents') || isWithin(path, '.codex') ||
@@ -20,15 +39,16 @@ export function planForPaths(inputPaths) {
     String(value).replaceAll('\\', '/').replace(/^\.\//u, ''),
   ).filter(Boolean))].sort();
   const skills = new Set();
-  const checks = new Set(['node .\\scripts\\verify-docs.mjs', 'git diff --check']);
+  const checks = new Set(['node .\\scripts\\verify-docs.mjs', 'git diff --check', 'git diff --cached --check']);
   const notes = new Set();
   const sourcePaths = paths.filter((path) => !guidance(path));
-  const chromium = sourcePaths.some((path) => isWithin(path, SOURCES.chromium));
-  const firefox = sourcePaths.some((path) => isWithin(path, SOURCES.firefox));
-  const shared = sourcePaths.some((path) =>
-    [SOURCES.shared, SOURCES.sharedAssets, SOURCES.chromiumCompat].some((root) => isWithin(path, root)) ||
-    [`${TOOLING_ROOT}/gulpfile.js`, `${TOOLING_ROOT}/build-cleanup.js`,
-      `${TOOLING_ROOT}/src/templates-data.js`].includes(path));
+  const chromium = sourcePaths.some((path) => isWithin(path, SOURCES.chromium) ||
+    isWithin(path, SOURCES.chromiumCompat) || inputTargets.get(path) === 'chromium');
+  const firefox = sourcePaths.some((path) => isWithin(path, SOURCES.firefox) ||
+    inputTargets.get(path) === 'firefox');
+  const shared = sourcePaths.some((path) => inputTargets.get(path) === 'both' ||
+    isWithin(path, SOURCES.shared) || (isWithin(path, SOURCES.sharedAssets) && !inputTargets.has(path)));
+  const sharedTestFixture = sourcePaths.includes(`${TOOLING_ROOT}/src/tooling/test-support/domain-dataset.js`);
   const runtimePaths = sourcePaths.filter((path) => !/\/(?:test|tests)\//u.test(path));
   const security = runtimePaths.some((path) =>
     /\/(?:background|provider)\//u.test(path) || isWithin(path, SOURCES.shared) ||
@@ -41,7 +61,8 @@ export function planForPaths(inputPaths) {
     isWithin(path, '.github/workflows') || /\/vendor\//u.test(path));
   const release = paths.some((path) =>
     /(?:^|\/)(?:RELEASE_PROCESS|FIREFOX_RELEASE_BUILD)\.md$/u.test(path) ||
-    /\/scripts\/package-(?:chromium|firefox)-release\.js$/u.test(path));
+    /\/scripts\/package-(?:chromium|firefox)-release\.js$/u.test(path) ||
+    path === `${TOOLING_ROOT}/src/tooling/repository-root.js`);
   const tooling = sourcePaths.some((path) =>
     isWithin(path, `${TOOLING_ROOT}/src/tooling`) || isWithin(path, `${TOOLING_ROOT}/scripts`) ||
     path === `${TOOLING_ROOT}/eslint.config.cjs`);
@@ -50,12 +71,11 @@ export function planForPaths(inputPaths) {
     !Object.values(SOURCES).some((root) => isWithin(path, root)) &&
     !isWithin(path, `${TOOLING_ROOT}/src/tooling`) && !isWithin(path, `${TOOLING_ROOT}/scripts`) &&
     !isWithin(path, 'scripts') && !isWithin(path, '.github') && !isWithin(path, '.vscode') &&
-    ![`${TOOLING_ROOT}/gulpfile.js`, `${TOOLING_ROOT}/build-cleanup.js`,
-      `${TOOLING_ROOT}/eslint.config.cjs`, `${TOOLING_ROOT}/src/templates-data.js`].includes(path) &&
+    !inputTargets.has(path) && path !== `${TOOLING_ROOT}/eslint.config.cjs` &&
     !/(?:^|\/)(?:package(?:-lock)?\.json|\.gitignore|\.gitattributes|LICENSE)$/u.test(path));
 
   // Final gates include their focused suites. Never suggest both for the same work.
-  if (shared || dependencies || release || unknown.length) {
+  if (shared || sharedTestFixture || dependencies || release || unknown.length) {
     checks.add(npm('verify'));
   } else {
     if (chromium) checks.add(npm('verify:chromium'));
@@ -70,7 +90,9 @@ export function planForPaths(inputPaths) {
   if (unknown.length) notes.add('Unclassified paths: review ownership before any move; aggregate gate selected conservatively.');
   if (security) skills.add('extension-security-review');
   if (pac) skills.add('pac-regression');
-  if (dependencies) skills.add('dependency-review');
+  if (dependencies || paths.some((path) =>
+    isWithin(path, `${SOURCES.chromiumCompat}/pages/lib/chrome-style`) ||
+    path === `${SOURCES.chromiumCompat}/pages/lib/fonts/emoji.woff`)) skills.add('dependency-review');
   if (policy || dependencies) checks.add(POLICY_TESTS);
   if (dependencies || paths.some((path) => /scripts\/(?:verify-supply-chain|repository-paths)/u.test(path))) {
     checks.add('node .\\scripts\\verify-supply-chain.mjs');
@@ -80,6 +102,7 @@ export function planForPaths(inputPaths) {
   }
   if (release) {
     skills.add('release-candidate');
+    notes.add('Run the release packagers in a clean checkout of the intended commit.');
     checks.add(npm('release:chromium'));
     checks.add(npm('release:firefox'));
   }
@@ -99,7 +122,7 @@ export function changedPaths(cwd = process.cwd()) {
   // NUL delimiters preserve spaces, Unicode and embedded newlines in Git paths.
   // Inspect index and worktree independently: a worktree edit can undo a staged
   // change in the net diff against HEAD without removing that staged change.
-  const tracked = [[], ['--cached', 'HEAD']].map((base) => execFileSync('git', [
+  const tracked = [[], ['--cached']].map((base) => execFileSync('git', [
     'diff', '--name-only', '-z', '--no-renames', ...base, '--',
   ], options)).join('');
   const untracked = execFileSync('git', [

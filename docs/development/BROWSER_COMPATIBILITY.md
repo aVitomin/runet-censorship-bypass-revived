@@ -2,7 +2,7 @@
 
 ## Expected minimums
 
-The 1.0.1–1.0.3 manifests target desktop **Chromium 108+** and **Firefox 140+**,
+The 1.1.0 manifests target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR on a compatible base, provided the required extension APIs exist.
 These are source/API-based minimums, not tests of every version, OS or fork.
 

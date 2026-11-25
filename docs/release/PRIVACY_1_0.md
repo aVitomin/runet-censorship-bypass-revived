@@ -1,4 +1,33 @@
-# Privacy notice — version 1.0.2
+# Privacy notice
+
+## Version 1.1.0
+
+При скачивании правил Antizapret сервер источника получает
+IP-адрес соединения. Если выбрать сохранённый PAC-файл, расширение прочитает
+его на устройстве. В Firefox кнопка «Проверить источник» для Antizapret проверяет
+локальную копию. В режиме Antizapret Firefox может передать имя сайта
+настроенному DNS-резолверу. В Chromium онлайн-источник Antizapret может использовать прокси провайдера.
+Для импортированного файла публичные домены идут через настроенные прокси,
+кроме явных правил «Напрямую». Прокси получает адрес назначения для запросов,
+которые браузер направляет через него. Отчёт для поддержки сохраняется
+локально. Вы сами решаете, отправлять ли его.
+
+The following details supplement the notice below for desktop version 1.1.0.
+
+- Downloading Antizapret rules contacts the configured source. The
+  official PAC address is `https://p.thenewone.lol:8443/proxy.pac`.
+  As with other downloads, the server can see the connection's IP address.
+  Choosing a saved Antizapret PAC file reads it on your device. In Firefox,
+  **Check source** checks the local Antizapret rules.
+- Firefox can use its DNS resolver for hostnames it needs to look up in
+  Antizapret mode. The resolver can receive the hostname. Firefox uses your
+  configured proxy for protected traffic. Chromium's online Antizapret source can use the provider's
+  proxies. Chromium's imported Antizapret source uses configured proxies for
+  public hostnames unless an explicit Direct rule applies. A proxy receives the destination of requests sent through it.
+- The support report is a separate local export. It contains diagnostic
+  categories and settings summaries. Sharing the file is a separate action.
+
+## Archived notice for version 1.0.2
 
 For Runet Censorship Bypass in
 [aVitomin/runet-censorship-bypass-revived](https://github.com/aVitomin/runet-censorship-bypass-revived).

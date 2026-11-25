@@ -1,7 +1,7 @@
 # Помощь и сообщения об ошибках
 
 [Установка](docs/user/INSTALLATION.md) ·
-[Руководство](docs/user/USER_GUIDE_1_0_2.md) ·
+[Руководство](docs/user/GUIDE.md) ·
 [Создать обращение](https://github.com/aVitomin/runet-censorship-bypass-revived/issues/new/choose)
 
 ## Первый запуск
@@ -30,7 +30,7 @@
 Загрузка правил обращается к серверу источника и передаёт обычные данные
 подключения, включая видимый серверу IP-адрес. Проверка соединения обращается
 к проверяемому сайту. Телеметрии разработчика и облачной синхронизации нет.
-[Подробнее о приватности](docs/release/PRIVACY_1_0.md).
+[Подробнее о приватности](docs/release/PRIVACY.md).
 
 ## Сначала проверьте
 
@@ -130,7 +130,7 @@ the browser can send the configured proxy credentials to that proxy.
 Routing-data downloads contact the source server, which sees ordinary
 connection metadata including the IP address visible to it. A connection check
 contacts the site being checked. The extension has no developer telemetry or
-cloud synchronization. [Privacy notice](docs/release/PRIVACY_1_0.md).
+cloud synchronization. [Privacy notice](docs/release/PRIVACY.md).
 
 ### Troubleshooting
 

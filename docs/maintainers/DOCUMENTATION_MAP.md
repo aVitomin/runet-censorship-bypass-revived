@@ -27,9 +27,9 @@ without changing their URLs. See [release naming](../development/RELEASE_PROCESS
 | --- | --- |
 | Understand the product and download it | [README](../../README.md) |
 | Install, update or remove it | [Installation](../user/INSTALLATION.md) |
-| Configure routing and connections | [User guide](../user/USER_GUIDE_1_0_2.md) |
+| Configure routing and connections | [User guide](../user/GUIDE.md) |
 | Troubleshoot or report a bug | [Support](../../SUPPORT.md) |
-| Review privacy or report a vulnerability | [Privacy](../release/PRIVACY_1_0.md), [Security](../../SECURITY.md) |
+| Review privacy or report a vulnerability | [Privacy](../release/PRIVACY.md), [Security](../../SECURITY.md) |
 | Prepare a development environment | [Development](../development/DEVELOPMENT.md) |
 | Understand runtime boundaries | [Chromium/shared architecture](../development/ARCHITECTURE.md), [Firefox architecture](../development/FIREFOX_ARCHITECTURE.md) |
 | Select checks or prepare a release | [Testing](../development/TESTING.md), [Release process](../development/RELEASE_PROCESS.md) |

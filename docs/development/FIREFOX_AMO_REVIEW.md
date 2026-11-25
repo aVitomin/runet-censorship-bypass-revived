@@ -17,7 +17,7 @@ extension-owned proxy setting without discarding saved settings.
 ## Permissions and data handling
 
 The complete manifest inventory and per-permission data explanations are in
-the [permission audit](../release/PERMISSIONS_AND_PRIVACY_1_0.md).
+the [permission audit](../release/PERMISSIONS_AND_PRIVACY.md).
 
 - `proxy`: apply/release browser proxy control and choose request routes.
 - `webRequest` and `webRequestBlocking`: authorize requests, answer matching
@@ -39,7 +39,7 @@ There are no content scripts, developer telemetry or analytics uploads.
 The required Mozilla data types are `authenticationInfo` and
 `browsingActivity`: proxy authentication and destination information can be
 transmitted as part of the routing function. They are not `none`.
-See the [1.0 privacy notice](../release/PRIVACY_1_0.md).
+See the [1.0 privacy notice](../release/PRIVACY.md).
 
 Stored passwords are not returned in UI reads, diagnostics or exports.
 Authentication is restricted to the matching request-authorized proxy and its
@@ -160,7 +160,7 @@ package rather than relabelling earlier screenshots.
 Provide the exact unsigned candidate XPI, reviewer source archive, checksums,
 source commit and reproducible build instructions through AMO's appropriate
 fields. Do not include profiles, raw logs, secrets or personal test accounts.
-Use the [listing draft](../release/FIREFOX_AMO_LISTING_1_0.md) and
+Use the [listing draft](../release/FIREFOX_AMO_LISTING.md) and
 [publication checklist](../release/STORE_PUBLICATION_CHECKLIST.md) only after
 their final package/privacy review. Update the existing fork listing, retaining
 its Gecko ID and URL; do not reuse the upstream add-on identity or claim that

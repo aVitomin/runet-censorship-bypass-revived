@@ -45,8 +45,9 @@
       return element;
     }
     parent.classList.add('routing-data-card');
-    parent.setAttribute('aria-label', t('routingDataTitle'));
-    append('h2', t('routingDataTitle'));
+    const title = t(status && status.active ? 'routingDataActiveTitle' : 'routingDataTitle');
+    parent.setAttribute('aria-label', title);
+    append('h2', title);
     if (!status) {
       append('p', t('routingDataUnavailable'), 'routing-data-note');
       return;

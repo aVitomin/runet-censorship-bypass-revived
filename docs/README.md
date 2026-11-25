@@ -4,10 +4,10 @@
 
 - [Скачать и установить](user/INSTALLATION.md)
 - [Изменения в 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0)
-- [Руководство 1.0.2](user/USER_GUIDE_1_0_2.md): Antifilter, ресурсы сайта и обновление базы
+- [Руководство пользователя](user/GUIDE.md): Antifilter, ресурсы сайта и обновление базы
 - [Помощь и сообщения об ошибках](../SUPPORT.md)
 - [Поддержать проект](../DONATE.md)
-- [Приватность 1.0](release/PRIVACY_1_0.md)
+- [Политика приватности](release/PRIVACY.md)
 - [Снимки интерфейса 1.0.2](assets/releases/1.0.2/README.md)
 
 **Версия 1.1.0** доступна в [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) и [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
@@ -38,7 +38,7 @@ material. They do not replace the current installation and development guides.
 ## English
 
 Start with [installation](user/INSTALLATION.md#english-summary),
-[the 1.0.2 guide](user/USER_GUIDE_1_0_2.md#english-summary), or [help and bug reports](../SUPPORT.md#english).
+[the user guide](user/GUIDE.md#english-summary), or [help and bug reports](../SUPPORT.md#english).
 Version **1.1.0** is available in Chrome Web Store and Firefox Add-ons.
 Chromium ZIP and signed Firefox XPI **1.1.0** are available for manual installation.
 [Changes in 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0). For development, use the separate

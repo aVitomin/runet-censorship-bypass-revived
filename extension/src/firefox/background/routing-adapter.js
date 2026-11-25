@@ -22,6 +22,7 @@
     FAILED: 'FAILED',
   });
   const MAX_AUTHORIZATIONS = 256;
+  const BACKGROUND_CALLBACK_GRACE_MS = 5000;
   const MAX_CALLBACK_BUDGET = 256;
   const MAX_ORIGIN_AUTH_RETRIES = 2;
   const AUTH_REF_PATTERN = /^[A-Za-z0-9._:-]{1,128}$/;
@@ -44,6 +45,14 @@
     return (typeof value === 'string' || typeof value === 'number') &&
       String(value).length > 0;
 
+  }
+
+  // Firefox channel IDs are decimal integers. Unknown formats stay in the normal
+  // bounded maps and cannot be retired by the numeric cutoff.
+  function channelNumber(requestId) {
+    if (!isRequestId(requestId)) return 0;
+    const n = Number(requestId);
+    return Number.isSafeInteger(n) && n > 0 && String(n) === String(requestId) ? n : 0;
   }
 
   function validCandidateHost(value) {
@@ -228,6 +237,8 @@
     const credentialResolverForRequest = options.credentialResolverForRequest;
     const antizapretSession = options.antizapretSession || (() => null);
     const strictRequests = new Map();
+    const now = options.now || (() => performance.now());
+    let retiredStrictThrough = 0;
     let authorizations = options.authorizations || new Map();
     let requestAuthContexts = options.requestAuthContexts || new Map();
 
@@ -265,8 +276,41 @@
 
     }
 
+    function isRetiredStrictRequest(requestId) {
+      if (!retiredStrictThrough || strictRequests.has(requestId)) return false;
+      const id = channelNumber(requestId);
+      return id > 0 && id <= retiredStrictThrough;
+    }
+
+    // Firefox can consult proxy.onRequest for internal DNS channels without
+    // exposing them to webRequest. Reclaim only aged, unobserved background
+    // decisions under pressure. An active page, auth exchange or pending lookup
+    // must retain its own grant.
+    function reclaimBackgroundRequests() {
+      if (strictRequests.size < MAX_AUTHORIZATIONS && authorizations.size < MAX_AUTHORIZATIONS &&
+          requestAuthContexts.size < MAX_AUTHORIZATIONS) return;
+      const cutoff = now() - BACKGROUND_CALLBACK_GRACE_MS;
+      for (const [id, attempt] of strictRequests) {
+        if (attempt.awaitingBeforeSince === undefined || attempt.awaitingBeforeSince > cutoff) {
+          continue;
+        }
+        const number = channelNumber(id);
+        if (!number) continue;
+        // This cutoff can only deny. Keep it across Clear so a late callback
+        // cannot be mistaken for a new OFF request, even if events arrive out of order.
+        retiredStrictThrough = Math.max(retiredStrictThrough, number);
+        strictRequests.delete(id);
+        clearAuthorization(id);
+      }
+      for (const [id, context] of requestAuthContexts) {
+        if (context.awaitingBeforeSince <= cutoff && !strictRequests.has(id)) {
+          clearAuthorization(id);
+        }
+      }
+    }
+
     function authorize(requestId, callbackBudget, authCandidates, resolver,
-        origin) {
+        origin, tabId) {
 
       if (!isRequestId(requestId) ||
           !Number.isSafeInteger(callbackBudget) || callbackBudget < 1 ||
@@ -286,6 +330,7 @@
           requestAuthContexts.set(requestId, {
             candidates: authCandidates,
             selected: null,
+            awaitingBeforeSince: tabId === -1 ? now() : undefined,
             resolver,
             originAuthentication: origin ? {
               origin,
@@ -323,6 +368,8 @@
         return converted.proxyResult;
       } catch (_error) {
         return BLOCKED_ROUTE;
+      } finally {
+        if (details.tabId === -1) attempt.awaitingBeforeSince = now();
       }
     }
 
@@ -331,6 +378,8 @@
       const requestId = details && details.requestId;
       try {
         const runtimeState = currentRuntimeState();
+        if (runtimeState === STATES.READY) reclaimBackgroundRequests();
+        if (isRetiredStrictRequest(requestId)) return BLOCKED_ROUTE;
         const session = antizapretSession();
         if (session && runtimeState === STATES.READY) {
           return onAntizapretProxyRequest(details, session);
@@ -351,7 +400,7 @@
             converted.callbackBudget,
             converted.authCandidates,
             credentialResolverForRequest ? credentialResolverForRequest() : null,
-            requestOrigin(details),
+            requestOrigin(details), details.tabId,
         )) {
           clearAuthorization(requestId);
           return DEFAULT_ROUTE;
@@ -389,6 +438,7 @@
     function onBeforeRequest(details) {
 
       try {
+        if (isRetiredStrictRequest(details && details.requestId)) return CANCEL;
         const runtimeState = currentRuntimeState();
         if (runtimeState === STATES.OFF) {
           return strictRequests.has(details && details.requestId) ? CANCEL : ALLOW;
@@ -403,7 +453,11 @@
         if ((strict && (!strict.authorized || strict.session !== antizapretSession() ||
               strict.url !== details.url || !selectedRoute)) ||
             (!strict && antizapretSession())) return CANCEL;
-        if (context) context.selected = selectedRoute;
+        if (strict) delete strict.awaitingBeforeSince;
+        if (context) {
+          delete context.awaitingBeforeSince;
+          context.selected = selectedRoute;
+        }
         const originAuth = context && context.originAuthentication;
         const origin = originAuth && requestOrigin(details);
         if (originAuth && originAuth.pending && (!origin ||

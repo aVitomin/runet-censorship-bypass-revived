@@ -19,6 +19,7 @@ const expectedCoreDocs = [
   'SECURITY.md',
   'docs/README.md',
   'docs/user/INSTALLATION.md',
+  'docs/user/GUIDE.md',
   'docs/user/USER_GUIDE.md',
   'docs/user/TROUBLESHOOTING.md',
   'docs/user/PRIVACY_AND_SECURITY.md',
@@ -36,7 +37,8 @@ const expectedCoreDocs = [
 const expectedReadmeNavigation = [
   'docs/README.md',
   'docs/user/INSTALLATION.md',
-  'docs/user/USER_GUIDE.md',
+  'docs/user/GUIDE.md',
+  'docs/release/PRIVACY.md',
   'docs/user/TROUBLESHOOTING.md',
   'docs/user/PRIVACY_AND_SECURITY.md',
   'docs/development/DEVELOPMENT.md',
@@ -58,19 +60,19 @@ function addError(file, line, target, reason) {
   errors.push({ file, line, target, reason });
 }
 
-function trackedMarkdownFiles() {
-  return trackedFiles(['*.md']);
-}
-
-function trackedFiles(pathspecs) {
-  const result = spawnSync('git', ['ls-files', '-z', '--', ...pathspecs], {
+function worktreeFiles(pathspecs) {
+  const result = spawnSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', ...pathspecs], {
     cwd: repoRoot,
     encoding: 'utf8',
   });
   if (result.status !== 0) {
     throw new Error(`git ls-files failed for ${pathspecs.join(', ')}: ${result.stderr.trim()}`);
   }
-  return result.stdout.split('\0').filter(Boolean).sort();
+  // Git's index still lists unstaged deletions. Validate regular files present on disk.
+  const paths = new Set(result.stdout.split('\0').filter(Boolean));
+  return [...paths].filter((file) => fs.lstatSync(path.join(repoRoot, file), {
+    throwIfNoEntry: false,
+  })?.isFile()).sort();
 }
 
 function withoutCode(text) {
@@ -388,7 +390,17 @@ for (const requiredPath of expectedCoreDocs) {
   }
 }
 
-const markdownFiles = trackedMarkdownFiles();
+// Chrome Web Store still serves the previous raw URL directly.
+const privacyPath = 'docs/release/PRIVACY.md';
+const submittedPrivacyPath = 'docs/release/PRIVACY_1_0.md';
+const currentPolicy = path.join(repoRoot, privacyPath);
+const submittedPolicy = path.join(repoRoot, submittedPrivacyPath);
+if (!fs.existsSync(currentPolicy) || !fs.existsSync(submittedPolicy) ||
+    !fs.readFileSync(currentPolicy).equals(fs.readFileSync(submittedPolicy))) {
+  addError(submittedPrivacyPath, 1, privacyPath, 'Published raw privacy notice differs from the current policy');
+}
+
+const markdownFiles = worktreeFiles(['*.md']);
 for (const file of markdownFiles) {
   const text = fs.readFileSync(path.join(repoRoot, file), 'utf8');
   checkCurrentDocPolicies(file, text);
@@ -404,7 +416,7 @@ for (const file of markdownFiles) {
   }
 }
 
-const additionalPolicyFiles = trackedFiles(['.github', releaseMetadataPath])
+const additionalPolicyFiles = worktreeFiles(['.github', releaseMetadataPath])
   .filter((file) => !markdownFiles.includes(file));
 for (const file of additionalPolicyFiles) {
   checkCurrentDocPolicies(file, fs.readFileSync(path.join(repoRoot, file), 'utf8'));

@@ -11,6 +11,7 @@ const ProductConfig = require('../background/product-config');
 const ProductionProvider = require('../background/production-provider');
 const Routing = require('../../shared/routing-contract');
 const Helpers = require('./dataset-test-helpers');
+const Popup = require('../pages/popup');
 
 const sourceRoot = Path.resolve(__dirname, '..');
 const manifest = JSON.parse(Fs.readFileSync(
@@ -1261,6 +1262,34 @@ describe('Firefox production control package', function() {
     Assert.doesNotMatch(JSON.stringify(support), /proxy.example|new-user|new-secret|savedRevision|effectiveId/);
   });
 
+  it('applies a pending Direct rule without replacing it with the untouched Effective route', async function() {
+    const page = await unifiedFixture();
+    const tabUrl = 'https://sub.example.com/';
+    const send = async (message) => {
+      const response = await page.send(message);
+      Assert.strictEqual(response.ok, true, JSON.stringify(response.error));
+      return response.result;
+    };
+    await send({type: 'firefox.activation.apply', expectedRevision: 0});
+    const saved = await send({type: 'firefox.settings.get'});
+    saved.settings.rules.direct = ['sub.example.com'];
+    await send({type: 'firefox.settings.replace', expectedRevision: saved.revision, settings: saved.settings});
+    const popup = Popup.createController({getActiveTabUrl: async () => tabUrl, rpc: {call: send}});
+    Assert.strictEqual(await popup.refresh(), true);
+    const before = popup.snapshot();
+    Assert.strictEqual(before.site.route.mode, 'AUTO');
+    Assert.strictEqual(before.configuration.pending, true);
+    const stale = await page.send({type: 'firefox.activation.apply',
+      expectedRevision: before.configuration.savedRevision, expectedEffectiveId: null});
+    Assert.deepStrictEqual(stale.error, {code: 'SAVED_REVISION_CHANGED'});
+    Assert.strictEqual(await popup.apply(before.site.route, true), true);
+    const after = popup.snapshot();
+    Assert.strictEqual(after.site.route.mode, 'DIRECT');
+    Assert.strictEqual(after.configuration.pending, false);
+    Assert.strictEqual(after.configuration.savedRevision, before.configuration.savedRevision);
+    Assert.deepStrictEqual((await send({type: 'firefox.settings.get'})).settings.rules.direct, ['sub.example.com']);
+  });
+
   it('composes popup Save + exact Apply, protects pending settings and rejects stale confirmation', async function() {
 
     const page = await unifiedFixture();
@@ -1294,12 +1323,23 @@ describe('Firefox production control package', function() {
     Assert.strictEqual(page.proxySettingsCalls.clear, 0);
     Assert.strictEqual(page.proxySettingsCalls.set, 1);
     Assert.strictEqual((await page.send({type: 'firefox.site.get', tabUrl: 'https://sub.example.com/'})).result.route.mode, 'AUTO');
+    const popup = async () => (await page.send({type: 'firefox.popup.get',
+      tabUrl: 'https://sub.example.com/'})).result;
+    Assert.strictEqual((await popup()).routingData.active, true);
+    const privateAccess = page.context.browser.extension.isAllowedIncognitoAccess;
+    page.context.browser.extension.isAllowedIncognitoAccess = async () => false;
+    const denied = await popup();
+    Assert.strictEqual(denied.configuration.active, false);
+    Assert.strictEqual(denied.routingData.active, false);
+    page.context.browser.extension.isAllowedIncognitoAccess = privateAccess;
     // A live ownership loss must not wait for the asynchronous change event to
     // stop the UI from claiming Active or a safe failed-Apply outcome.
     page.context.browser.proxy.settings.get = async () => ({
       levelOfControl: 'controlled_by_other_extensions', value: {},
     });
-    const lost = await status();
+    const lostPopup = await popup();
+    Assert.strictEqual(lostPopup.routingData.active, false);
+    const lost = lostPopup.configuration;
     Assert.strictEqual(lost.active, false);
     Assert.strictEqual(lost.blocked, true);
     Assert.strictEqual(lost.reason, 'CONTROL_LOSS');
@@ -2320,6 +2360,10 @@ describe('Firefox production control package', function() {
 
   it('popup routing update coalesces OFF checks and skips manual sources without writes', async function() {
     let checks = 0;
+    let markStarted;
+    const started = new Promise((resolve) => {
+      markStarted = resolve;
+    });
     let finish;
     const waiting = new Promise((resolve) => {
       finish = resolve;
@@ -2327,16 +2371,16 @@ describe('Firefox production control package', function() {
     const page = await unifiedFixture(true, {
       providerSourceUpdateConfigured: true,
       providerUpdateCheck: async () => {
-        checks += 1; return waiting;
+        checks += 1;
+        markStarted();
+        return waiting;
       },
       promotionInstall: async () => ({ok: true, status: 'INSTALLED'}),
     });
     const writes = Object.assign({}, page.proxySettingsCalls);
     const first = page.send({type: 'firefox.routingData.refresh'});
     const second = page.send({type: 'firefox.routingData.refresh'});
-    for (let n = 0; n < 30 && !checks; n += 1) {
-      await new Promise((resolve) => setImmediate(resolve));
-    }
+    await started;
     Assert.equal(checks, 1);
     finish({ok: true, status: 'STAGED'});
     Assert.equal((await first).result.status, 'PREPARED');

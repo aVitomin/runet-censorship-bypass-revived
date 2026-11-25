@@ -59,7 +59,9 @@ node ./scripts/cross-browser-visual-qa.mjs
 The harness copies the exact built packages to disposable locations, injects a
 read-only popup fixture only into those copies, and never modifies the packages
 being compared. Options uses the real page/controller with deterministic local
-state. Output is ignored under `.local/cross-browser-visual-qa/`.
+state. Each invocation prints the path of a new `.local/cross-browser-visual-qa/run-*/`
+folder containing its screenshots and report. To group runs, use a parent such as
+`--output .local/cross-browser-visual-qa/store`. Earlier runs are preserved.
 
 For each engine it captures 96 screenshots:
 
