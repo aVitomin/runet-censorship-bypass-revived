@@ -339,7 +339,8 @@
     description.id = 'popup-global-description';
     if (presentation.pillText && (presentation.tone === 'warning' ||
         presentation.pillText === t('popupHealthWorkingPill')) &&
-        presentation.pillText !== presentation.title) {
+        presentation.pillText !== presentation.title &&
+        presentation.pillText !== t('popupStatusActivePill')) {
       appendText(status, 'span', presentation.pillText,
           `ui-pill ${presentation.pillClass || ''}`.trim());
     }
@@ -422,7 +423,8 @@
             (state.configuration ? state.configuration.active : controlsPac(state)) ? 'unifiedApply' : 'unifiedApplyOn'),
           'ui-button primary',
       );
-      const candidateMissing = draft.siteMode === 'proxy' &&
+      const candidateMissing = !(state.configuration && state.configuration.pending) &&
+        draft.siteMode === 'proxy' &&
         getDraftProxyMethodCount(state) === 0;
       applyButton.disabled = candidateMissing;
       if (candidateMissing) {
@@ -701,7 +703,7 @@
   function renderPendingWarning(parent, state) {
 
     if (!state.configuration || !state.configuration.pending) return;
-    appendText(parent, 'p', t('unifiedPopupPending'), 'status warning');
+    appendText(parent, 'p', t('unifiedPopupPending'), 'status-message warning pending-note');
     appendOptionsLink(parent, t('unifiedReview'), '', 'ui-button primary');
 
   }
@@ -726,9 +728,14 @@
     summary.setAttribute('aria-controls', 'popup-details-content');
     const content = append(details, 'div', 'daily-details-content');
     content.id = 'popup-details-content';
-    const source = append(content, 'div', 'daily-detail-row');
-    appendText(source, 'span', t('popupRoutingSource'));
-    appendText(source, 'strong', getDraftProviderLabel(state));
+    const customSource = (state.providers || []).some((provider) =>
+      provider.key === draft.providerKey && provider.type === 'custom',
+    );
+    if (customSource || state.configuration && state.configuration.pending) {
+      const source = append(content, 'div', 'daily-detail-row');
+      appendText(source, 'span', t('popupSavedRoutingSource'));
+      appendText(source, 'strong', getDraftProviderLabel(state));
+    }
     const links = append(content, 'div', 'daily-detail-links');
     appendOptionsLink(
         links,
@@ -824,8 +831,8 @@
       if (configuration.active) {
         const unhealthy = state.proxyHealth && state.proxyHealth.status === 'error';
         const failure = operation && operation.ok === false && operation.previousActive;
-        return createPresentation('active', configuration.pending || unhealthy ? 'warning' : 'success',
-          configuration.pending ? 'unifiedPending' : 'unifiedActive',
+        return createPresentation('active', unhealthy || failure ? 'warning' : 'success',
+            'unifiedActive',
           failure ? t(operation.saved ? 'unifiedSiteSaved' : 'unifiedApplyFailed') :
             unhealthy ? getProxyHealthErrorText(state.proxyHealth) : t('popupControlActiveHelp'),
           unhealthy ? 'popupHealthWarningPill' :
@@ -1156,13 +1163,14 @@
     renderPopup(latestState);
     try {
       const configuration = latestState.configuration || {};
-      const result = await rpc.callBackground(latestState.controllable ?
-        'applySiteConfiguration' : 'applySavedConfiguration', {
-        tabUrl: activeTabUrl, mode: draft.siteMode, scope: draft.siteScope,
-        expectedRevision: configuration.savedRevision,
-        expectedEffectiveId: configuration.effectiveId || null,
-        applyAll,
-      });
+      const request = {tabUrl: activeTabUrl, expectedRevision: configuration.savedRevision,
+        expectedEffectiveId: configuration.effectiveId || null};
+      const editSite = latestState.controllable && isSiteDraftDirty(latestState);
+      if (editSite) {
+        Object.assign(request, {mode: draft.siteMode, scope: draft.siteScope, applyAll});
+      }
+      const method = editSite ? 'applySiteConfiguration' : 'applySavedConfiguration';
+      const result = await rpc.callBackground(method, request);
       latestState = result.popupState || latestState;
       lastOperation = Object.assign({kind: operation}, result);
       if (result.ok !== false) {

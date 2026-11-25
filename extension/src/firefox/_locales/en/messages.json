@@ -1,4 +1,5 @@
 {
+  "documentLanguage": {"message": "en"},
   "optionsAntizapretLocalSource": {
     "message": "Antizapret"
   },
@@ -18,6 +19,8 @@
   "sourceCheckChecking": {
     "message": "Checking source…"
   },
+  "sourceCheckLocal_ready": {"message": "Saved Antizapret rules are ready. This check reads the local copy."},
+  "sourceCheckLocal_unavailable": {"message": "No Antizapret rules are ready on this device. Download the rules or import a PAC file."},
   "sourceCheck_ready": {
     "message": "Source responded and its data passed validation. Active routing is unchanged."
   },
@@ -310,7 +313,7 @@
     "message": "Site rule saved, but not applied. Previous settings remain active."
   },
   "unifiedPopupPending": {
-    "message": "Other saved settings are waiting. Applying all changes will activate them too."
+    "message": "Saved settings are pending. Applying the site rule will also apply those settings."
   },
   "unifiedTransition": {
     "message": "Currently: $1. Selected: $2."
@@ -1193,6 +1196,9 @@
   },
   "antifilterPrepared": {
     "message": "Antifilter list is ready. Save the selected source and proxy settings, then Apply."
+  },
+  "routingDataActiveTitle": {
+    "message": "Active routing data"
   },
   "routingDataTitle": {
     "message": "Routing data"

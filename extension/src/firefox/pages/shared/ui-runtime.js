@@ -8,6 +8,7 @@
     module.exports = api;
     return;
   }
+  root.document.documentElement.lang = root.browser.i18n.getMessage('documentLanguage');
   root.rucbFirefoxUi = api;
 
 })(typeof globalThis === 'object' ? globalThis : this, function() {

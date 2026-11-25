@@ -18,12 +18,18 @@
    прокси, в том числе в обычных окнах.
 4. Настройте расширение по разделу [«Первый запуск»](#первый-запуск).
 
+В Chrome для обычных вкладок можно оставить настройки доступа по умолчанию.
+Чтобы открывать панель расширения в окне инкогнито, включите **Разрешить
+использование в режиме инкогнито** в сведениях о расширении. Доступ к
+файловым URL — отдельная настройка. Для сайтов и выбора PAC-файла через
+кнопку импорта она не требуется.
+
 Магазин — основной способ установки и получения следующих одобренных обновлений.
 Если установка ограничена политикой организации, обратитесь к администратору.
 
 ## Требования
 
-В манифестах **1.0.1–1.0.3** установлены расчётные минимумы:
+Манифесты версии **1.1.0** указывают минимальные версии браузеров:
 **Chromium 108+** и **Firefox 140+**, включая ESR на подходящей базе.
 Ожидается работа в совместимых настольных браузерах с Manifest V3 и API прокси.
 Версия движка Chromium важнее собственного номера Brave, Opera или другого
@@ -84,15 +90,25 @@ c784f03867a5106cc2f123894ac2637b3dd50f8adc7b49d12e620703b1c33baf
 
 ## Первый запуск
 
-Расширение начинает работу с выключенной маршрутизацией. Откройте настройки,
-выберите источник, при необходимости настройте подключения, нажмите
-**Сохранить настройки**, затем отдельно **Применить**.
+1. Откройте настройки расширения и перейдите в **Обзор**. При первой установке
+   мастер поможет выбрать источник. Пока вы настраиваете расширение, маршрутизация выключена.
+2. Если выбрали **Antizapret**, дальнейшие действия зависят от браузера.
+   - **Chromium.** Онлайн-источник может использовать прокси провайдера. Для файла
+     откройте **Источник правил → Антизапрет (локальный файл) → Импортировать доверенный PAC-файл Антизапрета**.
+     Выберите сохранённый PAC и включите свой прокси.
+   - **Firefox.** В разделе **Источник правил** выберите **Antizapret** и нажмите
+     **Загрузить правила Antizapret**. Если загрузка недоступна, выберите
+     **Импортировать PAC-файл**. Для обоих вариантов включите свой прокси и
+     параметр **Использовать прокси провайдера**.
+3. Сохраните настройки, затем нажмите **Применить**. Откройте или перезагрузите
+   подходящий под правило сайт. Нажмите значок расширения и проверьте имя
+   сайта, выбранный режим и состояние маршрутизации.
 
 Режим **Только мои правила и подключения** не требует автоматической базы.
 Для режима **Прокси** нужно подходящее настроенное подключение.
 Расширение не предоставляет VPN или прокси-сервер и не запускает локальные службы.
 
-[Руководство 1.0.2](USER_GUIDE_1_0_2.md).
+[Руководство пользователя](GUIDE.md).
 
 ## Обновить расширение
 
@@ -125,7 +141,7 @@ Chromium-версии на магазинную могут создать отд
 Обновление данных маршрутизации из панели расширения или **Обслуживания**
 не устанавливает новую версию расширения. Оно сохраняет применённые настройки
 и не включает выключенную маршрутизацию:
-[подробнее](USER_GUIDE_1_0_2.md#обновить-данные-маршрутизации).
+[подробнее](GUIDE.md#обновить-данные-маршрутизации).
 
 Для удаления сначала выключите маршрутизацию, затем удалите расширение на
 странице расширений браузера. После удаления распакованной Chromium-установки
@@ -141,8 +157,12 @@ Install **Chromium 1.1.0** from [Chrome Web Store](https://chromewebstore.google
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
 
+In Chrome, default access works for ordinary tabs. Turn on **Allow in Incognito**
+to open the extension panel in a private window. File URL access is separate.
+You can leave it off when browsing websites or choosing a PAC file through the importer.
+
 **Chromium 1.1.0** is also available as a manual ZIP; **Firefox 1.1.0** as a
-Mozilla-signed XPI. Versions **1.0.1–1.0.3** target desktop **Chromium 108+** and **Firefox 140+**,
+Mozilla-signed XPI. The **1.1.0** manifests target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR releases on a compatible base. These are API-based compatibility
 estimates, not test results for every version or fork. Required MV3 and proxy
 extension APIs must be available; mobile browsers and WebView are outside this scope.
@@ -154,4 +174,14 @@ Switching it to a store installation may require settings transfer; exported
 settings omit credentials and custom-source URLs. Disable the old installation
 before applying the new one.
 
-Save records settings; Apply activates them. See the [1.0.2 guide](USER_GUIDE_1_0_2.md#english-summary).
+On first install, open **Overview**. If you choose **Antizapret**:
+
+- **Chromium.** The online source can use the provider’s proxies. To use a saved
+  PAC, open **Routing source → Antizapret (local file) → Import a trusted Antizapret PAC file**.
+  Choose the file and enable your own proxy.
+- **Firefox.** Under **Routing source**, choose **Antizapret** and select
+  **Download Antizapret rules**. If the download fails, select **Import PAC file**.
+  For either option, enable your own proxy and turn on **Use provider proxies**.
+
+Save your settings and select **Apply**. Reload a site covered by a rule and
+check its hostname and mode in the popup. See the [user guide](GUIDE.md#english-summary).

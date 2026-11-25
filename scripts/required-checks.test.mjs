@@ -19,6 +19,7 @@ test('keeps documentation-only work focused', () => {
   assert.deepEqual(plan.checks, [
     'node .\\scripts\\verify-docs.mjs',
     'git diff --check',
+    'git diff --cached --check',
   ]);
 });
 
@@ -83,7 +84,7 @@ for (const [browser, file] of [
 }
 
 test('shared assets select aggregate once even with per-browser or tooling edits', () => {
-  for (const shared of [SOURCES.sharedAssets, SOURCES.shared, SOURCES.chromiumCompat]) {
+  for (const shared of [SOURCES.sharedAssets, SOURCES.shared]) {
     const plan = planForPaths([
       `${shared}/example.js`, `${SOURCES.firefox}/pages/options/index.js`,
       `${SOURCES.chromium}/background/service-worker.js`, `${TOOLING_ROOT}/src/tooling/test/example.js`,
@@ -92,6 +93,65 @@ test('shared assets select aggregate once even with per-browser or tooling edits
       `npm --prefix ${project} run verify`,
     ]);
     assert.ok(plan.notes.some((note) => note.includes('package trees')));
+  }
+});
+
+test('selects the package and tooling checks that consume each build helper', () => {
+  for (const [file, expected] of [
+    ['src/tooling/distribution-notices.js', ['verify']],
+    ['src/tooling/package-source.js', ['verify:firefox', 'verify:tooling']],
+    ['src/tooling/repository-root.js', ['verify', 'release:chromium', 'release:firefox']],
+    ['src/chromium-compat/pages/lib/example.js', ['verify:chromium']],
+    ['src/assets/brand/icon-512.png', ['verify:chromium']],
+    ['src/tooling/test-support/domain-dataset.js', ['verify']],
+    ['src/tooling/firefox-provider/generate-provider-dataset.js', ['verify:firefox', 'verify:tooling']],
+    ['src/tooling/test/package-source.js', ['verify:tooling']],
+    ['.gitattributes', ['verify']],
+  ]) {
+    const plan = planForPaths([`${TOOLING_ROOT}/${file}`]);
+    assert.deepEqual(plan.checks.filter((check) => check.startsWith('npm ')),
+      expected.map((script) => `npm --prefix ${project} run ${script}`), file);
+  }
+});
+
+test('Chromium compatibility font retains its vendor review', () => {
+  const plan = planForPaths([`${SOURCES.chromiumCompat}/pages/lib/fonts/emoji.woff`]);
+  assert.ok(plan.skills.includes('dependency-review'));
+  assert.deepEqual(plan.checks.filter((check) => check.startsWith('npm ')),
+    [`npm --prefix ${project} run verify:chromium`]);
+});
+
+test('production tooling imports retain build or release coverage', () => {
+  for (const [entry, packager] of [
+    ['gulpfile.js', null],
+    ['scripts/package-chromium-release.js', 'release:chromium'],
+    ['scripts/package-firefox-release.js', 'release:firefox'],
+  ]) {
+    const file = new URL(`../${TOOLING_ROOT}/${entry}`, import.meta.url);
+    const imports = fs.readFileSync(file, 'utf8').matchAll(/require\('([^']+\/src\/tooling\/[^']+)'\)/gu);
+    for (const [, specifier] of imports) {
+      const input = path.posix.join(TOOLING_ROOT, path.posix.dirname(entry), specifier + '.js');
+      const {checks} = planForPaths([input]);
+      const gates = packager ? [packager] : ['verify', 'verify:chromium', 'verify:firefox'];
+      assert.ok(gates.some((gate) => checks.includes(`npm --prefix ${project} run ${gate}`)), input);
+    }
+  }
+});
+
+test('selects the actual consumers of every distributed notice and license', async () => {
+  const {default: notices} = await import(`../${TOOLING_ROOT}/src/tooling/distribution-notices.js`);
+  const targetFiles = (target) => Object.values(notices.distributionNoticeSources(target));
+  const chromium = targetFiles('chromium');
+  const firefox = targetFiles('firefox');
+  const root = fileURLToPath(new URL('../', import.meta.url));
+  for (const file of new Set([...chromium, ...firefox])) {
+    const relative = path.relative(root, file);
+    const script = chromium.includes(file) && firefox.includes(file) ? 'verify' :
+      chromium.includes(file) ? 'verify:chromium' : 'verify:firefox';
+    const plan = planForPaths([relative]);
+    assert.deepEqual(plan.checks.filter((check) => check.startsWith('npm ')),
+      [`npm --prefix ${project} run ${script}`], relative);
+    assert.ok(!plan.notes.some((note) => note.startsWith('Unclassified paths')), relative);
   }
 });
 
@@ -132,6 +192,7 @@ test('detects staged/unstaged changes, deletions, untracked files and both renam
     for (const name of [removed, renamed, 'staged-delete.txt', 'staged.txt', 'unstaged.txt', 'net-unchanged.txt', '.gitignore']) write(name, name);
     write('.gitignore', '.local/\n');
     git('add', '--', '.');
+    assert.ok(changedPaths(root).includes(renamed), 'staged file before the first commit');
     git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
       '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'fixture');
     fs.unlinkSync(path.join(root, removed));

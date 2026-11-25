@@ -97,6 +97,105 @@ describe('Firefox fail-closed routing adapter', function() {
 
   });
 
+  it('reclaims unobserved Firefox background channels without releasing old callbacks', async function() {
+    let now = 1;
+    let state = Adapter.STATES.READY;
+    const session = {datasetRuntime: {routingInputForRequest: () => DIRECT_DECISION}};
+    const adapter = Adapter.createAdapter({
+      runtimeStateForRequest: () => state,
+      decideRoute: (value) => value,
+      antizapretSession: () => state === Adapter.STATES.READY ? session : null,
+      verifyAntizapretSession: async () => true,
+      now: () => now,
+    });
+    const details = (id, tabId = -1) => ({
+      requestId: String(id), tabId, url: 'https://fixture.test/',
+    });
+    const ordinary = details(1, 7);
+    const observed = details(2);
+    await adapter.onProxyRequest(ordinary);
+    await adapter.onProxyRequest(observed);
+    Assert.deepStrictEqual(adapter.onBeforeRequest(observed), {cancel: false});
+    for (let id = 3; id <= Adapter.MAX_AUTHORIZATIONS; id++) {
+      Assert.strictEqual(await adapter.onProxyRequest(details(id)), null);
+    }
+
+    const next = details(Adapter.MAX_AUTHORIZATIONS + 1, 7);
+    Assert.strictEqual((await adapter.onProxyRequest(next)).at(-1), null);
+    now += 60000;
+    Assert.strictEqual(await adapter.onProxyRequest(next), null);
+    Assert.deepStrictEqual(adapter.onBeforeRequest(next), {cancel: false});
+    Assert.deepStrictEqual(adapter.onBeforeRequest(ordinary), {cancel: false});
+    Assert.deepStrictEqual(adapter.onBeforeRequest(details(3)), {cancel: true});
+    Assert.ok(adapter.authContextCount() <= Adapter.MAX_AUTHORIZATIONS);
+    Assert.deepStrictEqual(adapter.onBeforeRequest(observed), {cancel: true});
+
+    state = Adapter.STATES.OFF;
+    adapter.clearAllAuthorizations();
+    Assert.deepStrictEqual(adapter.onBeforeRequest(details(3)), {cancel: true});
+    Assert.strictEqual((adapter.onProxyRequest(details(3))).at(-1), null);
+    Assert.deepStrictEqual(adapter.onBeforeRequest(observed), {cancel: true});
+    Assert.deepStrictEqual(adapter.onBeforeRequest(details(10000, 7)), {cancel: false});
+  });
+
+  it('keeps a pending lookup, an observed auth exchange and opaque IDs intact during cleanup', async function() {
+    let now = 0;
+    let release;
+    const credentials = {username: 'fixture-user', password: 'fixture-secret'};
+    const proxy = candidate('local', 'HTTP', '127.0.0.1', 8123, {authRef: 'fixture'});
+    const decision = proxyDecision([proxy]);
+    const session = {
+      datasetRuntime: {routingInputForRequest: ({requestId}) => requestId === '2' ?
+        new Promise((resolve) => {
+          release = resolve;
+        }) : decision},
+      resolveCredentials: () => credentials,
+    };
+    const adapter = Adapter.createAdapter({initialState: Adapter.STATES.READY,
+      decideRoute: (value) => value, antizapretSession: () => session,
+      verifyAntizapretSession: async () => true, now: () => now});
+    const request = (id) => ({requestId: String(id), url: 'http://site.test/', tabId: -1,
+      proxyInfo: {type: 'http', host: '127.0.0.1', port: 8123}});
+    const live = request(1);
+    await adapter.onProxyRequest(live);
+    Assert.deepStrictEqual(adapter.onBeforeRequest(live), {cancel: false});
+    const pending = adapter.onProxyRequest(request(2));
+    const opaque = request('opaque-id');
+    await adapter.onProxyRequest(opaque);
+    for (let id = 4; id <= Adapter.MAX_AUTHORIZATIONS; id++) {
+      await adapter.onProxyRequest(request(id));
+    }
+    now += 60000;
+    await adapter.onProxyRequest(request(500));
+    release(decision);
+    await pending;
+    Assert.deepStrictEqual(adapter.onBeforeRequest(request(2)), {cancel: false});
+    Assert.deepStrictEqual(adapter.onBeforeRequest(opaque), {cancel: false});
+    const challenge = {isProxy: true, challenger: {host: '127.0.0.1', port: 8123}};
+    Assert.strictEqual(adapter.resolveCredentialsForChallenge(Object.assign({}, live, challenge)),
+        credentials);
+    Assert.strictEqual(adapter.resolveCredentialsForChallenge(
+        Object.assign({}, request(4), challenge)), null);
+    Assert.deepStrictEqual(adapter.onBeforeRequest(request(4)), {cancel: true});
+  });
+
+  it('reclaims unobserved background grants but keeps active tab grants', function() {
+    let now = 0;
+    const adapter = Adapter.createAdapter({initialState: Adapter.STATES.READY,
+      routingInputForRequest: () => DIRECT_DECISION,
+      decideRoute: (value) => value, now: () => now});
+    const request = (id, tabId) => ({requestId: String(id), url: 'http://site.test/', tabId});
+    adapter.onProxyRequest(request(1, 7));
+    for (let id = 2; id <= Adapter.MAX_AUTHORIZATIONS; id++) {
+      adapter.onProxyRequest(request(id, -1));
+    }
+    now += 60000;
+    Assert.strictEqual(adapter.onProxyRequest(request(500, 7)), null);
+    Assert.deepStrictEqual(adapter.onBeforeRequest(request(1, 7)), {cancel: false});
+    Assert.deepStrictEqual(adapter.onBeforeRequest(request(500, 7)), {cancel: false});
+    Assert.deepStrictEqual(adapter.onBeforeRequest(request(2, -1)), {cancel: true});
+  });
+
   it('leaves ordinary traffic alone while durable runtime is OFF', function() {
 
     const adapter = Adapter.createAdapter();

@@ -1,4 +1,5 @@
 {
+  "documentLanguage": {"message": "ru"},
   "optionsAntizapretLocalSource": {
     "message": "Antizapret"
   },
@@ -18,6 +19,8 @@
   "sourceCheckChecking": {
     "message": "Проверяем источник…"
   },
+  "sourceCheckLocal_ready": {"message": "Сохранённые правила Antizapret готовы. Проверена только локальная копия."},
+  "sourceCheckLocal_unavailable": {"message": "На устройстве нет готовых правил Antizapret. Загрузите правила или импортируйте PAC-файл."},
   "sourceCheck_ready": {
     "message": "Источник ответил, данные прошли проверку. Действующие правила не изменились."
   },
@@ -310,7 +313,7 @@
     "message": "Правило сайта сохранено, но не применено. Прежние настройки продолжают действовать."
   },
   "unifiedPopupPending": {
-    "message": "Есть другие сохранённые настройки. Применение всех изменений затронет и их."
+    "message": "Сохранённые настройки ещё не действуют. При применении правила сайта они тоже вступят в силу."
   },
   "unifiedTransition": {
     "message": "Сейчас: $1. Выбрано: $2."
@@ -1193,6 +1196,9 @@
   },
   "antifilterPrepared": {
     "message": "Список Antifilter готов. Сохраните выбранный источник и настройки прокси, затем нажмите «Применить»."
+  },
+  "routingDataActiveTitle": {
+    "message": "Действующая база маршрутизации"
   },
   "routingDataTitle": {
     "message": "База маршрутизации"

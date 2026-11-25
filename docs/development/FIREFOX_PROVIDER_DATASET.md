@@ -283,7 +283,7 @@ the proxy but cannot authorize Direct because Firefox may use a different
 address for the connection. When that lookup fails or the configured proxy is
 unavailable, a protected request fails instead of changing to Direct. See the
 [proxy floor and ownership model](FIREFOX_ARCHITECTURE.md#proxy-floor-and-ownership)
-and the [first-use draft](release-drafts/FIRST_USE.md).
+and the [first-use guide](../user/GUIDE.md).
 
 ## Separate compact domain schema
 

@@ -17,6 +17,7 @@ const BUILD = Path.join(PROJECT, 'build');
 const CHROMIUM_PACKAGE = Path.join(BUILD, 'chromium');
 const FIREFOX_PACKAGE = Path.join(BUILD, 'firefox');
 const require = createRequire(import.meta.url);
+const {createVisualRunDirectory} = require(Path.join(PROJECT, 'src/tooling/visual-qa-output.js'));
 const Puppeteer = require(Path.join(PROJECT, 'node_modules', 'puppeteer-core'));
 const FirefoxSmoke = require(Path.join(
     PROJECT,
@@ -73,7 +74,6 @@ function parseArguments(argv) {
   const result = {
     chromiumBin: String(process.env.CHROMIUM_BIN || '').trim(),
     firefoxBin: String(process.env.FIREFOX_BIN || '').trim(),
-    output: Path.join(ROOT, '.local', 'cross-browser-visual-qa'),
     target: 'both',
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -89,31 +89,19 @@ function parseArguments(argv) {
     }
     throw new Error(`Unknown argument: ${name}`);
   }
-  result.output = Path.resolve(result.output);
   Assert.ok(['both', 'chromium', 'firefox'].includes(result.target));
   return result;
 
 }
 
-function ensureBuiltPackage(packageRoot, manifestVersion) {
+function checkCaptureInputs(packageRoot, executable) {
 
+  Assert.ok(Fs.statSync(executable).isFile(), `Expected a browser executable: ${executable}`);
+  Fs.accessSync(executable, Fs.constants.X_OK);
   const manifestPath = Path.join(packageRoot, 'manifest.json');
   Assert.ok(Fs.existsSync(manifestPath), `Build first: ${manifestPath}`);
   const manifest = JSON.parse(Fs.readFileSync(manifestPath, 'utf8'));
-  Assert.equal(manifest.manifest_version, manifestVersion);
-
-}
-
-function resetDirectory(directory) {
-
-  const resolved = Path.resolve(directory);
-  const localRoot = Path.resolve(ROOT, '.local');
-  Assert.ok(
-      resolved.startsWith(`${localRoot}${Path.sep}`),
-      `QA output must stay under ${localRoot}.`,
-  );
-  Fs.rmSync(resolved, {force: true, recursive: true});
-  Fs.mkdirSync(resolved, {recursive: true});
+  Assert.equal(manifest.manifest_version, 3);
 
 }
 
@@ -397,8 +385,6 @@ function screenshotName(parts) {
 
 async function captureChromium(options, report, temporaryRoots) {
 
-  Assert.ok(options.chromiumBin, '--chromium-bin or CHROMIUM_BIN is required.');
-  Assert.ok(Fs.existsSync(options.chromiumBin), options.chromiumBin);
   const copy = makeInstrumentedCopy(
       CHROMIUM_PACKAGE, 'chromium', temporaryRoots,
   );
@@ -449,7 +435,7 @@ async function captureChromium(options, report, temporaryRoots) {
           ]);
           await page.screenshot({
             fullPage: true,
-            path: Path.join(options.output, name),
+            path: Path.join(report.output, name),
           });
           report.captures.push({audit, engine: 'chromium', file: name, locale,
             scale, state, surface: 'popup'});
@@ -482,7 +468,7 @@ async function captureChromium(options, report, temporaryRoots) {
           ]);
           await optionsPage.screenshot({
             fullPage: false,
-            path: Path.join(options.output, name),
+            path: Path.join(report.output, name),
           });
           report.captures.push({audit, engine: 'chromium', file: name, locale,
             scale, section, surface: 'options'});
@@ -705,7 +691,7 @@ async function captureFirefoxSession(
       const name = screenshotName([
         'firefox', 'popup', locale, state, `${scale}x`,
       ]);
-      await firefoxScreenshot(client, Path.join(options.output, name));
+      await firefoxScreenshot(client, Path.join(report.output, name));
       report.captures.push({audit, engine: 'firefox', file: name, locale,
         scale, state, surface: 'popup'});
     }
@@ -735,7 +721,7 @@ async function captureFirefoxSession(
       const name = screenshotName([
         'firefox', 'options', locale, section, `${scale}x`,
       ]);
-      await firefoxScreenshot(client, Path.join(options.output, name));
+      await firefoxScreenshot(client, Path.join(report.output, name));
       report.captures.push({audit, engine: 'firefox', file: name, locale,
         scale, section, surface: 'options'});
     }
@@ -762,10 +748,6 @@ async function captureFirefoxSession(
 
 async function captureFirefox(options, report, temporaryRoots) {
 
-  if (!options.firefoxBin) {
-    options.firefoxBin = FirefoxSmoke.resolveFirefox();
-  }
-  Assert.ok(Fs.existsSync(options.firefoxBin), options.firefoxBin);
   const copy = makeInstrumentedCopy(FIREFOX_PACKAGE, 'firefox', temporaryRoots);
   for (const scale of SCALES) {
     for (const locale of LOCALES) {
@@ -808,15 +790,22 @@ function summarize(report) {
 async function main() {
 
   const options = parseArguments(process.argv.slice(2));
-  ensureBuiltPackage(CHROMIUM_PACKAGE, 3);
-  ensureBuiltPackage(FIREFOX_PACKAGE, 3);
-  resetDirectory(options.output);
+  if (options.target !== 'firefox') {
+    Assert.ok(options.chromiumBin, '--chromium-bin or CHROMIUM_BIN is required.');
+    checkCaptureInputs(CHROMIUM_PACKAGE, options.chromiumBin);
+  }
+  if (options.target !== 'chromium') {
+    options.firefoxBin = options.firefoxBin || FirefoxSmoke.resolveFirefox();
+    checkCaptureInputs(FIREFOX_PACKAGE, options.firefoxBin);
+  }
+  const output = createVisualRunDirectory(ROOT, options.output);
+  console.error(`Visual QA output: ${output}`);
   const temporaryRoots = [];
   const report = {
     browsers: {},
     captures: [],
     generatedAt: new Date().toISOString(),
-    output: options.output,
+    output,
     policy: {
       deviceScales: SCALES,
       locales: LOCALES,

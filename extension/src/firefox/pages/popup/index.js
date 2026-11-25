@@ -282,14 +282,14 @@
       });
       emit();
       try {
-        if (kind === 'ENABLE' && state.site.target.controllable) {
+        if (kind === 'ENABLE' && isDraftDirty(state.site, draft)) {
           const result = await rpc.call({
             type: 'firefox.site.apply',
             tabUrl: state.tabUrl,
             expectedRevision: state.configuration.savedRevision,
             expectedEffectiveId: state.configuration.effectiveId,
-            mode: (draft || state.site.route).mode,
-            scope: (draft || state.site.route).scope,
+            mode: draft.mode,
+            scope: draft.scope,
             applyAll,
           });
           await readAll();
@@ -302,7 +302,8 @@
           const type = kind === 'ENABLE' ?
             'firefox.activation.apply' : 'firefox.activation.clear';
           await rpc.call(kind === 'ENABLE' ?
-            {type, expectedRevision: state.configuration.savedRevision} : {type});
+            {type, expectedRevision: state.configuration.savedRevision,
+              expectedEffectiveId: state.configuration.effectiveId} : {type});
           await readAll();
         }
         state.notice = 'APPLIED';
@@ -598,7 +599,7 @@
       const privateRequired = state.capabilities.privateWindowAccess !== 'GRANTED';
       const dirty = isDraftDirty(state.site, draft);
       const proxyUnavailable = state.site.target.controllable && draft.mode === 'PROXY' &&
-        !state.site.proxyCandidateAvailable;
+        !state.site.proxyCandidateAvailable && (dirty || !configuration.pending);
       const health = ready && state.site.route && state.site.route.mode === 'PROXY' ?
         state.operational.health : null;
       const savedPending = configuration.pending && canEdit;
@@ -640,7 +641,7 @@
         Ui.appendText(card, 'p', t('popupProxyRouteNeedsMethod'), 'status warning');
       }
       if (savedPending) {
-        Ui.appendText(card, 'p', t('unifiedPopupPending'), 'status warning');
+        Ui.appendText(card, 'p', t('unifiedPopupPending'), 'status warning pending-note');
       }
       if (checkAtTop) Ui.appendText(card, 'p', healthText(health), 'muted');
       if (state.errorCode) {

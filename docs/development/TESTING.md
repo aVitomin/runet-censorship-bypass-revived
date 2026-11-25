@@ -22,9 +22,15 @@ Documentation-only changes do not invalidate runtime checks. Local results do no
 establish CI, browser QA, release provenance or signing.
 
 `scripts/required-checks.mjs` is advisory. It considers staged/unstaged changes
-against HEAD, deletions, both rename paths and non-ignored untracked files; it
-omits suites included in a selected final gate. Shared icons affect both targets.
-Unknown paths conservatively select aggregate checks pending ownership review.
+separately, including deletions, both ends of renames and non-ignored new files.
+Run `node ./scripts/required-checks.mjs` from the repository root for the current
+worktree, or pass explicit repository-relative paths to preview their checks.
+
+The root license, shared icons and distribution-notice helper affect both builds.
+Browser-specific notices select their browser. The Firefox packaging transform also
+needs tooling tests. The shared repository-root helper selects both release packagers;
+run those only from a clean checkout of the intended commit. Unknown paths select
+aggregate checks pending ownership review.
 `scripts/repository-paths.mjs` lists tooling paths, not Gulp inputs or automatic
 approval for file moves. Mapper tests:
 
@@ -40,13 +46,17 @@ whitespace checking. It requires no npm install:
 ```powershell
 node .\scripts\verify-docs.mjs
 git diff --check
+git diff --cached --check
 ```
 
-The verifier scans tracked Markdown, relative links, images and anchors, rejecting
+The verifier reads Markdown present in the working tree, including non-ignored
+new files. It skips removed paths and checks links to them in the remaining
+documents. It validates relative links, images and anchors, rejecting
 machine paths and stale current-release/default-branch/install metadata. It does
 not require external sites to respond. Use `--audit-external` only for an intended
-bounded live-link audit. New untracked Markdown must be included without staging
-the real index. Docs integrity and whitespace checks are required before every PR.
+bounded live-link audit. No staging is needed. Git’s two whitespace checks cover
+unstaged and staged diffs respectively. New files enter the staged check after
+`git add`. Docs integrity and whitespace checks are required before every PR.
 
 Dependency/Action/vendor changes additionally require the repository
 `dependency-review` workflow. Relevant supply-chain commands are:

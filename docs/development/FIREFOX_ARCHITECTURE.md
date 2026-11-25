@@ -188,6 +188,14 @@ responses per request/challenger. Terminal events, Clear and event-page recreati
 clear ephemeral route/auth attempts. Exhaustion cancels instead of trying the next
 proxy candidate: an availability limitation, not Direct fallback.
 
+Firefox can ask for a proxy route for its own DNS-over-HTTPS traffic without
+sending the extension a corresponding web request or terminal event. When the
+request tables fill, the adapter can revoke an aged background decision that
+has finished route selection but has never authorized a web request. It keeps
+pending DNS decisions, tab requests and observed authentication exchanges. A
+numeric cutoff denies late callbacks for retired strict channels across Apply
+and Clear. Unrecognized ID formats remain subject to the existing table limit.
+
 ## Provider updates and storage
 
 Firefox never executes downloaded PAC/JavaScript. Validated immutable SHA-256

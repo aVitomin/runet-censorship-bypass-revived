@@ -222,7 +222,9 @@
 
   }
 
-  function showFirstRun(state) {
+  function showFirstRun(state, visibilityOverride = null) {
+
+    if (visibilityOverride !== null) return visibilityOverride;
 
     const {configuration, revision} = state;
     return revision === 0 && configuration && !configuration.active &&
@@ -786,7 +788,7 @@
     let ruleRows = [];
     let refreshView = null;
     let ruleSearch = '';
-    let setupVisible = null;
+    let setupVisibilityOverride = null;
     let setupStep = 'choose';
     let setupSource = null;
     let localServiceReady = false;
@@ -804,7 +806,10 @@
       const requested = view ? view.location.hash.slice(1) : '';
       const selected = NAV_ITEMS.some(([id]) => id === requested) ? requested : 'overview';
       const actions = root.querySelector('.form-actions');
-      if (actions) actions.hidden = setupVisible && selected === 'overview';
+      if (actions) {
+        actions.hidden = selected === 'overview' &&
+          showFirstRun(controller.snapshot(), setupVisibilityOverride);
+      }
       root.querySelectorAll('.section[id]').forEach((section) => {
         section.hidden = section.id !== selected;
       });
@@ -1405,7 +1410,6 @@
         retry.addEventListener('click', () => controller.load());
         return;
       }
-      if (setupVisible === null) setupVisible = showFirstRun(state);
       let disabled = !state.editable || state.pending;
       const layout = Ui.append(root, 'div', 'options-layout');
       const nav = Ui.append(layout, 'nav', 'options-nav card');
@@ -1511,7 +1515,7 @@
           Ui.appendText(row, 'dt', t(labelKey), 'muted');
           Ui.appendText(row, 'dd', t(valueKey));
         }
-        if (!setupVisible) {
+        if (!showFirstRun(state, setupVisibilityOverride)) {
           Ui.renderPrivateAccessOnboarding(overviewStatus, state.capabilities, {
             checkAgain: () => controller.checkPrivateAccess(),
             pending: state.pending,
@@ -1558,7 +1562,8 @@
         try {
           const result = await transferRpc.call({type: 'firefox.provider.source.check', source});
           if (sourceSelect.value === source) {
-            sourceCheckStatus.textContent = t(`sourceCheck_${result.code}`,
+            const prefix = source === 'antizapret-local' ? 'sourceCheckLocal_' : 'sourceCheck_';
+            sourceCheckStatus.textContent = t(prefix + result.code,
                 result.code === 'http' ? [String(result.httpStatus)] : []);
           }
         } catch (_error) {
@@ -1951,6 +1956,7 @@
           document.activeElement.dataset.setupAction;
         Ui.clear(firstRun);
         const currentSection = view && view.location.hash.slice(1);
+        const setupVisible = showFirstRun(current, setupVisibilityOverride);
         actions.hidden = setupVisible &&
           (currentSection === 'overview' || !NAV_ITEMS.some(([id]) => id === currentSection));
         overviewStatus.hidden = setupVisible && setupStep !== 'verify';
@@ -1959,7 +1965,7 @@
           start.type = 'button';
           start.disabled = current.pending;
           start.addEventListener('click', () => {
-            setupVisible = true;
+            setupVisibilityOverride = true;
             renderFirstRun(true);
             renderOverview();
           });
@@ -1998,7 +2004,7 @@
           renderFirstRun(true);
         }
         function close() {
-          setupVisible = false;
+          setupVisibilityOverride = false;
           renderOverview();
           renderFirstRun(true);
         }
@@ -2039,6 +2045,7 @@
             input.checked = setupSource === source;
             input.disabled = current.pending;
             input.addEventListener('change', () => {
+              setupVisibilityOverride = true;
               setupSource = source;
               next.disabled = false;
             });

@@ -22,6 +22,7 @@
     };
     container.replaceChildren();
     const title = append(container, 'h1', t('resourcesTitle'));
+    doc.title = title.textContent;
     const target = append(container, 'p', '', 'resource-target');
     const intro = append(container, 'p', t('resourcesIntro'));
     const privacySummary = append(container, 'p', t('resourcesPrivacySummary'), 'resource-muted');
@@ -250,14 +251,9 @@
       busy = true;
       updateControls();
       try {
-        if (!Number.isSafeInteger(tabId) || tabId < 0) throw new Error('RESOURCE_TARGET_INVALID');
-        const tab = await browserApi.tabs.get(tabId);
-        host = Core.hostFromUrl(tab && tab.url);
-        await checkTarget();
+        // Load the selected UI language even if the source tab has closed.
         await adapter.read();
-        // Chromium may have a separately selected UI language.
         doc.title = title.textContent = t('resourcesTitle');
-        target.textContent = host;
         intro.textContent = t('resourcesIntro');
         privacySummary.textContent = t('resourcesPrivacySummary');
         privacyHeading.textContent = t('resourcesDetails');
@@ -266,6 +262,11 @@
           node.textContent = t(['resourcesStart', 'resourcesStop', 'resourcesReload',
             'resourcesClear', 'resourcesSettings'][index]);
         });
+        if (!Number.isSafeInteger(tabId) || tabId < 0) throw new Error('RESOURCE_TARGET_INVALID');
+        const tab = await browserApi.tabs.get(tabId);
+        host = Core.hostFromUrl(tab && tab.url);
+        await checkTarget();
+        target.textContent = host;
         status.textContent = t('resourcesIdle');
       } catch (_error) {
         host = '';

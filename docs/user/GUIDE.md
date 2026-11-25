@@ -1,9 +1,8 @@
-# Первый запуск / First use
+# Руководство пользователя
 
-Черновик для локальной сборки. Для опубликованной версии см. [установку](../../user/INSTALLATION.md)
-и [руководство](../../user/USER_GUIDE_1_0_2.md).
+[Установка и загрузки](INSTALLATION.md) · [Помощь](../../SUPPORT.md) · [English](#english-summary)
 
-## Русский
+## Первый запуск
 
 ### Chromium
 
@@ -34,8 +33,8 @@
    - **Antizapret** использует правила источника, DNS Firefox и ваш прокси.
      Нажмите **Загрузить правила Antizapret**. Если сервер не выдаёт файл с
      вашего подключения, нажмите **Импортировать PAC-файл** и выберите
-     поддерживаемый файл Antizapret. Включите свой прокси и использование
-     прокси источника. В этом режиме **Авто** направляет публичные домены через
+     поддерживаемый файл Antizapret до 2 МиБ. Включите своё прокси-подключение
+     и параметр **Использовать прокси провайдера**. В этом режиме **Авто** направляет публичные домены через
      ваш прокси, в том числе домены вне списка. Для исключения добавьте правило
      **Напрямую**.
    - Для прокси-маршрутов **Anticensority** запустите совместимую службу,
@@ -61,19 +60,25 @@ Revived применяются только при включении маршр
 
 ### Проверка источника и локальный PAC
 
-В разделе **Источник правил** нажмите **Проверить источник**. Проверка покажет
-HTTP-код сервера, сетевой сбой, тайм-аут или ошибку проверки данных. Она
-использует текущее подключение и сохраняет действующие правила.
-В Chromium проверяется первый адрес выбранного источника. Обновление базы
+В разделе **Источник правил** нажмите **Проверить источник**. Для сетевого
+источника при ошибке появится HTTP-код или причина сбоя. В Chromium проверяется
+первый адрес. Действующие правила сохраняются. Обновление базы
 и применение настроек остаются отдельными действиями.
 Для Antizapret в Firefox проверка показывает, готовы ли правила в расширении.
 Чтобы обратиться к серверу источника, нажмите **Загрузить правила Antizapret**.
 
-В Chromium можно выбрать локальный `.pac` для первичной проверки UTF-8
-и наличия функции `FindProxyForURL`. Проверка не выполняет файл.
-Для применения в Chromium отдайте доверенный файл с локального сервера,
-доступного только на `127.0.0.1`, укажите его HTTP-адрес в собственном
-источнике, сохраните и нажмите **Применить**.
+В Chromium откройте **Источник правил**. В разделе **Антизапрет (локальный файл)**
+найдите **Импортировать доверенный PAC-файл Антизапрета** и выберите файл
+поддерживаемого формата до 2 МиБ. Успешный импорт сохраняет этот источник.
+Включите свой прокси, сохраните изменения и нажмите **Применить**. В режиме
+**Авто** публичные домены, включая домены вне списка, идут через настроенный
+прокси. Для исключений задайте **Напрямую**. При ошибке выполнения PAC Chromium
+может подключиться напрямую. Для обновления импортируйте свежий файл.
+
+Для другого доверенного PAC отдельная проверка файла в Chromium проверяет
+кодировку и наличие функции `FindProxyForURL`. Чтобы использовать его как
+собственный источник, отдавайте файл с локального сервера на `127.0.0.1`,
+укажите его HTTP-адрес, сохраните настройки и нажмите **Применить**.
 Чтобы выполнить доверенный локальный PAC средствами Firefox, отключите
 маршрутизацию Revived и укажите `file:///C:/путь/proxy.pac` в поле
 **URL автоматической настройки прокси**. Для использования правил Antizapret в
@@ -101,12 +106,45 @@ HTTP-код сервера, сетевой сбой, тайм-аут или ош
 Сервер получает обычные данные подключения, например IP-адрес. Выполняемая
 расширением проверка соединения обращается к проверяемому сайту. Телеметрии
 разработчика и облачной синхронизации нет.
-[Уведомление о приватности версии 1.0.2](../../release/PRIVACY_1_0.md).
+[Политика приватности](../release/PRIVACY.md).
 
-## English
+### Выбрать маршрут сайта
 
-Draft for the local build. For the published version, see [installation](../../user/INSTALLATION.md#english-summary)
-and the [user guide](../../user/USER_GUIDE_1_0_2.md#english-summary).
+Откройте обычную вкладку и нажмите значок расширения. Проверьте имя сайта.
+**Авто** следует источнику и применимым правилам, **Через прокси** требует
+настроенного подключения, **Напрямую** открывает сайт в обход прокси расширения.
+Выберите область правила — один хост или домен с поддоменами. Примените правило
+и перезагрузите сайт. Если панель сообщает о других сохранённых изменениях,
+проверьте их перед применением.
+
+### Обновить данные маршрутизации
+
+Откройте подробности в панели или раздел **Обслуживание** в настройках.
+Дата данных относится к самой базе, время успешной проверки — к обращению
+за обновлением. Проверка источника, обновление данных и применение сохранённых
+настроек — отдельные действия.
+
+### Если сайт загружается не полностью
+
+В панели обычной вкладки откройте **Ресурсы сайта**, начните сбор и
+перезагрузите исходную вкладку. Воспроизведите проблему и остановите сбор.
+Выберите только нужные домены. Сохранённые правила для выбранных хостов
+действуют во всём браузере после применения. Для медленных страниц есть
+[проверка в трёх режимах](../../SUPPORT.md#slow-pages).
+
+### Перенести настройки или обратиться за помощью
+
+В разделе **Импорт / Экспорт** экспортируйте настройки для переноса между
+установками. Файл содержит правила сайтов и адреса прокси. При импорте
+проверьте предварительный просмотр и отдельно примените сохранённый результат.
+Для обращения в поддержку откройте **Импорт / Экспорт → Экспорт для поддержки**
+и просмотрите скачанный отчёт. В нём указаны версия браузера и расширения,
+тип источника и состояние маршрутизации. Правила сайтов, адреса прокси и
+учётные данные в отчёт не входят. Прикладывайте именно этот файл. [Как сообщить о проблеме](../../SUPPORT.md)
+
+## English summary
+
+[Install or update](INSTALLATION.md#english-summary) · [Help](../../SUPPORT.md#english)
 
 ### Chromium
 
@@ -135,7 +173,8 @@ and the [user guide](../../user/USER_GUIDE_1_0_2.md#english-summary).
    - **Antizapret** uses the source rules, Firefox DNS and your own proxy.
      Select **Download Antizapret rules**. If the server cannot serve the file
      on your connection, select **Import PAC file** and choose a supported
-     Antizapret file. Enable your own proxy and turn on source proxy use. In
+     Antizapret file up to 2 MiB. Enable your own proxy connection and turn on
+     **Use provider proxies**. In
      this mode, **Auto** sends public domains through your proxy, including
      domains outside the list. Add a **Direct** rule for any exception.
    - For **Anticensority** proxy routes, start a compatible service such as Tor
@@ -160,19 +199,25 @@ Revived's site rules apply when routing in the extension is enabled.
 
 ### Source check and local PAC
 
-Open **Routing source** and select **Check source**. The result shows the
-server's HTTP status, a network failure, a timeout, or a validation error.
-The check uses your current connection and leaves active routing in place.
-Chromium checks the first address for the selected source. Updating routing
+Open **Routing source** and select **Check source**. For an online source,
+a failed check shows the HTTP status or the reason it failed. Chromium checks
+the first address. Active rules stay in place. Updating routing
 data and applying settings remain separate actions.
 For Antizapret in Firefox, the check shows whether rules are ready in the
 extension. Select **Download Antizapret rules** to contact the source server.
 
-In Chromium, you can select a local `.pac` file to check its UTF-8 encoding
-and whether it contains a `FindProxyForURL` function. The check does not run
-the file. In Chromium, to apply a trusted file, serve it from a local
-server bound to `127.0.0.1`, add that HTTP address as a custom source,
-save, and select **Apply**. To run a trusted local PAC through Firefox itself,
+In Chromium, open **Routing source**. Under **Antizapret (local file)**,
+use **Import a trusted Antizapret PAC file** and choose a supported file up to
+2 MiB. A successful import saves that source. Enable your own proxy, save any
+changes and select **Apply**. In **Auto**, public hostnames, including those
+outside the list, use your configured proxy. Use **Direct** for exceptions.
+If Chromium cannot run the routing script, it can connect directly. To update
+the rules, import a fresh file.
+
+For other trusted PAC files, Chromium's file check verifies UTF-8 and the
+presence of a `FindProxyForURL` function. To use one as a custom source, serve
+it on `127.0.0.1`, enter the local HTTP URL, save and select **Apply**.
+To run a trusted local PAC through Firefox itself,
 turn off routing in Revived and enter `file:///C:/path/proxy.pac` under
 **Automatic proxy configuration URL**. To use Antizapret rules inside Revived,
 select **Import PAC file** in the source settings.
@@ -199,4 +244,22 @@ Routing-data downloads contact the source servers separately. The server
 receives ordinary connection metadata such as IP address. An extension
 connection check contacts the site being checked. The extension has no
 developer telemetry or cloud synchronization.
-[Version 1.0.2 privacy notice](../../release/PRIVACY_1_0.md).
+[Privacy notice](../release/PRIVACY.md).
+
+### Site rules, updates and support
+
+Open the toolbar popup on a regular website. Check the hostname, then select
+**Auto**, **Proxy** or **Direct** and the host or domain scope. Proxy needs
+an enabled connection. Review any other saved changes before applying. Reload
+the site to test the result.
+
+Use the popup details or **Maintenance** for routing data. The source date
+and the last successful check describe different events. To investigate a
+partially loaded site, open **Website resources**, start capture, reload the
+original tab and stop capture. Review hosts before saving browser-wide rules.
+
+Use **Import / Export** to move settings. The transfer file contains site rules
+and proxy addresses. For a bug report, open **Import / Export → Export for support**.
+Review the downloaded report before attaching it. It includes browser and
+extension versions, source type and routing status. It omits site rules, proxy
+addresses and credentials. [Support](../../SUPPORT.md#english)

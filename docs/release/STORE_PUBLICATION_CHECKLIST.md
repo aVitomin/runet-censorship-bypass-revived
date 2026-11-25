@@ -64,16 +64,16 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
   access, modes/scope, Save/Apply, pending categories, imports, auth, recovery,
   updates and ownership loss. Old screenshot QA is not complete release QA.
 - [ ] Compare every built permission and data declaration to the
-  [audit](PERMISSIONS_AND_PRIVACY_1_0.md). Do not copy explanations for absent
+  [audit](PERMISSIONS_AND_PRIVACY.md). Do not copy explanations for absent
   permissions or silently broaden grants.
-- [ ] Approve the [privacy notice](PRIVACY_1_0.md) against actual network/storage
+- [ ] Approve the [privacy notice](PRIVACY.md) against actual network/storage
   behavior. Distinguish local settings from proxy/source/check transmissions;
   preserve sensitive-export warnings and no-password/support-export claims.
-- [ ] Verify the version's privacy notice on main is reachable without sign-in
-  and matches the submitted package before entering the current Chrome store URL:
-  `https://raw.githubusercontent.com/aVitomin/runet-censorship-bypass-revived/refs/heads/main/docs/release/PRIVACY_1_0.md`.
-  Recheck the URL at submission time; repository link validation alone does not
-  establish public availability.
+- [ ] After merge, verify the full [privacy notice](PRIVACY.md) on public main.
+  Compare the Chrome privacy field (currently the raw URL ending in
+  `docs/release/PRIVACY_1_0.md`) with the proposed raw `docs/release/PRIVACY.md`.
+  Keep the old raw URL serving the full notice. Update AMO's separate hosted
+  policy and check both public listings after each approved dashboard change.
 - [ ] Recheck repository, documentation, support, privacy and security links
   using the [public-link audit](LINK_AUDIT_1_0.md). Verify support/private-report
   forms in the maintainer account; no report needs to be submitted as a test.
@@ -90,7 +90,7 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
   archive. Check validation findings and provide reproducible build instructions.
   Keep credentials outside the repository/CI; signing is performed through
   Mozilla, not by this documentation workflow.
-- [ ] Enter the [Firefox listing](FIREFOX_AMO_LISTING_1_0.md): title, summary,
+- [ ] Enter the [Firefox listing](FIREFOX_AMO_LISTING.md): title, summary,
   description, category, natural tags, homepage and support. Review locales and
   supported desktop platforms; do not infer Android support from MV3 support.
 - [ ] Supply the approved privacy policy and confirm `authenticationInfo` and
@@ -115,7 +115,7 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
 - [ ] Use the authorized publisher account and correct extension identity.
   Upload the canonical Chromium ZIP with its manifest at archive root; record
   the exact artifact and checksum. Do not upload the source tree.
-- [ ] Enter the [Chrome listing copy](CHROME_WEB_STORE_LISTING_1_0.md), confirm
+- [ ] Enter the [Chrome listing copy](CHROME_WEB_STORE_LISTING.md), confirm
   package-derived title/short description/locales, choose the current relevant
   category and distribution preferences, and verify homepage/support links.
 - [ ] Complete the privacy dashboard: single purpose, every permission/host

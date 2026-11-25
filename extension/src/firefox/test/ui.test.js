@@ -10,6 +10,24 @@ const Options = require('../pages/options');
 
 const sourceRoot = Path.resolve(__dirname, '..');
 
+describe('Firefox UI document language', function() {
+  it('uses the same localized catalog as the page text on all three pages', function() {
+    const runtime = Fs.readFileSync(Path.join(sourceRoot, 'pages/shared/ui-runtime.js'), 'utf8');
+    for (const locale of ['en', 'ru']) {
+      const messages = JSON.parse(Fs.readFileSync(
+          Path.join(sourceRoot, '_locales', locale, 'messages.json'), 'utf8'));
+      const document = {documentElement: {}};
+      const browser = {i18n: {getMessage: (key) => messages[key].message}};
+      require('node:vm').runInNewContext(runtime, {document, browser});
+      Assert.equal(document.documentElement.lang, locale);
+    }
+    for (const page of ['popup', 'options', 'resources']) {
+      const html = Fs.readFileSync(Path.join(sourceRoot, 'pages', page, 'index.html'), 'utf8');
+      Assert.ok(html.includes('src="../shared/ui-runtime.js"'), page);
+    }
+  });
+});
+
 function routingData(overrides = {}) {
   return Object.assign({source: 'anticensority', sourceUpdatedAt: null, lastCheckedAt: null,
     canCheck: true, updating: false, active: false}, overrides);
@@ -92,6 +110,14 @@ describe('Firefox first-run Options', function() {
       configuration: withConfiguration({effectiveId: 'existing'})})), false);
     Assert.equal(Options.showFirstRun(withState({
       configuration: withConfiguration({active: true})})), false);
+  });
+
+  it('follows external activation until the user opens, starts or dismisses setup', function() {
+    const active = withState({revision: 1, configuration: withConfiguration({active: true})});
+    Assert.equal(Options.showFirstRun(state), true);
+    Assert.equal(Options.showFirstRun(active), false);
+    Assert.equal(Options.showFirstRun(active, true), true);
+    Assert.equal(Options.showFirstRun(state, false), false);
   });
 
   it('exposes one recovery action before Save or Apply and keeps manual independent of the list', function() {
@@ -1096,8 +1122,8 @@ describe('Firefox production UI controllers', function() {
     const controller = popupController({rpc: {async call(message) {
 
       calls.push(message);
-      if (message.type === 'firefox.site.apply') {
-        return {applied: true};
+      if (message.type === 'firefox.activation.apply') {
+        return {intent: 'ON', status: 'ACTIVE'};
       }
       if (message.type === 'firefox.site.get') {
         return siteState();
@@ -1117,7 +1143,7 @@ describe('Firefox production UI controllers', function() {
     Assert.strictEqual(await controller.apply(), true);
 
     Assert.deepStrictEqual(calls.map((item) => item.type), [
-      'firefox.site.apply',
+      'firefox.activation.apply',
       'firefox.capabilities.get',
       'firefox.site.get',
       'firefox.operational.get',
@@ -1157,9 +1183,9 @@ describe('Firefox production UI controllers', function() {
     const controller = popupController({rpc: {async call(message) {
 
       calls += 1;
-      if (message.type === 'firefox.site.apply') {
+      if (message.type === 'firefox.activation.apply') {
         await gate.promise;
-        return {applied: true};
+        return {intent: 'ON', status: 'ACTIVE'};
       }
       if (message.type === 'firefox.site.get') return siteState();
       if (message.type === 'firefox.operational.get') {
