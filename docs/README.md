@@ -10,8 +10,8 @@
 - [Политика приватности](release/PRIVACY.md)
 - [Снимки интерфейса 1.1.1](assets/releases/1.1.1/README.md)
 
-В магазинах доступна **1.1.0** для обоих браузеров. Для ручной установки
-скачайте **Chromium ZIP 1.1.1** или **подписанный Firefox XPI 1.1.0**. [Все варианты установки](user/INSTALLATION.md).
+Firefox Add-ons предлагает **1.1.1**, а Chrome Web Store — **1.1.0**.
+Для ручной установки доступны **Chromium ZIP 1.1.1** и **подписанный Firefox XPI 1.1.1**. [Все варианты установки](user/INSTALLATION.md).
 
 Для старого Firefox **0.0.4.0** сохранены отдельные [руководство](user/USER_GUIDE.md),
 [решение проблем](user/TROUBLESHOOTING.md) и [приватность](user/PRIVACY_AND_SECURITY.md).
@@ -39,7 +39,7 @@ material. They do not replace the current installation and development guides.
 
 Start with [installation](user/INSTALLATION.md#english-summary),
 [the user guide](user/GUIDE.md#english-summary), or [help and bug reports](../SUPPORT.md#english).
-Version **1.1.0** is available in Chrome Web Store and Firefox Add-ons.
-Chromium ZIP **1.1.1** and the signed Firefox XPI **1.1.0** are available for manual installation.
+Firefox Add-ons offers **1.1.1**, and Chrome Web Store offers **1.1.0**.
+The Chromium ZIP and signed Firefox XPI are both available for manual installation at **1.1.1**.
 [Screenshots](assets/releases/1.1.1/README.md#english) · [Changes in 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1). For development, use the separate
 guides above. Older Firefox **0.0.4.0** has its own documentation.

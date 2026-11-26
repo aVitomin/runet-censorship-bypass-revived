@@ -13,7 +13,7 @@
 | Браузер | Из магазина | Вручную с GitHub |
 | --- | --- | --- |
 | Chrome, Brave, Edge и другие настольные браузеры на Chromium | [Chrome Web Store · 1.1.0](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) | [Chromium ZIP · 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-chromium-1.1.1-34f3f65.zip) |
-| Firefox для компьютера | [Firefox Add-ons · 1.1.0](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) | [Подписанный Firefox XPI · 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-firefox-1.1.0-signed.xpi) |
+| Firefox для компьютера | [Firefox Add-ons · 1.1.1](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) | [Подписанный Firefox XPI · 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-firefox-1.1.1-signed.xpi) |
 
 Магазинная версия обновляется через браузер. Распакованная сборка Chromium обновляется вручную. Смотрите [инструкцию по установке](docs/user/INSTALLATION.md) и [изменения в 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1).
 
@@ -51,7 +51,7 @@
 <summary>Контрольные суммы скачиваемых файлов</summary>
 
 - [Chromium 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1) — `runet-censorship-bypass-chromium-1.1.1-34f3f65.zip`. SHA-256 `9fa70108c0764452e74a81f442bda85ef1ce488ffa169a10a67ad2d778726317`.
-- [Firefox 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0) — `runet-censorship-bypass-firefox-1.1.0-signed.xpi`. SHA-256 `c784f03867a5106cc2f123894ac2637b3dd50f8adc7b49d12e620703b1c33baf`.
+- [Firefox 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1) — `runet-censorship-bypass-firefox-1.1.1-signed.xpi`. SHA-256 `0cc8ca9ed5aac43f34e77e6dcb6394e700e4e74d72fe54a9bafcbf573cc8d0d5`.
 
 </details>
 
@@ -73,7 +73,7 @@ Choose how Chromium and Firefox connect to websites. **Auto** follows the select
 | Browser | Store | Manual download |
 | --- | --- | --- |
 | Chrome, Brave, Edge and other desktop Chromium browsers | [Chrome Web Store · 1.1.0](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) | [Chromium ZIP · 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-chromium-1.1.1-34f3f65.zip) |
-| Desktop Firefox | [Firefox Add-ons · 1.1.0](https://addons.mozilla.org/en-US/firefox/addon/runet-censorship-bypass-mv3/) | [Mozilla-signed Firefox XPI · 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-firefox-1.1.0-signed.xpi) |
+| Desktop Firefox | [Firefox Add-ons · 1.1.1](https://addons.mozilla.org/en-US/firefox/addon/runet-censorship-bypass-mv3/) | [Mozilla-signed Firefox XPI · 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-firefox-1.1.1-signed.xpi) |
 
 Store installations update through the browser. Update an unpacked Chromium installation manually. The expected minimums are Chromium 108 and Firefox 140. Firefox needs private-window permission for browser-wide proxy control. Antizapret in Firefox and Antifilter in both browsers need your own proxy connection. Chromium can use the proxies of the online Antizapret source.
 
