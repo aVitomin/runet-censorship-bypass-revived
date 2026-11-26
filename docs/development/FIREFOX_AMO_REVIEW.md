@@ -2,10 +2,10 @@
 
 ## Scope and purpose
 
-Reviewer reference for `1.0.1`, published on Mozilla Add-ons and verified on
-2026-10-29. Source tag: `v1.0.1`, commit
-`4b9a9b31d19677d6ed8fb1399503b24023a51c02`. See the
-[release record](releases/1.0.1.md) for the signed package and validation scope.
+Review the submitted desktop package using the exact XPI, matching source archive,
+version and checksums supplied with the submission. The [1.0.1 release record](releases/1.0.1.md)
+retains the earlier signed-package verification.
+
 The manifest minimum is Firefox `140.0`, calculated from required
 APIs; see [compatibility and actual QA](BROWSER_COMPATIBILITY.md).
 
@@ -32,6 +32,7 @@ the [permission audit](../release/PERMISSIONS_AND_PRIVACY.md).
 - `alarms`: fixed HTTPS routing-data checks every 12 hours, with validated
   promotion when the runtime and selected source permit it. Refresh keeps OFF
   off and does not apply pending user settings.
+- `dns`: resolve hostnames when Antizapret routing needs an IP address.
 - `notifications`: localized attention notices, without credentials or
   private destination/proxy details.
 
@@ -39,7 +40,7 @@ There are no content scripts, developer telemetry or analytics uploads.
 The required Mozilla data types are `authenticationInfo` and
 `browsingActivity`: proxy authentication and destination information can be
 transmitted as part of the routing function. They are not `none`.
-See the [1.0 privacy notice](../release/PRIVACY.md).
+See the [current privacy notice](../release/PRIVACY.md).
 
 Stored passwords are not returned in UI reads, diagnostics or exports.
 Authentication is restricted to the matching request-authorized proxy and its
@@ -94,12 +95,19 @@ omits website credentials/referrer, does not follow redirects and discards the
 body. A matching proxy can still request configured proxy credentials. Limited
 health status is not proof of all traffic routes.
 
-Chromium additionally supports PAC/custom sources and automatic relevant
-connection-health checks. Firefox has automatic source refresh but only
-user-triggered connection checks. Terminal Direct fallback and exhausted
+Chromium evaluates built-in and custom PAC scripts in its browser proxy engine
+and can check a relevant proxy connection automatically. Firefox treats supported
+routing formats as data. Firefox can refresh sources automatically and checks
+proxy connections only on request. Terminal Direct fallback and exhausted
 proxy-auth retry behavior remain documented routing differences.
 
 ## Reproduce and test
+
+For Antizapret, download the source or import a compatible saved PAC file. Use
+**Check source** to verify the locally stored rules. Configure a reviewer-controlled
+proxy and test hostname, enable source routing, then save and apply. Check that
+an invalid import or failed source download leaves existing rules active.
+
 
 Use a fresh disposable desktop profile, the exact candidate XPI, and only
 reviewer-controlled test origins/proxies and synthetic credentials. No personal
@@ -136,7 +144,7 @@ not a public connectivity-test service. Source reproduction and package layout:
    present but usernames/passwords/custom-source URLs are absent. Confirm import
    replaces Saved only, makes no provider request and leaves active routing alone.
    Re-enter missing credentials (or explicitly mark unnecessary), Save, then Apply.
-   A support export contains only environment/status and cannot be imported.
+   A support export contains environment, status and limited saved/applied routing summaries. It excludes site rules, endpoints and credentials and cannot be imported.
 8. Confirm Maintenance distinguishes source-data time, check time and HTTPS
    validation without an author signature. Refresh may return unchanged older
    data. Verify OFF stays off and an active refresh leaves pending Saved

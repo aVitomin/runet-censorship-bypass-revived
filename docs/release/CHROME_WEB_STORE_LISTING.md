@@ -33,11 +33,11 @@ proxy, or a separately running local service.
 - Choose Auto, Proxy or Direct for a site, an exact host or a domain with subdomains.
 - Use a built-in or custom PAC source, the optional Antifilter list, or Only my rules and connections.
 - Check online sources for updates in the popup. It shows the source date and the last successful check separately.
-- Website resources: manually review hosts from one non-private tab and save selected browser-wide Proxy rules, without applying them. Capture stays in the open tool page only.
+- Open Website resources from the popup and start capture to review hosts requested by the current regular tab. Save selected hosts as browser-wide Proxy rules and apply them when ready. Results stay in the open tool.
 - Configure your own proxies or connect to separately running Tor, Tor Browser or WARP.
 - Save settings for review, then Apply them. Existing settings stay active until Apply.
 - Transfer settings with import preview and create a separate sanitized support report.
-- Check routing-data updates and connection status.
+- Check proxy connection status.
 - Choose a light, dark or system appearance in Options; the popup uses the same theme.
 
 Auto follows the selected source and rules; it can use a proxy. Explicit Direct
@@ -48,8 +48,7 @@ including other saved changes; unsaved Options edits are not included.
 To get started, choose Antizapret if its service is available on your connection.
 It can use its own proxies for sites its rules match when source proxies are
 enabled. If the download is unavailable, import a trusted PAC under **Antizapret (local file)**.
-This mode uses your own proxy for public hostnames, including those outside the
-list. Explicit Direct rules still apply. To update the rules, import a fresh file.
+Configure and enable your own proxy, then save and apply. This mode can route public hosts through that proxy even when they are outside the list. Explicit Direct rules still apply. To update the rules, import a fresh file.
 
 Antifilter supplies an exact-host list and uses your enabled Proxy-rule
 connections with your consent. Save changes, select Apply, then reload a site
@@ -89,11 +88,11 @@ SOCKS authentication depends on the browser.
 - Режимы «Авто», «Прокси» и «Напрямую» для одного хоста или домена с поддоменами.
 - Встроенный или свой PAC-источник, дополнительный список Antifilter либо режим «Только мои правила и подключения».
 - Проверка обновлений сетевых источников из панели. Дата данных и время последней успешной проверки показаны отдельно.
-- «Ресурсы сайта»: ручной просмотр доменов одной обычной вкладки и сохранение выбранных правил «Прокси» для всего браузера без применения. Сбор остаётся только в открытом инструменте.
+- Откройте «Ресурсы сайта» в панели и запустите сбор. Просмотрите хосты текущей обычной вкладки и сохраните выбранные хосты как правила «Прокси» для всего браузера. Чтобы правила начали действовать, нажмите «Применить». Результаты сбора хранятся только в открытом инструменте.
 - Собственные прокси и подключение к отдельно запущенным Tor, Tor Browser или WARP.
 - Сохранение настроек отдельно от применения: прежние продолжают действовать до «Применить».
 - Перенос настроек с предварительным просмотром и отдельный очищенный отчёт для поддержки.
-- Обновление данных маршрутизации и проверка подключений.
+- Проверка подключения через прокси.
 - Светлая, тёмная или системная тема: настройки и панель используют один выбор.
 
 «Авто» следует выбранному источнику и правилам, поэтому может использовать
@@ -106,7 +105,7 @@ SOCKS authentication depends on the browser.
 подключении. Если использование прокси источника включено, сайты, подходящие
 под его правила, могут открываться через прокси Antizapret. Если загрузка
 недоступна, откройте «Антизапрет (локальный файл)» и импортируйте доверенный PAC.
-В этом режиме публичные домены, в том числе вне списка, используют ваш прокси.
+Настройте и включите свой прокси, затем сохраните и примените изменения. Этот режим может направлять через ваш прокси публичные сайты вне списка.
 Явные правила «Напрямую» сохраняют приоритет. Для обновления импортируйте свежий файл.
 
 Antifilter
@@ -166,8 +165,7 @@ Privacy-practices preparation:
   connection checks using the [privacy notice](PRIVACY.md). Do not certify
   “no user data handled” on the basis of local processing alone.
 - Explain PAC download/browser evaluation explicitly in the remote-code field;
-  the reviewer notes identify the unresolved policy determination. Do not
-  automatically choose “No” or assert an exemption/approval.
+  prior approval applies to the reviewed package. Review the exact update and its proxy transport before certifying the submission.
 - Complete Limited Use/no-sale/purpose-restriction certifications only after
   the publisher has reviewed the exact submission. This draft is not consent
   to certify on the publisher's behalf.
@@ -187,4 +185,4 @@ programs; those distinctions do not establish approval of this exact package.
 Use screenshots captured from the candidate in both supported languages. See the
 [Chrome Web Store listing guidance](https://developer.chrome.com/docs/webstore/cws-dashboard-listing/)
 and [submission checklist](STORE_PUBLICATION_CHECKLIST.md). Historical images
-and their provenance are in the [1.0.2 gallery](../assets/releases/1.0.2/README.md).
+and their provenance are in the [1.1.1 gallery](../assets/releases/1.1.1/README.md#english).

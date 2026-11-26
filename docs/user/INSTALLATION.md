@@ -1,8 +1,8 @@
 # Установка, обновление и удаление
 
-**Версия 1.1.0 доступна в Chrome Web Store и Firefox Add-ons.**
-Для ручной установки доступны **Chromium ZIP 1.1.0** и подписанный Firefox XPI **1.1.0**.
-Версии в магазинах проверены 21 ноября 2026.
+В магазинах доступна **1.1.0** для обоих браузеров. Для ручной установки
+скачайте **Chromium ZIP 1.1.1** или **подписанный Firefox XPI 1.1.0**.
+Версии в магазинах проверены 26 ноября 2026 года.
 
 ## Установить из магазина
 
@@ -29,7 +29,7 @@
 
 ## Требования
 
-Манифесты версии **1.1.0** указывают минимальные версии браузеров:
+Минимальные версии по манифестам:
 **Chromium 108+** и **Firefox 140+**, включая ESR на подходящей базе.
 Ожидается работа в совместимых настольных браузерах с Manifest V3 и API прокси.
 Версия движка Chromium важнее собственного номера Brave, Opera или другого
@@ -42,8 +42,8 @@
 
 ## Ручная установка Chromium: ZIP
 
-1. Скачайте [готовый ZIP 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-chromium-1.1.0-f8aa606.zip).
-   SHA-256 указан ниже и в [описании релиза](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0).
+1. Скачайте [готовый ZIP 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-chromium-1.1.1-34f3f65.zip).
+   SHA-256 указан ниже и в [описании релиза](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1).
 2. Проверьте SHA-256 и полностью распакуйте ZIP в постоянную папку.
 3. Откройте `chrome://extensions`, `brave://extensions` или `edge://extensions`.
 4. Включите **Режим разработчика → Загрузить распакованное расширение**.
@@ -52,19 +52,18 @@
 Не перемещайте и не удаляйте эту папку: браузер продолжает читать её файлы.
 Архивы **Source code** содержат исходники, а не готовое расширение.
 
-В имени старого ZIP может быть `mv3`: это сборка Chromium. В списке Assets
-ориентируйтесь на подпись **Chromium — ZIP**; для Firefox нужен подписанный XPI.
+В разделе загрузок GitHub выбирайте файл с подписью **Chromium — ZIP**.
 
 SHA-256 ZIP:
 
 ```text
-48168f5ddd5dae48a334917babb73c1ca6947f4e9f68b19dfd8d2d05774fb17d
+9fa70108c0764452e74a81f442bda85ef1ce488ffa169a10a67ad2d778726317
 ```
 
 Пример проверки в Windows:
 
 ```powershell
-Get-FileHash .\runet-censorship-bypass-chromium-1.1.0-f8aa606.zip -Algorithm SHA256
+Get-FileHash .\runet-censorship-bypass-chromium-1.1.1-34f3f65.zip -Algorithm SHA256
 ```
 
 Если сумма отличается, не устанавливайте файл.
@@ -85,8 +84,7 @@ SHA-256 XPI:
 c784f03867a5106cc2f123894ac2637b3dd50f8adc7b49d12e620703b1c33baf
 ```
 
-Для проверки используйте `Get-FileHash` с именем XPI. Unsigned-кандидаты и временная
-загрузка через `about:debugging` предназначены для разработки, не для обычной установки.
+В Windows выполните `Get-FileHash` с именем XPI и сравните результат с суммой выше. Для обычной установки используйте подписанный пакет.
 
 ## Первый запуск
 
@@ -126,12 +124,12 @@ c784f03867a5106cc2f123894ac2637b3dd50f8adc7b49d12e620703b1c33baf
 2. Скачайте новый ZIP из [Releases](https://github.com/aVitomin/runet-censorship-bypass-revived/releases)
    и проверьте SHA-256.
 3. Полностью замените файлы в **той же постоянной папке**. Не смешивайте разные версии.
-4. На странице расширений нажмите **Перезагрузить / Reload** у существующей карточки.
+4. На странице расширений нажмите **Перезагрузить** у существующей карточки.
 5. Проверьте настройки и явно примените их.
 
 ZIP не обновляется через магазин. Другая папка или переход с распакованной
 Chromium-версии на магазинную могут создать отдельную установку с собственным
-хранилищем. Для переноса используйте экспорт и импорт настроек 1.0; пароли и
+хранилищем. Для переноса используйте экспорт и импорт настроек; пароли и
 адрес пользовательского источника нужно ввести заново. Выключите прежнюю
 установку перед применением новой, чтобы они не конкурировали за управление прокси.
 Не рассчитывайте на автоматический перенос данных между установками.
@@ -153,7 +151,7 @@ Chromium-версии на магазинную могут создать отд
 ## English summary
 
 Install **Chromium 1.1.0** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.1.0** from
-[Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/). Firefox requires **140+** and private-window
+[Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/runet-censorship-bypass-mv3/). Firefox requires **140+** and private-window
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
 
@@ -161,8 +159,7 @@ In Chrome, default access works for ordinary tabs. Turn on **Allow in Incognito*
 to open the extension panel in a private window. File URL access is separate.
 You can leave it off when browsing websites or choosing a PAC file through the importer.
 
-**Chromium 1.1.0** is also available as a manual ZIP; **Firefox 1.1.0** as a
-Mozilla-signed XPI. The **1.1.0** manifests target desktop **Chromium 108+** and **Firefox 140+**,
+The [manual Chromium ZIP 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-chromium-1.1.1-34f3f65.zip) and [Mozilla-signed Firefox XPI 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-firefox-1.1.0-signed.xpi) are available on GitHub. The manifests target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR releases on a compatible base. These are API-based compatibility
 estimates, not test results for every version or fork. Required MV3 and proxy
 extension APIs must be available; mobile browsers and WebView are outside this scope.

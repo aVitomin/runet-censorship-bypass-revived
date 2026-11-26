@@ -4,179 +4,79 @@
 
 # Runet Censorship Bypass — Revived
 
-Независимый форк [Anticensority](https://github.com/anticensority/runet-censorship-bypass).
-**Версия 1.1.0 доступна в Chrome Web Store и Firefox Add-ons.**
-На GitHub доступны **Chromium ZIP 1.1.0** и подписанный Firefox XPI **1.1.0**.
+Выбирайте, как Chromium и Firefox подключаются к сайтам. Для каждого сайта можно выбрать **Авто**, **Через прокси** или **Напрямую**. Расширение управляет настройками браузера и использует прокси выбранного источника или ваше подключение.
 
-Выбирайте, как браузер открывает сайты: по автоматическим правилам, через
-настроенный прокси или напрямую. Расширение для Chromium и Firefox с интерфейсом
-на русском и английском языках.
-
-Две сборки одного проекта: **Chromium** для Chrome, Brave, Edge и совместимых
-браузеров; **Firefox** для браузеров на его основе. Обе используют Manifest V3.
-Доступность обновления в магазинах проверяется отдельно для каждой сборки.
-
-Расширение не предоставляет VPN или прокси-сервер. Оно использует выбранный
-источник маршрутов, ваши прокси и отдельно запущенные Tor, Tor Browser или WARP.
-
-[Установка](docs/user/INSTALLATION.md) ·
-[Руководство пользователя](docs/user/GUIDE.md) ·
-[Помощь и сообщения об ошибках](SUPPORT.md) ·
-[Новости](https://github.com/aVitomin/runet-censorship-bypass-revived/issues/105) ·
-[Поддержать проект](DONATE.md) ·
-[English](#english)
+[Руководство](docs/user/GUIDE.md) · [Помощь](SUPPORT.md) · [Новости](https://github.com/aVitomin/runet-censorship-bypass-revived/issues/105) · [English](#english)
 
 ## Скачать
 
-| Браузер | Версия | Установка из магазина |
+| Браузер | Из магазина | Вручную с GitHub |
 | --- | --- | --- |
-| **Chrome, Brave и совместимые Chromium-браузеры** | **1.1.0** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
-| **Firefox 140+** | **1.1.0** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
+| Chrome, Brave, Edge и другие настольные браузеры на Chromium | [Chrome Web Store · 1.1.0](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) | [Chromium ZIP · 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-chromium-1.1.1-34f3f65.zip) |
+| Firefox для компьютера | [Firefox Add-ons · 1.1.0](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) | [Подписанный Firefox XPI · 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-firefox-1.1.0-signed.xpi) |
 
-Магазинные установки получают одобренные обновления через браузер.
-Для ручной установки доступны **Chromium ZIP 1.1.0** и
-**подписанный Mozilla Firefox XPI 1.1.0**.
+Магазинная версия обновляется через браузер. Распакованная сборка Chromium обновляется вручную. Смотрите [инструкцию по установке](docs/user/INSTALLATION.md) и [изменения в 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1).
 
-Расчётная совместимость **1.0.1–1.0.3** — настольные **Chromium 108+** и
-**Firefox 140+**, включая ESR, с необходимыми API.
-Это оценка по используемым технологиям, а не проверка каждой версии и каждого
-форка. [Требования и проверенные версии](docs/development/BROWSER_COMPATIBILITY.md).
+Расчётные минимумы — Chromium 108 и Firefox 140. [Требования и проверенные версии](docs/development/BROWSER_COMPATIBILITY.md).
 
-**Ручная установка:** [Chromium ZIP 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-chromium-1.1.0-f8aa606.zip) ·
-[подписанный Firefox XPI 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-firefox-1.1.0-signed.xpi) ·
-[что нового в 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0).
+## Быстрый старт
 
-В 1.1.0 появился мастер первого запуска и поддержка Antizapret в Firefox. Панель показывает текущий сайт и его режим маршрутизации.
-
-### Быстрый старт
-
-1. Установите расширение из магазина своего браузера и закрепите его значок.
-2. В Firefox разрешите работу в приватных окнах: это нужно для общей настройки прокси.
-3. Выберите источник в настройках. В Chromium **Antizapret** может использовать
-   прокси своего провайдера. В Firefox прокси-маршрутам **Anticensority** нужна
-   совместимая локальная служба, например запущенный Tor. Для **Antifilter**
-   в обоих браузерах подключите свой прокси или локальную службу и разрешите
-   использовать это подключение для сайтов из списка.
-4. Сохраните изменения и нажмите **Применить**. После включения маршрутизации
-   откройте или перезагрузите сайт, который входит в список источника или
-   совпадает с вашим правилом. Проверьте режим сайта в панели расширения и
-   убедитесь, что страница загружается.
-
-[Подробная установка, обновление и проверка файлов](docs/user/INSTALLATION.md).
-Архивы **Source code** предназначены для разработки.
+1. Установите расширение и закрепите его значок. В Firefox разрешите работу в приватных окнах, чтобы расширение могло управлять прокси в браузере.
+2. В **Обзоре** выберите источник правил. В Chromium онлайн-источник Antizapret может использовать свои прокси. В Firefox для Antizapret понадобится своё подключение. Для Antifilter нужен свой прокси в обоих браузерах. [Как выбрать источник и прокси](docs/user/GUIDE.md#первый-запуск).
+3. Сохраните настройки и нажмите **Применить**. Откройте сайт, который подходит под правило, и проверьте его режим в панели расширения.
 
 ## Как пользоваться
 
-Откройте сайт и нажмите значок расширения:
+- **Авто** следует выбранному источнику и вашим правилам.
+- **Через прокси** использует подходящее настроенное подключение.
+- **Напрямую** обходит прокси расширения для выбранного сайта.
 
-| Режим | Что делает |
-| --- | --- |
-| **Авто** | Следует выбранному источнику и общим правилам |
-| **Прокси** | Использует подходящее настроенное подключение |
-| **Напрямую** | Обходит прокси расширения для этого сайта |
-
-Правило можно задать для одного хоста или домена с поддоменами. **Напрямую**
-имеет приоритет над **Прокси**. В режиме **Только мои правила и подключения**
-автоматическая база не нужна.
-
-**Сохранить** записывает настройки, **Применить** включает сохранённые изменения.
-До применения продолжают действовать прежние настройки. Обновление базы
-не включает выключенную маршрутизацию и не применяет отложенные правки.
-
-[Подключения, источники, перенос настроек и обновления](docs/user/GUIDE.md)
+Задайте правило для одного хоста или домена с поддоменами. Пока сохранённые изменения ждут применения, браузер продолжает пользоваться действующими правилами.
 
 ## Интерфейс
 
-В обоих браузерах доступны светлая, тёмная и системная темы, русский и английский.
-Ниже показан интерфейс Chromium и Firefox 1.0.2.
+В обоих браузерах доступны светлая, тёмная и системная темы. Ниже показана панель сайта в Chromium 1.1.1.
 
-![Обзор Chromium 1.0.2, светлая тема](docs/assets/releases/1.0.2/chromium/ru/01-overview.png)
+![Панель Chromium 1.1.1 в тёмной теме. Для news.example выбран маршрут «Напрямую».](docs/assets/releases/1.1.1/chromium/ru/01-current-site.png)
 
-<details>
-<summary>Подключения Chromium 1.0.2, тёмная тема</summary>
-
-![Подключения Chromium 1.0.2, тёмная тема](docs/assets/releases/1.0.2/chromium/ru/03-connections.png)
-
-</details>
-
-<details>
-<summary>Firefox 1.0.2: светлая и тёмная темы</summary>
-
-![Настройки Firefox 1.0.2](docs/assets/releases/1.0.2/firefox/ru/01-overview.png)
-
-![Подключения Firefox 1.0.2](docs/assets/releases/1.0.2/firefox/ru/03-connections.png)
-
-</details>
+[Снимки Chromium и Firefox на русском и английском](docs/assets/releases/1.1.1/README.md)
 
 ## Помощь и приватность
 
-Начните с [проверок и формы сообщения об ошибке](SUPPORT.md).
-Состояние **Защита включена** означает управление маршрутизацией; оно не
-гарантирует доступность сайтов, анонимность или шифрование. Используйте
-доверенные источники и прокси.
+Состояние **Защита включена** означает, что расширение управляет маршрутизацией. Доступность сайта зависит от выбранных правил, источника и подключения.
 
-[Какие данные получает прокси и источник правил](docs/release/PRIVACY.md) ·
-[Сообщить об уязвимости приватно](SECURITY.md) ·
-[Вся документация](docs/README.md)
+[Сообщить о проблеме](SUPPORT.md) · [Какие данные получает прокси](docs/release/PRIVACY.md) · [Сообщить об уязвимости приватно](SECURITY.md) · [Поддержать проект](DONATE.md)
 
 <details>
-<summary>Проверить скачанные файлы</summary>
+<summary>Контрольные суммы скачиваемых файлов</summary>
 
-**Chromium 1.1.0** — `runet-censorship-bypass-chromium-1.1.0-f8aa606.zip`
-
-SHA-256: `48168f5ddd5dae48a334917babb73c1ca6947f4e9f68b19dfd8d2d05774fb17d`
-
-**Firefox 1.1.0** — `runet-censorship-bypass-firefox-1.1.0-signed.xpi`
-
-SHA-256: `c784f03867a5106cc2f123894ac2637b3dd50f8adc7b49d12e620703b1c33baf`
-
-[Выпуск 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0)
+- [Chromium 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1) — `runet-censorship-bypass-chromium-1.1.1-34f3f65.zip`. SHA-256 `9fa70108c0764452e74a81f442bda85ef1ce488ffa169a10a67ad2d778726317`.
+- [Firefox 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0) — `runet-censorship-bypass-firefox-1.1.0-signed.xpi`. SHA-256 `c784f03867a5106cc2f123894ac2637b3dd50f8adc7b49d12e620703b1c33baf`.
 
 </details>
+
+<details>
+<summary>Документация для разработки и старых версий</summary>
+
+[Документация](docs/README.md) · [Разработка](docs/development/DEVELOPMENT.md) · [Архитектура](docs/development/ARCHITECTURE.md) · [Тестирование](docs/development/TESTING.md) · [Выпуск](docs/development/RELEASE_PROCESS.md) · [Участие в проекте](CONTRIBUTING.md)
+
+Firefox 0.0.4.0 — [руководство](docs/user/USER_GUIDE.md), [решение проблем](docs/user/TROUBLESHOOTING.md), [приватность](docs/user/PRIVACY_AND_SECURITY.md). [Архив исходного проекта](docs/legacy/UPSTREAM_README.md).
+
+</details>
+
+Revived — независимый форк [Anticensority](https://github.com/anticensority/runet-censorship-bypass). [Лицензия GNU GPL v3](LICENSE).
 
 ## English
 
-**Runet Censorship Bypass — Revived** is an independent Anticensority fork.
-**Version 1.1.0 is available in Chrome Web Store and Firefox Add-ons.**
-Chromium ZIP **1.1.0** and Mozilla-signed Firefox XPI **1.1.0**
-are available for manual installation.
-[Changes in 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0).
+Choose how Chromium and Firefox connect to websites. **Auto** follows the selected source and your rules, **Proxy** uses a configured connection, and **Direct** bypasses the extension proxy for that site. Save records your changes. Apply activates them.
 
-Choose **Auto**, **Proxy**, or **Direct** for websites in Chromium and Firefox.
-The extension controls browser routing and provides no VPN or proxy service.
-Save records settings; Apply activates them.
+| Browser | Store | Manual download |
+| --- | --- | --- |
+| Chrome, Brave, Edge and other desktop Chromium browsers | [Chrome Web Store · 1.1.0](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) | [Chromium ZIP · 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-chromium-1.1.1-34f3f65.zip) |
+| Desktop Firefox | [Firefox Add-ons · 1.1.0](https://addons.mozilla.org/en-US/firefox/addon/runet-censorship-bypass-mv3/) | [Mozilla-signed Firefox XPI · 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-firefox-1.1.0-signed.xpi) |
 
-Install from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or
-[Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
-Expected 1.0.1–1.0.3 minimums are desktop **Chromium 108+** and **Firefox 140+**, including
-ESR on a compatible base. See [installation](docs/user/INSTALLATION.md#english-summary),
-[the user guide](docs/user/GUIDE.md#english-summary), and [help](SUPPORT.md#english).
+Store installations update through the browser. Update an unpacked Chromium installation manually. The expected minimums are Chromium 108 and Firefox 140. Firefox needs private-window permission for browser-wide proxy control. Antizapret in Firefox and Antifilter in both browsers need your own proxy connection. Chromium can use the proxies of the online Antizapret source.
 
-In Chromium, **Antizapret** can use its provider's proxies. In Firefox,
-**Anticensority** proxy routes require a compatible local service such as Tor.
-For **Antifilter** in either browser, set up a proxy or local service and allow
-the extension to use it for listed sites. Allow private-window access in
-Firefox, save changes and select **Apply**. Once routing is active, open or
-reload a site covered by the source or a site rule, check its mode in the popup
-and confirm that it loads.
+[Installation](docs/user/INSTALLATION.md#english-summary) · [User guide](docs/user/GUIDE.md#english-summary) · [Support](SUPPORT.md#english) · [Changes in 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1) · [Screenshots](docs/assets/releases/1.1.1/README.md#english) · [Developer docs](docs/README.md#for-developers)
 
-Support this independent fork: [donations](DONATE.md#english).
-
-<details>
-<summary>Разработчикам и пользователям старых версий</summary>
-
-[Разработка](docs/development/DEVELOPMENT.md) ·
-[Архитектура](docs/development/ARCHITECTURE.md) ·
-[Тестирование](docs/development/TESTING.md) ·
-[Процесс выпуска](docs/development/RELEASE_PROCESS.md) ·
-[Участие в проекте](CONTRIBUTING.md)
-
-Firefox 0.0.4.0: [руководство](docs/user/USER_GUIDE.md),
-[решение проблем](docs/user/TROUBLESHOOTING.md),
-[приватность](docs/user/PRIVACY_AND_SECURITY.md).
-[Исторический README](docs/legacy/UPSTREAM_README.md).
-
-</details>
-
-Проект основан на [Anticensority](https://github.com/anticensority/runet-censorship-bypass)
-с сохранением авторства и истории. Лицензия: [GNU GPL v3](LICENSE).
+Revived is an independent [Anticensority](https://github.com/anticensority/runet-censorship-bypass) fork. [GNU GPL v3](LICENSE).

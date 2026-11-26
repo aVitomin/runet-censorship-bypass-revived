@@ -18,7 +18,7 @@ Keep the existing AMO entry, Gecko ID and public URL. Verify both localized desc
 - **Russian title:** Обход блокировок Рунета — Revived.
 - **Russian summary:** Выбирайте «Авто», «Прокси» или «Напрямую» для сайтов.
   Настраивайте правила и подключения, сохраняйте изменения и применяйте их отдельно.
-- **Screenshots:** use a single gallery captured from the candidate and enter Russian and English captions. The [1.0.2 gallery](../assets/releases/1.0.2/README.md) is retained with its provenance.
+- **Screenshots:** use a single gallery captured from the candidate and enter Russian and English captions. The [1.1.1 gallery](../assets/releases/1.1.1/README.md#english) includes both languages.
 
 The summary is deliberately below Mozilla's 250-character limit. The
 [AMO listing guidance](https://extensionworkshop.com/documentation/develop/create-an-appealing-listing/)
@@ -38,7 +38,7 @@ outside the list. Add a Direct rule for exceptions.
 - Set rules for one host or a domain and its subdomains.
 - Choose Anticensority, Antifilter, Antizapret or manual site rules.
 - For Anticensority or Antifilter, check for updates in the popup or let Firefox check the selected source every 12 hours. The source date and last successful check are shown separately.
-- Website resources: manually review hosts from one non-private tab and save selected browser-wide Proxy rules, without applying them. Capture stays in the open tool page only.
+- Open Website resources from the popup and start capture to review hosts requested by the current regular tab. Save selected hosts as browser-wide Proxy rules and apply them when ready. Results stay in the open tool.
 - Configure your own proxies and separately running local services.
 - Save settings, review changes, then Apply. Existing settings stay active until Apply.
 - Preview imported settings, export settings for transfer, or create a separate sanitized support report.
@@ -56,6 +56,8 @@ for the browser-wide proxy setting. Save changes, select Apply, then reload a
 site covered by the source or your rule. Check its mode in the popup and confirm
 that the page loads.
 
+With Antizapret selected and source routing enabled, Auto can route public hosts through your proxy even when they are outside the list. Use Direct rules for exceptions.
+
 Antifilter supplies an exact-host list, not proxy servers. It uses your selected
 Proxy connections only after explicit consent. Old or unknown source dates show
 a warning without switching routing off.
@@ -68,14 +70,12 @@ authorized route, Firefox can send the configured proxy credentials to that
 proxy. An HTTPS proxy protects the connection to the proxy with TLS. For a
 normally tunneled HTTPS site, the proxy sees the destination while the browser's
 TLS connection to the site protects page content. Source servers receive
-download requests and connection metadata such as IP address. A connection
-check contacts the site being checked. Settings exports omit credentials and
+download requests and connection metadata such as IP address. A user-requested connection check contacts the selected site and stops at redirects. Settings exports omit credentials and
 still include site rules and proxy addresses. Review support reports before sharing.
 
 Firefox reads Anticensority, Antifilter and supported Antizapret rules as data
 without executing downloaded PAC JavaScript. For Antizapret, the configured
-DNS resolver can receive a hostname when Firefox needs its IP address. The data is validated but has no author's
-cryptographic signature. Arbitrary/custom PAC sources are not supported here.
+DNS resolver can receive a hostname when Firefox needs its IP address. The extension validates source data without verifying an author's signature. Arbitrary/custom PAC sources are not supported here.
 The extension does not guarantee bypass, connectivity, anonymity or encryption
 and does not route other applications. SOCKS authentication depends on Firefox.
 
@@ -96,7 +96,7 @@ and does not route other applications. SOCKS authentication depends on Firefox.
 - Правила для одного хоста или домена с поддоменами.
 - На выбор — Anticensority, Antifilter, Antizapret или собственные правила без автоматического списка.
 - Если выбран Anticensority или Antifilter, Firefox проверяет обновления каждые 12 часов. Проверку также можно запустить из панели. Дата данных и время последней успешной проверки показаны отдельно.
-- «Ресурсы сайта»: ручной просмотр доменов одной обычной вкладки и сохранение выбранных правил «Прокси» для всего браузера без применения. Сбор остаётся только в открытом инструменте.
+- Откройте «Ресурсы сайта» в панели и запустите сбор. Просмотрите хосты текущей обычной вкладки и сохраните выбранные хосты как правила «Прокси» для всего браузера. Чтобы правила начали действовать, нажмите «Применить». Результаты сбора хранятся только в открытом инструменте.
 - Собственные прокси и подключение к отдельно запущенным локальным службам.
 - Сохранение, просмотр изменений и отдельное применение. До «Применить» действуют прежние настройки.
 - Перенос настроек с предварительным просмотром и отдельный очищенный отчёт для поддержки.
@@ -115,6 +115,8 @@ Tor Browser или Tor. Прокси-маршруты Anticensority исполь
 «Применить» и перезагрузите сайт из списка источника или своего правила.
 Проверьте режим сайта в панели расширения и убедитесь, что страница загружается.
 
+Если выбран Antizapret и включена маршрутизация по источнику, «Авто» может направлять через ваш прокси публичные сайты вне списка. Для исключений добавьте правила «Напрямую».
+
 Antifilter предоставляет список точных имён сайтов, без прокси-серверов. Он
 использует выбранные вами подключения для правил «Прокси» с явного разрешения.
 Предупреждение о старой или неизвестной дате базы не отключает маршрутизацию.
@@ -127,14 +129,13 @@ Antifilter предоставляет список точных имён сай�
 При обычном туннелировании HTTPS прокси видит адрес назначения, а соединение
 браузера с сайтом по TLS защищает содержимое страницы. Серверы источников
 получают запросы загрузки и данные подключения, например IP-адрес. Проверка
-соединения обращается к проверяемому сайту. Файл настроек содержит правила
+соединения запускается по запросу, обращается к проверяемому сайту и останавливается на перенаправлении. Файл настроек содержит правила
 сайтов и адреса прокси. Учётные данные из него исключены. Отчёт для поддержки
 нужно просмотреть перед отправкой.
 
 Firefox читает правила Anticensority, Antifilter и поддерживаемые файлы Antizapret
 как данные без исполнения скачанного PAC-кода. Когда для правила Antizapret нужен
-IP-адрес, Firefox может передать имя сайта настроенному DNS-резолверу. Данные проходят проверки, но не имеют
-криптографической подписи автора. Произвольные PAC-источники не поддерживаются.
+IP-адрес, Firefox может передать имя сайта настроенному DNS-резолверу. Расширение проверяет данные источника без проверки электронной подписи автора. Произвольные PAC-источники не поддерживаются.
 Расширение не гарантирует обход, доступность, анонимность или шифрование
 и не маршрутизирует другие приложения. Авторизация SOCKS зависит от Firefox.
 
