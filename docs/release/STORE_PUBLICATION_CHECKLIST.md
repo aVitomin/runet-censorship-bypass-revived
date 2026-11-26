@@ -12,9 +12,9 @@ separate maintainer authorization for those actions.
 
 Checked on 2026-11-26.
 
-- [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/runet-censorship-bypass-mv3/) offers Firefox **1.1.0**, Mozilla file **5283665**. The Mozilla-signed Firefox XPI is also available in [GitHub release 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0).
+- [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/runet-censorship-bypass-mv3/) offers Firefox **1.1.1**, Mozilla file **5308240**.
 - [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) serves Chromium **1.1.0** through the public update service.
-- [GitHub release 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1) offers the Chromium ZIP. Its SHA-256 matches the [trusted main run](https://github.com/aVitomin/runet-censorship-bypass-revived/actions/runs/45719637814).
+- [GitHub release 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1) offers the Chromium ZIP and the Mozilla-signed Firefox XPI. The Chromium ZIP matches the [trusted main run](https://github.com/aVitomin/runet-censorship-bypass-revived/actions/runs/45719637814). The XPI matches the Mozilla download by SHA-256.
 
 ## Previous channel status — 1.0.3
 

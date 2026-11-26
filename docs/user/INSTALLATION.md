@@ -1,7 +1,7 @@
 # Установка, обновление и удаление
 
-В магазинах доступна **1.1.0** для обоих браузеров. Для ручной установки
-скачайте **Chromium ZIP 1.1.1** или **подписанный Firefox XPI 1.1.0**.
+Firefox Add-ons предлагает **1.1.1**, а Chrome Web Store — **1.1.0**.
+Для ручной установки доступны **Chromium ZIP 1.1.1** и **подписанный Firefox XPI 1.1.1**.
 Версии в магазинах проверены 26 ноября 2026 года.
 
 ## Установить из магазина
@@ -9,7 +9,7 @@
 | Браузер | Версия | Где установить |
 | --- | --- | --- |
 | Chrome, Brave и совместимые Chromium-браузеры | **1.1.0** | [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) |
-| Firefox **140+** | **1.1.0** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
+| Firefox **140+** | **1.1.1** | [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) |
 
 1. Откройте магазин в нужном браузере, нажмите кнопку установки и подтвердите разрешения.
 2. Закрепите значок расширения на панели.
@@ -70,8 +70,8 @@ Get-FileHash .\runet-censorship-bypass-chromium-1.1.1-34f3f65.zip -Algorithm SHA
 
 ## Ручная установка Firefox: подписанный XPI
 
-1. Скачайте [подписанный Firefox XPI 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-firefox-1.1.0-signed.xpi).
-   SHA-256 указан ниже и в [описании релиза](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0).
+1. Скачайте [подписанный Firefox XPI 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-firefox-1.1.1-signed.xpi).
+   SHA-256 указан ниже и в [описании релиза](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1).
 2. Проверьте SHA-256. В Firefox откройте **Дополнения и темы → шестерёнка →
    Установить дополнение из файла**, выберите XPI и подтвердите установку.
 3. Разрешите расширению работу в приватных окнах и закрепите значок.
@@ -81,7 +81,7 @@ Get-FileHash .\runet-censorship-bypass-chromium-1.1.1-34f3f65.zip -Algorithm SHA
 SHA-256 XPI:
 
 ```text
-c784f03867a5106cc2f123894ac2637b3dd50f8adc7b49d12e620703b1c33baf
+0cc8ca9ed5aac43f34e77e6dcb6394e700e4e74d72fe54a9bafcbf573cc8d0d5
 ```
 
 В Windows выполните `Get-FileHash` с именем XPI и сравните результат с суммой выше. Для обычной установки используйте подписанный пакет.
@@ -150,7 +150,7 @@ Chromium-версии на магазинную могут создать отд
 
 ## English summary
 
-Install **Chromium 1.1.0** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.1.0** from
+Install **Chromium 1.1.0** from [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) or **Firefox 1.1.1** from
 [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/runet-censorship-bypass-mv3/). Firefox requires **140+** and private-window
 permission for browser-wide proxy control. Store installations receive approved
 updates through the browser when automatic updates are enabled.
@@ -159,7 +159,7 @@ In Chrome, default access works for ordinary tabs. Turn on **Allow in Incognito*
 to open the extension panel in a private window. File URL access is separate.
 You can leave it off when browsing websites or choosing a PAC file through the importer.
 
-The [manual Chromium ZIP 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-chromium-1.1.1-34f3f65.zip) and [Mozilla-signed Firefox XPI 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.0/runet-censorship-bypass-firefox-1.1.0-signed.xpi) are available on GitHub. The manifests target desktop **Chromium 108+** and **Firefox 140+**,
+The [manual Chromium ZIP 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-chromium-1.1.1-34f3f65.zip) and [Mozilla-signed Firefox XPI 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/download/v1.1.1/runet-censorship-bypass-firefox-1.1.1-signed.xpi) are available on GitHub. The manifests target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR releases on a compatible base. These are API-based compatibility
 estimates, not test results for every version or fork. Required MV3 and proxy
 extension APIs must be available; mobile browsers and WebView are outside this scope.

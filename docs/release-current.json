@@ -8,15 +8,15 @@
   "zipFilename": "runet-censorship-bypass-chromium-1.1.1-34f3f65.zip",
   "zipSize": 1398273,
   "zipSha256": "9fa70108c0764452e74a81f442bda85ef1ce488ffa169a10a67ad2d778726317",
-  "firefoxVersionName": "1.1.0",
-  "firefoxTag": "v1.1.0",
-  "firefoxReleaseUrl": "https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0",
-  "firefoxXpiFilename": "runet-censorship-bypass-firefox-1.1.0-signed.xpi",
-  "firefoxXpiSize": 3884846,
-  "firefoxXpiSha256": "c784f03867a5106cc2f123894ac2637b3dd50f8adc7b49d12e620703b1c33baf",
+  "firefoxVersionName": "1.1.1",
+  "firefoxTag": "v1.1.1",
+  "firefoxReleaseUrl": "https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1",
+  "firefoxXpiFilename": "runet-censorship-bypass-firefox-1.1.1-signed.xpi",
+  "firefoxXpiSize": 3886211,
+  "firefoxXpiSha256": "0cc8ca9ed5aac43f34e77e6dcb6394e700e4e74d72fe54a9bafcbf573cc8d0d5",
   "chromeWebStoreUrl": "https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph",
   "firefoxAddonsUrl": "https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/",
   "storeAvailabilityCheckedAt": "2026-11-26",
   "chromeWebStoreVersion": "1.1.0",
-  "firefoxAddonsVersion": "1.1.0"
+  "firefoxAddonsVersion": "1.1.1"
 }
