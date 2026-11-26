@@ -10,8 +10,9 @@
   **Antizapret**, если сервис доступен на вашем подключении. При включённых
   прокси источника подходящие сайты могут открываться через прокси Antizapret.
 - **Firefox.** Разрешите работу расширения в приватных окнах. Для
-  прокси-маршрутов **Anticensority** запустите совместимую локальную службу,
-  например Tor Browser или Tor.
+  **Antizapret** загрузите правила или импортируйте сохранённый PAC и настройте
+  свой прокси. Для прокси-маршрутов **Anticensority** запустите совместимую
+  службу, например Tor Browser или Tor. [Подробные шаги](docs/user/GUIDE.md#firefox).
 - **В обоих браузерах.** Для **Antifilter** или собственного правила **Прокси**
   включите своё подключение. Для Antifilter разрешите использовать это
   подключение для сайтов из списка. В Firefox также загрузите список.
@@ -110,9 +111,10 @@
 - **Chromium.** Open **Routing source** in Options and choose **Antizapret** if
   its service is available on your connection. With source proxies enabled,
   matching sites can use Antizapret proxies.
-- **Firefox.** Allow the extension to run in private windows. For
-  **Anticensority** proxy routes, run a compatible local service such as
-  Tor Browser or Tor.
+- **Firefox.** Allow the extension to run in private windows. For **Antizapret**,
+  download rules or import a saved PAC and configure your own proxy. For
+  **Anticensority** proxy routes, run a compatible local service such as Tor
+  Browser or Tor. [Step-by-step setup](docs/user/GUIDE.md#english-summary).
 - **Both browsers.** Enable your own connection for **Antifilter** or for an
   explicit **Proxy** rule. For Antifilter, also allow use of that connection for
   listed sites. In Firefox, download the list as well. Save changes and select

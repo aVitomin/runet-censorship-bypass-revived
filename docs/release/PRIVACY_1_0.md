@@ -1,43 +1,63 @@
-# Privacy notice
+# Политика приватности
 
-## Version 1.1.0
+[English](#english)
 
-При скачивании правил Antizapret сервер источника получает
-IP-адрес соединения. Если выбрать сохранённый PAC-файл, расширение прочитает
-его на устройстве. В Firefox кнопка «Проверить источник» для Antizapret проверяет
-локальную копию. В режиме Antizapret Firefox может передать имя сайта
-настроенному DNS-резолверу. В Chromium онлайн-источник Antizapret может использовать прокси провайдера.
-Для импортированного файла публичные домены идут через настроенные прокси,
-кроме явных правил «Напрямую». Прокси получает адрес назначения для запросов,
-которые браузер направляет через него. Отчёт для поддержки сохраняется
-локально. Вы сами решаете, отправлять ли его.
+Политика относится к настольному расширению Runet Censorship Bypass — Revived
+для Chromium и Firefox. [Какая версия доступна](../user/INSTALLATION.md).
 
-The following details supplement the notice below for desktop version 1.1.0.
+## Данные в браузере
 
-- Downloading Antizapret rules contacts the configured source. The
-  official PAC address is `https://p.thenewone.lol:8443/proxy.pac`.
-  As with other downloads, the server can see the connection's IP address.
-  Choosing a saved Antizapret PAC file reads it on your device. In Firefox,
-  **Check source** checks the local Antizapret rules.
-- Firefox can use its DNS resolver for hostnames it needs to look up in
-  Antizapret mode. The resolver can receive the hostname. Firefox uses your
-  configured proxy for protected traffic. Chromium's online Antizapret source can use the provider's
-  proxies. Chromium's imported Antizapret source uses configured proxies for
-  public hostnames unless an explicit Direct rule applies. A proxy receives the destination of requests sent through it.
-- The support report is a separate local export. It contains diagnostic
-  categories and settings summaries. Sharing the file is a separate action.
+Правила сайтов, адреса прокси, учётные данные, настройки и данные маршрутизации
+хранятся в профиле браузера. Расширение использует имя сайта и сведения о сетевых
+запросах для выбора маршрута и авторизации на прокси. У разработчика нет
+телеметрии, рекламы или облачной синхронизации. Хранилище браузера доступно тем,
+у кого есть доступ к профилю.
 
-## Archived notice for version 1.0.2
+При запуске «Ресурсов сайта» инструмент временно собирает имена хостов, типы
+ресурсов и количество запросов одной обычной вкладки. Результат хранится в
+открытом инструменте. Если вы сохраните выбранные хосты как правила, они
+попадут в настройки. [Подробнее о сборе](#optional-website-resource-helper).
 
-For Runet Censorship Bypass in
-[aVitomin/runet-censorship-bypass-revived](https://github.com/aVitomin/runet-censorship-bypass-revived).
-Effective date: 3 November 2026. Applies to version `1.0.2` for desktop Chromium
-and Firefox. This notice does not announce store availability; see
-[installation and channel status](../user/INSTALLATION.md).
-For versions 1.0.0 and 1.0.1, see the [previous notice](PRIVACY_1_0_1.md).
-The [earlier-release notice](../user/PRIVACY_AND_SECURITY.md) remains separate.
+## Сетевые запросы
 
-## Data used in your browser
+- Выбранный прокси получает адрес назначения и ту часть трафика, которую
+  раскрывает его протокол. При запросе авторизации браузер может передать
+  учётные данные подходящему прокси. При обычном HTTPS-туннелировании TLS
+  между браузером и сайтом защищает содержимое страницы.
+- Сервер источника получает запрос загрузки и видимый ему IP-адрес. Для импорта
+  сохранённого PAC расширение читает файл на устройстве. В Firefox команда
+  «Проверить источник» для Antizapret проверяет локальную копию.
+- Если Firefox нужен IP-адрес для правила Antizapret, настроенный DNS-резолвер
+  может получить имя сайта. В Chromium онлайн-источник Antizapret может
+  использовать прокси провайдера. Импортированный файл использует ваши прокси
+  при включённой маршрутизации по этому источнику. Для исключений укажите
+  «Напрямую».
+- Firefox проверяет подключение по запросу и останавливается на перенаправлении.
+  Chromium может выполнять повторные проверки и обращаться к адресам
+  перенаправления. [Подробности сетевых запросов](#data-that-leaves-the-browser).
+
+## Настройки и отчёт для поддержки
+
+Файл настроек содержит правила сайтов и адреса прокси. Храните его у себя.
+Для обращения в поддержку выберите «Экспорт для поддержки» и проверьте файл
+перед отправкой. Отчёт содержит сведения о браузере и краткую диагностику
+сохранённых и применённых настроек. В нём нет адресов прокси, правил сайтов,
+паролей и истории посещений. Экспорт сохраняет файл на устройстве.
+
+Firefox требует доступа к приватным окнам, поскольку настройка прокси действует
+на весь браузер. В декларации Firefox указаны данные аутентификации и сведения о
+посещаемых адресах, необходимые для маршрутизации. Данные используются для
+описанных функций и не продаются. [Разрешения](PERMISSIONS_AND_PRIVACY.md) ·
+[Помощь и контакты](../../SUPPORT.md).
+
+## English
+
+This notice covers desktop Chromium and Firefox editions of Runet Censorship
+Bypass — Revived. For the current downloads, see [Installation](../user/INSTALLATION.md#english-summary).
+Earlier notices are available for [1.0.2](https://github.com/aVitomin/runet-censorship-bypass-revived/blob/v1.0.2/docs/release/PRIVACY_1_0.md),
+[1.0.0 and 1.0.1](PRIVACY_1_0_1.md), and [the legacy Firefox edition](../user/PRIVACY_AND_SECURITY.md).
+
+### Data used in your browser
 
 The extension uses the current site's hostname and network-request metadata to
 select routes and handle proxy authentication. Browser APIs can provide request
@@ -55,7 +75,7 @@ uploaded to a developer service. Storage is local, not an encrypted password
 vault or cloud synchronization service. People/software with access to your
 browser profile may be able to access it.
 
-## Optional website resource helper
+### Optional website resource helper
 
 Opening the helper does not start capture. After an explicit Start, this open
 extension page observes requests from one selected non-private tab for up to
@@ -73,7 +93,7 @@ Saving explicitly selected hosts adds normal browser-wide Saved Proxy rules;
 those chosen rules then follow ordinary local storage/export behavior below.
 Existing Direct rules remain unchanged. Saving does not apply or enable routing.
 
-## Data that leaves the browser
+### Data that leaves the browser
 
 - **Ordinary routed traffic:** a destination website and network services see
   the connection in the usual way. When a proxy is selected, it receives the
@@ -90,6 +110,14 @@ Existing Direct rules remain unchanged. Saving does not apply or enable routing.
   supported; universal SOCKS authentication is not promised. The transport
   chosen for a proxy determines its exposure; local storage is not a promise
   that transmission to an HTTP proxy is encrypted.
+- **Antizapret:** downloading rules contacts the source server, which receives
+  the connection's visible IP address. Import reads the selected PAC file on
+  the device. In Firefox, **Check source** checks the local Antizapret copy.
+  Firefox can use its configured DNS resolver when a rule requires a hostname
+  lookup. The resolver can receive that hostname. Chromium can use the proxies
+  of the online Antizapret source. With an imported PAC and source routing
+  enabled, applicable public hosts use a configured proxy. An explicit Direct
+  rule provides an exception.
 - **Chromium routing sources:** selected built-in or user-configured PAC
   sources are fetched manually and through scheduled refresh/retry paths.
   The server receives the source URL and ordinary connection/request metadata,
@@ -144,7 +172,7 @@ Existing Direct rules remain unchanged. Saving does not apply or enable routing.
   open GitHub support links or attach a file, GitHub and recipients handle the
   information you choose to send under their own services' policies.
 
-## Import and export
+### Import and export
 
 Export settings contains portable Saved configuration, including site rules,
 scope and proxy addresses. It excludes unsaved drafts, usernames, passwords,
@@ -171,11 +199,11 @@ identifiers. It cannot be imported as settings. Inspect the file and your
 accompanying message before sharing; sanitization does not make your own text
 or screenshots safe automatically.
 
-## Permissions and private windows
+### Permissions and private windows
 
 Broad host/network access is used for routing and proxy authentication, not for
 advertising or harvesting page contents. Details are in the
-[permission audit](PERMISSIONS_AND_PRIVACY_1_0.md).
+[permission audit](PERMISSIONS_AND_PRIVACY.md).
 Firefox declares `authenticationInfo` and `browsingActivity` because proxy
 authentication and destinations can be transmitted as part of routing.
 “No developer telemetry” must not be represented as “no data handled.”
@@ -186,7 +214,7 @@ If permission is revoked, routing may be blocked until you turn the extension's
 proxy control off or restore access. Restricted-site access is separate, and
 privileged browser pages are outside ordinary site routing.
 
-## Limited use of user data
+### Limited use of user data
 
 In line with the Limited Use requirements of the
 [Chrome Web Store User Data Policy](https://developer.chrome.com/docs/webstore/program-policies/limited-use),
@@ -206,7 +234,7 @@ covers network-request lifecycle/error metadata used for authentication and
 connection handling. The last category does not mean tracking mouse movement,
 keystrokes or page interaction. Local processing is included in these disclosures.
 
-## Retention, controls and limitations
+### Retention, controls and limitations
 
 Edit or remove saved settings and Apply when you want active routing to change.
 Turning routing off releases the extension's proxy setting; it does not erase
@@ -222,7 +250,7 @@ fallback has a possible collision with a local service; it is not protection
 against compromised local software. Data availability and an active status
 do not verify a proxy connection.
 
-## Contact
+### Contact
 
 Ordinary questions: [support forms](https://github.com/aVitomin/runet-censorship-bypass-revived/issues/new/choose).
 Possible vulnerabilities: follow the

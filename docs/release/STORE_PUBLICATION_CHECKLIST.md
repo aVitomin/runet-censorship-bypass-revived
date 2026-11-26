@@ -6,16 +6,15 @@ the other channels. This document grants no permission to bump
 versions, sign, tag, create releases, upload or submit store packages. Obtain
 separate maintainer authorization for those actions.
 
-The [release record](../development/releases/1.0.3.md) binds source, trusted-main
-CI and canonical artifacts. Publication status remains independent per channel.
+[Release metadata](../release-current.json) records the latest verified public download for each browser and the current store versions.
 
 ## Current channel status
 
-Checked on 2026-11-21.
+Checked on 2026-11-26.
 
-- [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/) offers Firefox **1.1.0**, Mozilla file **5283665**. Windows Firefox 159.0.1 passed a signature-enforced update from 1.0.3 and restart with routing settings preserved.
-- [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) offers Chromium **1.1.0**. The public Chrome update service returned 1.1.0 for the existing extension ID.
-- [GitHub Release v1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0) offers the Chromium ZIP and signed Firefox XPI. Both downloads were verified against their SHA-256 values.
+- [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/runet-censorship-bypass-mv3/) offers Firefox **1.1.0**, Mozilla file **5283665**. The Mozilla-signed Firefox XPI is also available in [GitHub release 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0).
+- [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) serves Chromium **1.1.0** through the public update service.
+- [GitHub release 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1) offers the Chromium ZIP. Its SHA-256 matches the [trusted main run](https://github.com/aVitomin/runet-censorship-bypass-revived/actions/runs/45719637814).
 
 ## Previous channel status — 1.0.3
 
@@ -57,8 +56,8 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
   listings or claiming a verified homepage domain the publisher does not own.
 - [ ] Verify [screenshots and provenance](../assets/store/README.md) against the
   final package: truthful state, readable text, correct dimensions, no private
-  data. The [current gallery](../assets/releases/1.0.2/README.md) contains five
-  Options views per browser and locale. If a popup screenshot is used, distinguish
+  data. The [1.1.1 gallery](../assets/releases/1.1.1/README.md#english) contains the site
+  panel and four settings views per browser and language. If a popup screenshot is used, distinguish
   a native browser popup from a standalone page; check browser-supplied labels.
 - [ ] Repeat reviewer/browser QA on the exact candidate: clean off, private
   access, modes/scope, Save/Apply, pending categories, imports, auth, recovery,
@@ -109,9 +108,10 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
 
 ## Chrome Web Store — parallel channel
 
-- [ ] First resolve the [PAC/remote-code policy review](CHROME_REVIEWER_NOTES_1_0.md#pac-disclosure-and-publication-hold)
-  and data-transport review for the new candidate. If unresolved, keep that update unpublished;
-  do not make an unsupported remote-code/secure-transmission certification.
+- [ ] Review the current package’s PAC and proxy transport disclosures. The
+  [historical 1.0 reviewer notes](CHROME_REVIEWER_NOTES_1_0.md#pac-disclosure-and-publication-hold)
+  explain where Chromium evaluates downloaded PAC. Record any reviewer decision
+  against the exact submitted package.
 - [ ] Use the authorized publisher account and correct extension identity.
   Upload the canonical Chromium ZIP with its manifest at archive root; record
   the exact artifact and checksum. Do not upload the source tree.
@@ -124,8 +124,8 @@ unchecked boxes are not a claim that the confirmed submissions did not occur.
 - [ ] Upload the reviewed store icon, five 1280x800 screenshots and 440x280
   promotional tile; verify current
   [image requirements](https://developer.chrome.com/docs/webstore/images).
-- [ ] Provide [reviewer notes](CHROME_REVIEWER_NOTES_1_0.md), then submit only
-  with authorization. Review results and smoke-test the accepted store package.
+- [ ] Provide reviewer notes for the current package with its checksum, PAC disclosures
+  and reproducible tests. Submit with authorization. Review results and smoke-test the accepted store package.
   Record the actual listing URL; do not invent one or link to a legacy package.
 
 ## After approval and authorized publication

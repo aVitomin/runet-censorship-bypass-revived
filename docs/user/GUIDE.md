@@ -115,7 +115,10 @@ Revived применяются только при включении маршр
 настроенного подключения, **Напрямую** открывает сайт в обход прокси расширения.
 Выберите область правила — один хост или домен с поддоменами. Примените правило
 и перезагрузите сайт. Если панель сообщает о других сохранённых изменениях,
-проверьте их перед применением.
+проверьте их перед применением. В версии 1.1.1, если нужное правило уже сохранено в настройках,
+оставьте переключатель режима в панели как есть и нажмите **Применить все
+сохранённые изменения**. Панель применит сохранённое правило вместе с остальными
+сохранёнными правками.
 
 ### Обновить данные маршрутизации
 
@@ -128,7 +131,7 @@ Revived применяются только при включении маршр
 
 В панели обычной вкладки откройте **Ресурсы сайта**, начните сбор и
 перезагрузите исходную вкладку. Воспроизведите проблему и остановите сбор.
-Выберите только нужные домены. Сохранённые правила для выбранных хостов
+Выберите хосты, которые нужно направлять через прокси. Сохранённые правила для выбранных хостов
 действуют во всём браузере после применения. Для медленных страниц есть
 [проверка в трёх режимах](../../SUPPORT.md#slow-pages).
 
@@ -250,8 +253,9 @@ developer telemetry or cloud synchronization.
 
 Open the toolbar popup on a regular website. Check the hostname, then select
 **Auto**, **Proxy** or **Direct** and the host or domain scope. Proxy needs
-an enabled connection. Review any other saved changes before applying. Reload
-the site to test the result.
+an enabled connection. Review any other saved changes before applying. In
+1.1.1, if you saved the site rule in Settings, leave the mode selector as it is
+and select **Apply all saved changes**. Reload the site to test the result.
 
 Use the popup details or **Maintenance** for routing data. The source date
 and the last successful check describe different events. To investigate a

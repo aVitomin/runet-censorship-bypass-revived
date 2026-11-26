@@ -13,7 +13,7 @@ remaining listing work belong in the [store checklist](STORE_PUBLICATION_CHECKLI
 | [1.0 feature inventory](FEATURE_INVENTORY_1_0.md) | Claims mapped to implementation/evidence |
 | [Permissions and privacy](PERMISSIONS_AND_PRIVACY.md) | Store-form justifications |
 | [Privacy policy](PRIVACY.md) | Current policy and previous edition |
-| [1.0.2 screenshots](../assets/releases/1.0.2/README.md) | Versioned images and provenance |
+| [1.1.1 screenshots](../assets/releases/1.1.1/README.md#english) | Versioned images and provenance |
 | [Link audit](LINK_AUDIT_1_0.md) | Dated URL checks |
 
 Repository listing drafts do not prove that store text was submitted or published.

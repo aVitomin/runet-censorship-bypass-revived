@@ -2,7 +2,7 @@
 
 ## Expected minimums
 
-The 1.1.0 manifests target desktop **Chromium 108+** and **Firefox 140+**,
+The 1.1.1 manifests target desktop **Chromium 108+** and **Firefox 140+**,
 including ESR on a compatible base, provided the required extension APIs exist.
 These are source/API-based minimums, not tests of every version, OS or fork.
 
@@ -56,8 +56,9 @@ require Firefox 154 or Chromium 156 specifically:
 | 1.0.3 Chromium ZIP | Windows Chrome 156.0.8078.80 | Routing/auth/restart/ownership smoke; unpacked 1.0.2 → 1.0.3 update with OFF, Effective and pending Saved preserved |
 | Signed Firefox 1.0.2 → temporary unsigned 1.0.3 | Windows Firefox 159.0 | OFF, Effective and pending Saved preserved; candidate reinstalled after restart, not a permanent signed update |
 | Signed Firefox 1.0.2 → 1.0.3 | Windows Firefox 159.0.1 | Signature-enforced permanent update/restart without reinstall; OFF, Effective and pending Saved preserved |
-
 | Signed Firefox 1.0.3 → 1.1.0 | Windows Firefox 159.0.1 | Permanent signature-enforced update and restart. OFF, applied and pending settings persisted. |
+| Unpacked Chromium 1.1.0 → 1.1.1 | Windows Chrome 158.0.8127.37 | OFF, applied and pending settings persisted across restart. |
+| Signed Firefox 1.1.0 → temporary unsigned 1.1.1 | Windows Firefox 159.0.1 | OFF, applied and pending settings persisted after restart and temporary reinstallation. |
 
 These records do not prove store automatic delivery or comprehensive routing/UI
 coverage. Chromium 108 and Firefox 140 were not individually launched; Linux

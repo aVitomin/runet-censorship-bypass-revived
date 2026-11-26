@@ -1,6 +1,6 @@
 # Manifest permissions and privacy
 
-This inventory covers desktop Chromium and Firefox 1.1.0. Chromium declares
+This inventory covers the current desktop Chromium and Firefox manifests. Chromium declares
 `minimum_chrome_version: "108"`. Firefox declares `strict_min_version: "140.0"`.
 Compare the tables with both packaged manifests when preparing a candidate.
 [Chromium manifest template](../../extension/src/chromium/manifest.tmpl.json) ·

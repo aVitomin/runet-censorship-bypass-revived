@@ -3,16 +3,16 @@
 ## Пользователям
 
 - [Скачать и установить](user/INSTALLATION.md)
-- [Изменения в 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0)
-- [Руководство пользователя](user/GUIDE.md): Antifilter, ресурсы сайта и обновление базы
+- [Изменения в 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1)
+- [Руководство пользователя](user/GUIDE.md) — первый запуск, прокси и правила сайтов
 - [Помощь и сообщения об ошибках](../SUPPORT.md)
 - [Поддержать проект](../DONATE.md)
 - [Политика приватности](release/PRIVACY.md)
-- [Снимки интерфейса 1.0.2](assets/releases/1.0.2/README.md)
+- [Снимки интерфейса 1.1.1](assets/releases/1.1.1/README.md)
 
-**Версия 1.1.0** доступна в [Chrome Web Store](https://chromewebstore.google.com/detail/poohkdbmgajmcifcaijdjgiihghlgbph) и [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/runet-censorship-bypass-mv3/).
-Для ручной установки доступны
-**Chromium ZIP 1.1.0** и **подписанный Firefox XPI 1.1.0**.
+В магазинах доступна **1.1.0** для обоих браузеров. Для ручной установки
+скачайте **Chromium ZIP 1.1.1** или **подписанный Firefox XPI 1.1.0**. [Все варианты установки](user/INSTALLATION.md).
+
 Для старого Firefox **0.0.4.0** сохранены отдельные [руководство](user/USER_GUIDE.md),
 [решение проблем](user/TROUBLESHOOTING.md) и [приватность](user/PRIVACY_AND_SECURITY.md).
 
@@ -40,6 +40,6 @@ material. They do not replace the current installation and development guides.
 Start with [installation](user/INSTALLATION.md#english-summary),
 [the user guide](user/GUIDE.md#english-summary), or [help and bug reports](../SUPPORT.md#english).
 Version **1.1.0** is available in Chrome Web Store and Firefox Add-ons.
-Chromium ZIP and signed Firefox XPI **1.1.0** are available for manual installation.
-[Changes in 1.1.0](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.0). For development, use the separate
+Chromium ZIP **1.1.1** and the signed Firefox XPI **1.1.0** are available for manual installation.
+[Screenshots](assets/releases/1.1.1/README.md#english) · [Changes in 1.1.1](https://github.com/aVitomin/runet-censorship-bypass-revived/releases/tag/v1.1.1). For development, use the separate
 guides above. Older Firefox **0.0.4.0** has its own documentation.
